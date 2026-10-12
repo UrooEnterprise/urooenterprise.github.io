@@ -92,7 +92,7 @@ const translations = {
         customNotice: "✨ कस्टमायझेशन उपलब्ध! मनगटाचा विशिष्ट आकार किंवा दगडांचे मिश्रण हवे आहे का?",
         chatCustom: "कस्टमायझेशनसाठी चॅट करा",
         youMightLike: "तुम्हाला हे देखील आवडेल",
-        footerText: "मीशो और अमेझॉनवर अधिकृत विक्रेता",
+        footerText: "मीशो आणि अमेझॉनवर अधिकृत विक्रेता",
         rights: "© 2026 उरू एंटरप्राइज. सर्व हक्क राखीव.",
         naturalDisclaimer: "नैसर्गिक दगडांच्या पोत आणि रंगात फरक असू शकतो."
     },
@@ -522,5 +522,23 @@ function handleSearch(query, pushHistory = true) {
     appContainer.innerHTML = html;
 }
 
-history.replaceState({ view: 'home', param: null }, '', '');
-showHome(false);
+// Check URL parameters for direct Instagram Ad deep-linking
+function checkUrlParameters() {
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get('product');
+    const categoryId = params.get('category');
+
+    if (productId) {
+        history.replaceState({ view: 'product', param: parseInt(productId) }, '', '');
+        showProductDetail(parseInt(productId), false);
+    } else if (categoryId) {
+        history.replaceState({ view: 'category', param: categoryId }, '', '');
+        showCategory(categoryId, false);
+    } else {
+        history.replaceState({ view: 'home', param: null }, '', '');
+        showHome(false);
+    }
+}
+
+// Initialize on load
+checkUrlParameters();
