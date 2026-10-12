@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uroo Enterprise - Crystals, Vastu & Spiritual Store</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts for professional look -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Language Selector Bar for 5 Languages -->
+    <div class="language-bar">
+        <span>🌐 Lang:</span>
+        <button id="lang-en" class="lang-btn active" onclick="changeLanguage('en')">English</button>
+        <button id="lang-hi" class="lang-btn" onclick="changeLanguage('hi')">हिंदी</button>
+        <button id="lang-mr" class="lang-btn" onclick="changeLanguage('mr')">मराठी</button>
+        <button id="lang-te" class="lang-btn" onclick="changeLanguage('te')">తెలుగు</button>
+        <button id="lang-ta" class="lang-btn" onclick="changeLanguage('ta')">தமிழ்</button>
+    </div>
+
+    <!-- Top Disclaimer Ticker -->
+    <div class="disclaimer-ticker">
+        <marquee behavior="scroll" direction="left" scrollamount="5">
+            ⚠️ Note: Images are for illustration purposes only. Actual color or size may vary slightly due to natural gemstone properties.
+        </marquee>
+    </div>
+
+    <!-- Header / Navbar with Quick WhatsApp Button -->
+    <header class="main-header">
+        <div class="header-top-row">
+            <div class="logo-container" onclick="navigateTo('home')">
+                <h1>Uroo Enterprise</h1>
+                <p>Certified Crystals & Vastu</p>
+            </div>
+            <a href="https://wa.me/919016406623?text=Hello%20Uroo%20Enterprise,%20I%20have%20an%20inquiry%20regarding%20your%20products." target="_blank" class="top-wa-btn">
+                <i class="fa-brands fa-whatsapp" style="font-size:14px;"></i> Chat Now
+            </a>
+        </div>
+        <div class="header-search">
+            <input type="text" id="searchInput" placeholder="Search bracelets, rashi, pyrite..." oninput="handleSearchInput(event)">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+    </header>
+
+    <!-- Main Content App Wrapper -->
+    <main id="app-container">
+        <!-- Dynamic content injected via JavaScript -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer" style="padding: 20px 16px; text-align: center; font-size: 11px; color: #666; background: #fff; margin-top: 30px; border-top: 1px solid #eee;">
+        <p style="font-weight:600; color:#4a154b; font-size:13px; margin-bottom:6px;">Uroo Enterprise</p>
+        <p>Official Marketplace Seller on Meesho & Amazon</p>
+        <p style="margin-top: 8px;">&copy; 2026 Uroo Enterprise. All rights reserved.</p>
+    </footer>
+
+    <script src="products.js"></script>
+</body>
+</html>
