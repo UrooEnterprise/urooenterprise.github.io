@@ -92,7 +92,7 @@ const translations = {
         customNotice: "✨ कस्टमायझेशन उपलब्ध! मनगटाचा विशिष्ट आकार किंवा दगडांचे मिश्रण हवे आहे का?",
         chatCustom: "कस्टमायझेशनसाठी चॅट करा",
         youMightLike: "तुम्हाला हे देखील आवडेल",
-        footerText: "मीशो आणि अमेझॉनवर अधिकृत विक्रेता",
+        footerText: "मीशो और अमेझॉनवर अधिकृत विक्रेता",
         rights: "© 2026 उरू एंटरप्राइज. सर्व हक्क राखीव.",
         naturalDisclaimer: "नैसर्गिक दगडांच्या पोत आणि रंगात फरक असू शकतो."
     },
@@ -176,7 +176,8 @@ const products = [
         originalPrice: 799,
         customizable: true,
         images: [
-            'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600'
+            'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600',
+            'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600'
         ],
         description: {
             en: 'Natural Citrine crystal bracelet known as the Merchant Stone for attracting financial success, business growth, and positive energy.',
@@ -231,7 +232,8 @@ const products = [
         originalPrice: 1299,
         customizable: false,
         images: [
-            'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600'
+            'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600',
+            'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=600'
         ],
         description: {
             en: 'Powerful Vastu remedy featuring running horses and original Pyrite stones to accelerate career progress, wealth flow, and positive energy.',
@@ -258,7 +260,8 @@ const products = [
         originalPrice: 599,
         customizable: false,
         images: [
-            'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600'
+            'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600',
+            'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=600'
         ],
         description: {
             en: 'Stylish heart-shaped evil eye pendant on a durable golden finish chain, combining daily fashion with powerful protective symbolism.',
@@ -280,7 +283,6 @@ function changeLanguage(lang) {
     renderCurrentState();
 }
 
-// Handle Browser Back Button smoothly
 window.addEventListener('popstate', (event) => {
     renderCurrentState();
 });
@@ -333,7 +335,7 @@ function showHome(pushHistory = true) {
 
     html += `</div><div class="section-title">${t.featuredColl}</div><div class="product-grid">`;
 
-    products.slice(0, 4).forEach(p => {
+    products.forEach(p => {
         html += createProductCardHTML(p);
     });
 
@@ -366,4 +368,159 @@ function showCategory(catId, pushHistory = true) {
         history.pushState({ view: 'category', param: catId }, '', '');
     }
     const cat = categories.find(c => c.id === catId);
-    const catProducts = products.filter(p => p.categor
+    const catProducts = products.filter(p => p.category === catId);
+    const t = translations[currentLang];
+
+    let html = `
+        <div class="section-title" style="margin-top:16px;">${cat ? cat.name[currentLang] : 'Products'} (${catProducts.length})</div>
+        <div class="product-grid">
+    `;
+
+    if(catProducts.length === 0) {
+        html += `<p style="padding:16px; font-size:13px;">No products added in this category yet. Check back soon or chat on WhatsApp!</p>`;
+    } else {
+        catProducts.forEach(p => {
+            html += createProductCardHTML(p);
+        });
+    }
+
+    html += `</div>`;
+    appContainer.innerHTML = html;
+    window.scrollTo(0, 0);
+}
+
+function createProductCardHTML(p) {
+    const t = translations[currentLang];
+    return `
+        <div class="product-card" onclick="navigateTo('product', ${p.id})">
+            ${p.customizable ? `<span class="customization-badge">${t.customizableBadge}</span>` : ''}
+            <img src="${p.images[0]}" alt="${p.name[currentLang]}">
+            <div class="product-info">
+                <div class="product-name">${p.name[currentLang]}</div>
+                <div>
+                    <span class="product-price">Rs. ${p.price}</span>
+                    <span class="product-original-price">Rs. ${p.originalPrice}</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function showProductDetail(productId, pushHistory = true) {
+    if (pushHistory) {
+        history.pushState({ view: 'product', param: productId }, '', '');
+    }
+    const p = products.find(item => item.id === productId);
+    if (!p) return;
+    const t = translations[currentLang];
+
+    let thumbHTML = '';
+    p.images.forEach((img, idx) => {
+        thumbHTML += `<img src="${img}" class="thumb-img ${idx === 0 ? 'active' : ''}" onclick="changeMainImage(this, '${img}')">`;
+    });
+
+    let recommendedHTML = '';
+    const related = products.filter(item => item.id !== productId).slice(0, 3);
+    related.forEach(rel => {
+        recommendedHTML += createProductCardHTML(rel);
+    });
+
+    let customizationBoxHTML = '';
+    if (p.customizable) {
+        const customMsg = encodeURIComponent(`Hello Uroo Enterprise, I want custom wrist size / stone combination for: ${p.name.en}`);
+        customizationBoxHTML = `
+            <div class="custom-notice-box">
+                <p>${t.customNotice}</p>
+                <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${customMsg}" target="_blank" class="btn-custom-wa">
+                    <i class="fa-brands fa-whatsapp"></i> ${t.chatCustom}
+                </a>
+            </div>
+        `;
+    }
+
+    let html = `
+        <div class="detail-container">
+            <div class="image-gallery">
+                <img src="${p.images[0]}" id="mainImageDisplay" class="main-img-view" alt="${p.name[currentLang]}">
+            </div>
+            <div class="thumbnail-strip">
+                ${thumbHTML}
+            </div>
+            <div class="detail-content">
+                <h2 class="detail-title">${p.name[currentLang]}</h2>
+                <div class="detail-price-box">
+                    <span class="detail-price">Rs. ${p.price}</span>
+                    <span class="product-original-price" style="font-size:14px;">Rs. ${p.originalPrice}</span>
+                </div>
+
+                ${customizationBoxHTML}
+
+                <div class="detail-desc">
+                    <p>${p.description[currentLang]}</p>
+                </div>
+                
+                <div class="legal-disclaimer">
+                    ⚠️ <strong>Disclaimer:</strong> ${t.ticker}
+                </div>
+
+                <div class="recommendations-section">
+                    <h3>${t.youMightLike}</h3>
+                    <div class="product-grid" style="padding:0;">
+                        ${recommendedHTML}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fixed Bottom Buying Buttons -->
+            <div class="action-bar">
+                <a href="${p.meeshoLink}" target="_blank" class="btn-meesho"><i class="fa-solid fa-bag-shopping"></i> ${t.viewOnMeesho}</a>
+                <a href="${p.amazonLink}" target="_blank" class="btn-amazon"><i class="fa-brands fa-amazon"></i> ${t.viewOnAmazon}</a>
+                <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(p.whatsappMessage)}" target="_blank" class="btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> ${t.chatWhatsApp}</a>
+            </div>
+        </div>
+    `;
+
+    appContainer.innerHTML = html;
+    window.scrollTo(0, 0);
+}
+
+function changeMainImage(element, src) {
+    document.getElementById('mainImageDisplay').src = src;
+    document.querySelectorAll('.thumb-img').forEach(img => img.classList.remove('active'));
+    element.classList.add('active');
+}
+
+function handleSearchInput(event) {
+    const query = event.target.value.toLowerCase().trim();
+    if(query === '') {
+        showHome(true);
+        return;
+    }
+    navigateTo('search', query);
+}
+
+function handleSearch(query, pushHistory = true) {
+    if (pushHistory) {
+        history.pushState({ view: 'search', param: query }, '', '');
+    }
+    const filtered = products.filter(p => p.name[currentLang].toLowerCase().includes(query) || p.description[currentLang].toLowerCase().includes(query));
+
+    let html = `
+        <div class="section-title" style="margin-top:16px;">Search Results (${filtered.length})</div>
+        <div class="product-grid">
+    `;
+
+    if(filtered.length === 0) {
+        html += `<p style="padding:16px; font-size:13px;">No products found matching "${query}".</p>`;
+    } else {
+        filtered.forEach(p => {
+            html += createProductCardHTML(p);
+        });
+    }
+
+    html += `</div>`;
+    appContainer.innerHTML = html;
+}
+
+history.replaceState({ view: 'home', param: null }, '', '');
+showHome(false);
