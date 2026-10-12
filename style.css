@@ -12,7 +12,6 @@ body {
     padding-bottom: 60px;
 }
 
-/* Language Bar for 5 languages */
 .language-bar {
     background: #222;
     color: white;
@@ -259,7 +258,6 @@ body {
     margin-left: 6px;
 }
 
-/* About Us Section */
 .about-section {
     background: white;
     margin: 20px 16px;
@@ -324,7 +322,6 @@ body {
     margin-top: 6px;
 }
 
-/* Product Detail View */
 .detail-container {
     background: white;
     padding-bottom: 90px;
@@ -493,4 +490,4 @@ body {
     font-size: 14px;
     margin-bottom: 12px;
     color: #333;
-  }
+}
