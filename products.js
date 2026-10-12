@@ -7,10 +7,8 @@ const INSTAGRAM_URL = "https://www.instagram.com/urooenterprise/";
 const FACEBOOK_URL = "https://www.facebook.com/people/Uroo-Enterprise/61577735529706/";
 const SUPPORT_EMAIL = "UrooEnterprise@gmail.com";
 
-// Current Language State (Default is English)
 let currentLang = 'en';
 
-// Translations Dictionary for 5 Languages
 const translations = {
     en: {
         ticker: "⚠️ Note: Images are for illustration purposes only. Actual color or size may vary slightly due to natural gemstone properties.",
@@ -23,8 +21,8 @@ const translations = {
         exploreCategories: "Explore Categories",
         featuredColl: "Featured Collections",
         aboutTitle: "About Uroo Enterprise",
-        aboutDesc: "Welcome to Uroo Enterprise! We specialize in premium quality natural crystal bracelets, zodiac rashi items, authentic Vastu remedies, and spiritual accessories. Every piece is carefully curated and energized to bring positivity, protection, and prosperity into your life.",
-        aboutMarketplace: "🛍️ Trusted Marketplace Seller: You can shop with 100% confidence from us directly here or find our official storefronts on Meesho and Amazon.",
+        aboutDesc: "Welcome to Uroo Enterprise! We specialize in premium quality natural crystal bracelets, zodiac rashi items, authentic Vastu remedies, and spiritual accessories.",
+        aboutMarketplace: "🛍️ Trusted Marketplace Seller: Shop directly here or on Meesho & Amazon.",
         connectWithUs: "Connect With Us:",
         instagram: "Instagram",
         facebook: "Facebook",
@@ -36,9 +34,7 @@ const translations = {
         customNotice: "✨ Customization Available! Want a specific wrist size or stone mix?",
         chatCustom: "Chat for Customization",
         youMightLike: "You Might Also Like",
-        footerText: "Official Marketplace Seller on Meesho & Amazon",
-        rights: "© 2026 Uroo Enterprise. All rights reserved.",
-        naturalDisclaimer: "Natural stones vary in texture and shade. All remedies are traditional."
+        rights: "© 2026 Uroo Enterprise. All rights reserved."
     },
     hi: {
         ticker: "⚠️ नोट: छवियां केवल चित्रण के उद्देश्य से हैं। प्राकृतिक रत्न गुणों के कारण वास्तविक रंग या आकार थोड़ा भिन्न हो सकता है।",
@@ -51,8 +47,8 @@ const translations = {
         exploreCategories: "श्रेणियां देखें",
         featuredColl: "विशेष संग्रह",
         aboutTitle: "उरू एंटरप्राइज के बारे में",
-        aboutDesc: "उरू एंटरप्राइज में आपका स्वागत है! हम प्रीमियम गुणवत्ता वाले प्राकृतिक क्रिस्टल ब्रेसलेट, राशि उत्पाद, प्रामाणिक वास्तु उपाय और आध्यात्मिक सामान प्रदान करते हैं। प्रत्येक उत्पाद को आपके जीवन में सकारात्मकता, सुरक्षा और समृद्धि लाने के लिए विशेष रूप से तैयार किया जाता है।",
-        aboutMarketplace: "🛍️ विश्वसनीय विक्रेता: आप सीधे हमसे या मीशो और अमेज़न पर हमारे आधिकारिक स्टोर से खरीदारी कर सकते हैं।",
+        aboutDesc: "उरू एंटरप्राइज में आपका स्वागत है! हम प्रीमियम गुणवत्ता वाले प्राकृतिक क्रिस्टल ब्रेसलेट, राशि उत्पाद, प्रामाणिक वास्तु उपाय प्रदान करते हैं।",
+        aboutMarketplace: "🛍️ विश्वसनीय विक्रेता: सीधे या मीशो और अमेज़न पर खरीदारी करें।",
         connectWithUs: "हमसे जुड़ें:",
         instagram: "इंस्टाग्राम",
         facebook: "फेसबुक",
@@ -61,26 +57,24 @@ const translations = {
         viewOnAmazon: "अमेज़न",
         chatWhatsApp: "व्हाट्सएप",
         customizableBadge: "कस्टमाइज़ेबल",
-        customNotice: "✨ कस्टमाइज़ेशन उपलब्ध! अपनी कलाई का आकार या पत्थरों का मिश्रण बनवाना चाहते हैं?",
-        chatCustom: "कस्टमाइज़ेशन के लिए चैट करें",
+        customNotice: "✨ कस्टमाइज़ेशन उपलब्ध! अपनी कलाई का आकार या पत्थरों का मिश्रण चाहते हैं?",
+        chatCustom: "चैट करें",
         youMightLike: "आपको यह भी पसंद आ सकता है",
-        footerText: "मीशो और अमेज़न पर आधिकारिक विक्रेता",
-        rights: "© 2026 उरू एंटरप्राइज। सर्वाधिकार सुरक्षित।",
-        naturalDisclaimer: "प्राकृतिक पत्थरों के रंग और बनावट में भिन्नता हो सकती है।"
+        rights: "© 2026 उरू एंटरप्राइज। सर्वाधिकार सुरक्षित।"
     },
     mr: {
-        ticker: "⚠️ टीप: प्रतिमा केवळ मनोरंजनासाठी/माहितीसाठी आहेत. नैसर्गिक रत्नांच्या गुणधर्मामुळे प्रत्यक्ष रंग किंवा आकारात थोडा बदल होऊ शकतो.",
+        ticker: "⚠️ टीप: प्रतिमा केवळ मनोरंजनासाठी आहेत. नैसर्गिक रत्नांच्या गुणधर्मामुळे रंग किंवा आकारात बदल होऊ शकतो.",
         subtitle: "प्रमाणित क्रिस्टल्स आणि वास्तू",
         chatNow: "चॅट करा",
-        searchPlaceholder: "ब्रेसलेट, राशी, पायराईट शोधा...",
+        searchPlaceholder: "ब्रेसलेट, राशी शोधा...",
         bannerTitle: "उरू एंटरप्राइज",
         bannerDesc: "प्रमाणित क्रिस्टल्स, वास्तू आणि आध्यात्मिक संग्रह",
-        marketplaceTag: "🛒 मीशो और अमेझॉनवर अधिकृतपणे उपलब्ध",
+        marketplaceTag: "🛒 मीशो आणि अमेझॉनवर अधिकृतपणे उपलब्ध",
         exploreCategories: "श्रेण्या पहा",
         featuredColl: "प्रमुख संग्रह",
         aboutTitle: "उरू एंटरप्राइज बद्दल",
-        aboutDesc: "उरू एंटरप्राइजमध्ये आपले स्वागत आहे! आम्ही प्रीमियम दर्जाचे नैसर्गिक क्रिस्टल ब्रेसलेट, राशी उत्पादने, अस्सल वास्तू उपाय आणि आध्यात्मिक वस्तू प्रदान करतो. तुमच्या आयुष्यात सकारात्मकता, संरक्षण आणि समृद्धी आणण्यासाठी प्रत्येक वस्तू काळजीपूर्वक तयार केली जाते.",
-        aboutMarketplace: "🛍️ विश्वासू विक्रेता: तुम्ही आमच्याकडून थेट खरेदी करू शकता किंवा मीशो आणि अमेझॉनवरील आमच्या अधिकृत स्टोअरला भेट देऊ शकता.",
+        aboutDesc: "उरू एंटरप्राइजमध्ये आपले स्वागत आहे!",
+        aboutMarketplace: "🛍️ विश्वासू विक्रेता: थेट किंवा मीशो आणि अमेझॉनवरून खरेदी करा.",
         connectWithUs: "आमच्याशी कनेक्ट व्हा:",
         instagram: "इन्स्टाग्राम",
         facebook: "फेसबुक",
@@ -89,26 +83,24 @@ const translations = {
         viewOnAmazon: "अमेझॉन",
         chatWhatsApp: "व्हॉट्सॲप",
         customizableBadge: "कस्टमाइझ करण्यायोग्य",
-        customNotice: "✨ कस्टमायझेशन उपलब्ध! मनगटाचा विशिष्ट आकार किंवा दगडांचे मिश्रण हवे आहे का?",
-        chatCustom: "कस्टमायझेशनसाठी चॅट करा",
+        customNotice: "✨ कस्टमायझेशन उपलब्ध!",
+        chatCustom: "चॅट करा",
         youMightLike: "तुम्हाला हे देखील आवडेल",
-        footerText: "मीशो आणि अमेझॉनवर अधिकृत विक्रेता",
-        rights: "© 2026 उरू एंटरप्राइज. सर्व हक्क राखीव.",
-        naturalDisclaimer: "नैसर्गिक दगडांच्या पोत आणि रंगात फरक असू शकतो."
+        rights: "© 2026 उरू एंटरप्राइज."
     },
     te: {
-        ticker: "⚠️ గమనిక: చిత్రాలు వివరణ ప్రయోజనాల కోసం మాత్రమే. సహజ రత్నాల ధర్మాల కారణంగా వాస్తవ రంగు లేదా పరిమాణం కొద్దిగా మారవచ్చు.",
+        ticker: "⚠️ గమనిక: చిత్రాలు వివరణ ప్రయోజనాల కోసం మాత్రమే.",
         subtitle: "ధృవీకరించబడిన క్రిస్టల్స్ & వాస్తు",
         chatNow: "చాట్ చేయండి",
-        searchPlaceholder: "బ్రాస్‌లెట్లు, రాశి, పైరైట్ వెతకండి...",
+        searchPlaceholder: "బ్రాస్‌లెట్లు వెతకండి...",
         bannerTitle: "ఉరూ ఎంటర్‌ప్రైజ్",
-        bannerDesc: "ధృవీకరించబడిన క్రిస్టల్స్, వాస్తు & ఆధ్యాత్మిక సేకరణ",
-        marketplaceTag: "🛒 మీషో మరియు అమెజాన్‌లో అధికారికంగా అందుబాటులో ఉంది",
+        bannerDesc: "ధృవీకరించబడిన క్రిస్టల్స్, వాస్తు సేకరణ",
+        marketplaceTag: "🛒 మీషో మరియు అమెజాన్‌లో అందుబాటులో ఉంది",
         exploreCategories: "వర్గాలను అన్వేషించండి",
         featuredColl: "ఫీచర్ చేసిన సేకరణలు",
         aboutTitle: "ఉరూ ఎంటర్‌ప్రైజ్ గురించి",
-        aboutDesc: "ఉరూ ఎంటర్‌ప్రైజ్‌కి స్వాగతం! మేము ప్రీమియం నాణ్యత గల సహజ క్రిస్టల్ బ్రాస్‌లెట్లు, రాశి వస్తువులు, వాస్తు నివారణలు మరియు ఆధ్యాత్మిక ఉపకరణాలను అందిస్తున్నాము. మీ జీవితంలో సానుకూలత, రక్షణ మరియు సమృద్ధిని తీసుకురావడానికి ప్రతి వస్తువు శ్రద్ధగా ఎంపిక చేయబడుతుంది.",
-        aboutMarketplace: "🛍️ విశ్వసనీయ విక్రేత: మీరు నేరుగా మా వద్ద లేదా మీషో మరియు అమెజాన్ స్టోర్లలో కొనుగోలు చేయవచ్చు.",
+        aboutDesc: "ఉరూ ఎంటర్‌ప్రైజ్‌కి స్వాగతం!",
+        aboutMarketplace: "🛍️ విశ్వసనీయ విక్రేత.",
         connectWithUs: "మాతో కనెక్ట్ అవ్వండి:",
         instagram: "ఇన్‌స్టాగ్రామ్",
         facebook: "ఫేస్‌బుక్",
@@ -117,26 +109,24 @@ const translations = {
         viewOnAmazon: "అమెజాన్",
         chatWhatsApp: "వాట్సాప్",
         customizableBadge: "అనుకూలీకరించదగినది",
-        customNotice: "✨ అనుకూలీకరణ అందుబాటులో ఉంది! నిర్దిష్ట మణికట్టు పరిమాణం లేదా రాయి కలయిక కావాలా?",
-        chatCustom: "అనుకూలీకరణ కోసం చాట్ చేయండి",
+        customNotice: "✨ అనుకూలీకరణ అందుబాటులో ఉంది!",
+        chatCustom: "చాట్ చేయండి",
         youMightLike: "మీకు ఇవి కూడా నచ్చవచ్చు",
-        footerText: "మీషో మరియు అమెజాన్‌లో అధికారిక విక్రేత",
-        rights: "© 2026 ఉరూ ఎంటర్‌ప్రైజ్. అన్ని హక్కులూ రిజర్వు చేయబడ్డాయి.",
-        naturalDisclaimer: "సహజ రాళ్ల ఆకృతి మరియు రంగులో చిన్నపాటి వ్యత్యాసాలు ఉండవచ్చు."
+        rights: "© 2026 ఉరూ ఎంటర్‌ప్రైజ్."
     },
     ta: {
-        ticker: "⚠️ குறிப்பு: படங்கள் விளக்கத்திற்காக மட்டுமே. இயற்கையான கற்களின் தன்மையால் நிறம் அல்லது அளவு சிறிது மாறுபடலாம்.",
+        ticker: "⚠️ குறிப்பு: படங்கள் விளக்கத்திற்காக மட்டுமே.",
         subtitle: "சான்றளிக்கப்பட்ட படிகங்கள் & வாஸ்து",
         chatNow: "உரையாட",
-        searchPlaceholder: "பிரேஸ்லெட்டுகள், ராசி, பைரைட் தேடவும்...",
+        searchPlaceholder: "பிரேஸ்லெட்டுகள் தேடவும்...",
         bannerTitle: "உரூ என்டர்பிரைஸ்",
-        bannerDesc: "சான்றளிக்கப்பட்ட படிகங்கள், வாஸ்து & ஆன்மீக சேகரிப்பு",
-        marketplaceTag: "🛒 மீஷோ மற்றும் அமேசானில் அதிகாரப்பூர்வமாக கிடைக்கின்றன",
+        bannerDesc: "சான்றளிக்கப்பட்ட படிகங்கள் சேகரிப்பு",
+        marketplaceTag: "🛒 மீஷோ மற்றும் அமேசானில் கிடைக்கின்றன",
         exploreCategories: "வகைகளைக் காண்க",
         featuredColl: "சிறப்பு சேகரிப்புகள்",
         aboutTitle: "உரூ என்டர்பிரைஸ் பற்றி",
-        aboutDesc: "உரூ என்டர்பிரைஸுக்கு உங்களை வரவேற்கிறோம்! நாங்கள் உயர்ந்த தரமான இயற்கை படிக பிரேஸ்லெட்டுகள், ராசி பொருட்கள், வாஸ்து பரிகாரங்கள் மற்றும் ஆன்மீக אביசரிகளில் நிபுணத்துவம் பெற்றவர்கள். உங்கள் வாழ்வில் நேர்மறை ஆற்றலையும் செழிப்பையும் கொண்டுவர ஒவ்வொரு பொருளும் கவனமாக தேர்ந்தெடுக்கப்படுகிறது.",
-        aboutMarketplace: "🛍️ நம்பகமான விற்பனையாளர்: எங்களை நேரடியாகவோ அல்லது மீஷோ மற்றும் அமேசானில் எங்கள் அதிகாரப்பூர்வ கடைகள் மூலமாகவோ வாங்கலாம்.",
+        aboutDesc: "உரூ என்டர்பிரைஸுக்கு உங்களை வரவேற்கிறோம்!",
+        aboutMarketplace: "🛍️ நம்பகமான விற்பனையாளர்.",
         connectWithUs: "எங்களை தொடர்பு கொள்ள:",
         instagram: "இன்ஸ்டாகிராம்",
         facebook: "பேஸ்புக்",
@@ -145,12 +135,10 @@ const translations = {
         viewOnAmazon: "அமேசான்",
         chatWhatsApp: "வாட்ஸ்அப்",
         customizableBadge: "விருப்பப்படி மாற்றலாம்",
-        customNotice: "✨ விருப்பத்தேர்வு உண்டு! குறிப்பிட்ட மணிக்கட்டு அளவு அல்லது கல் கலவை வேண்டுமா?",
-        chatCustom: "விருப்பத்தேர்வுக்கு வாட்ஸ்அப்பில் பேசுக",
+        customNotice: "✨ விருப்பத்தேர்வு உண்டு!",
+        chatCustom: "பேசுக",
         youMightLike: "உங்களுக்கு இதுவும் பிடிக்கலாம்",
-        footerText: "மீஷோ மற்றும் அமேசானில் அதிகாரப்பூர்வ விற்பனையாளர்",
-        rights: "© 2026 உரூ என்டர்பிரைஸ். அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.",
-        naturalDisclaimer: "இயற்கை கற்களின் அமைப்பு மற்றும் நிழலில் சிறிய வேறுபாடுகள் இருக்கலாம்."
+        rights: "© 2026 உரூ என்டர்பிரைஸ்."
     }
 };
 
@@ -211,7 +199,7 @@ const products = [
             en: 'Specially energized natural stone bracelet designed for Aries (Mesha Rashi) natives. Combines Carnelian for drive and Tiger Eye for confidence and protection.',
             hi: 'मेष राशि के जातकों के लिए विशेष रूप से ऊर्जावान प्राकृतिक पत्थर का ब्रेसलेट। इसमें ऊर्जा के लिए कार्नेलियन और आत्मविश्वास के लिए टाइगर आई का संयोजन है।',
             mr: 'मेष राशीच्या लोकांसाठी विशेषतः ऊर्जावान बनवलेले नैसर्गिक दगडाचे ब्रेसलेट. यात ऊर्जेसाठी कार्नेलियन आणि आत्मविश्वासासाठी टायगर आय आहे.',
-            te: 'మేష రాశివారి కోసం ప్రత్యేకంగా శక్తివంతం చేయబడిన సహజ రాతి బ్రాస్‌లెట్. ఉత్సాహం కోసం కార్నెలియన్ మరియు ఆత్మవిశ్వాసం కోసం టైగర్ ఐ కలపబడ్డాయి.',
+            te: 'మేష రాశివారి కోసం ప్రత్యేకంగా శక్తివంతం చేయబడిన సహజ రాతి బ్రాస్‌లెట్. ఉత్సాహం కోసం కార్నెలియన్ और ఆత్మవిశ్వాసం కోసం టైగర్ ఐ కలపబడ్డాయి.',
             ta: 'மேஷ ராசிக்காரர்களுக்காக பிரத்யேகமாக ஆற்றல் ஊட்டப்பட்ட இயற்கை கல் பிரேஸ்லெட். உத்வேகத்திற்கு கார்னிலியனும், பாதுகாப்பிற்கு டைகர் ஐயும் இணைக்கப்பட்டுள்ளது.'
         },
         meeshoLink: 'https://meesho.com',
@@ -522,7 +510,6 @@ function handleSearch(query, pushHistory = true) {
     appContainer.innerHTML = html;
 }
 
-// Check URL parameters for direct Instagram Ad deep-linking
 function checkUrlParameters() {
     const params = new URLSearchParams(window.location.search);
     const productId = params.get('product');
@@ -540,5 +527,4 @@ function checkUrlParameters() {
     }
 }
 
-// Initialize on load
 checkUrlParameters();
