@@ -10,7 +10,7 @@
 </head>
 <body>
 
-    <!-- Language Selector Bar for 5 Languages -->
+    <!-- Language Selector Bar -->
     <div class="language-bar">
         <span>🌐 Lang:</span>
         <button id="lang-en" class="lang-btn active" onclick="changeLanguage('en')">English</button>
@@ -43,6 +43,14 @@
             <i class="fa-solid fa-magnifying-glass"></i>
         </div>
     </header>
+
+    <!-- Quick Category Jump Bar (Visible everywhere for fast navigation) -->
+    <nav class="quick-jump-bar">
+        <button onclick="navigateTo('category', 'bracelets')">💍 Bracelets</button>
+        <button onclick="navigateTo('category', 'zodiac')">✨ Zodiac / Rashi</button>
+        <button onclick="navigateTo('category', 'vastu')">🏛️ Spiritual / Vastu</button>
+        <button onclick="navigateTo('category', 'jewellery')">💎 Jewellery</button>
+    </nav>
 
     <!-- Main Content App Wrapper -->
     <main id="app-container">
