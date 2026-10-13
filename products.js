@@ -12,7 +12,6 @@ let currentLang = 'en';
 const translations = {
     en: {
         ticker: "⚠️ Note: Images are for illustration purposes only. Actual color or size may vary slightly due to natural gemstone properties.",
-        subtitle: "Certified Crystals & Vastu",
         chatNow: "Chat Now",
         searchPlaceholder: "Search bracelets, rashi, pyrite...",
         bannerTitle: "Uroo Enterprise",
@@ -38,7 +37,6 @@ const translations = {
     },
     hi: {
         ticker: "⚠️ नोट: छवियां केवल चित्रण के उद्देश्य से हैं। प्राकृतिक रत्न गुणों के कारण वास्तविक रंग या आकार थोड़ा भिन्न हो सकता है।",
-        subtitle: "प्रमाणित क्रिस्टल और वास्तु",
         chatNow: "चैट करें",
         searchPlaceholder: "ब्रेसलेट, राशि, पाइराइट खोजें...",
         bannerTitle: "उरू एंटरप्राइज",
@@ -64,12 +62,11 @@ const translations = {
     },
     mr: {
         ticker: "⚠️ टीप: प्रतिमा केवळ मनोरंजनासाठी आहेत. नैसर्गिक रत्नांच्या गुणधर्मामुळे रंग किंवा आकारात बदल होऊ शकतो.",
-        subtitle: "प्रमाणित क्रिस्टल्स आणि वास्तू",
         chatNow: "चॅट करा",
         searchPlaceholder: "ब्रेसलेट, राशी शोधा...",
         bannerTitle: "उरू एंटरप्राइज",
         bannerDesc: "प्रमाणित क्रिस्टल्स, वास्तू आणि आध्यात्मिक संग्रह",
-        marketplaceTag: "🛒 मीशो आणि अमेझॉनवर अधिकृतपणे उपलब्ध",
+        marketplaceTag: "🛒 मीशो और अमेझॉनवर अधिकृतपणे उपलब्ध",
         exploreCategories: "श्रेण्या पहा",
         featuredColl: "प्रमुख संग्रह",
         aboutTitle: "उरू एंटरप्राइज बद्दल",
@@ -90,7 +87,6 @@ const translations = {
     },
     te: {
         ticker: "⚠️ గమనిక: చిత్రాలు వివరణ ప్రయోజనాల కోసం మాత్రమే.",
-        subtitle: "ధృవీకరించబడిన క్రిస్టల్స్ & వాస్తు",
         chatNow: "చాట్ చేయండి",
         searchPlaceholder: "బ్రాస్‌లెట్లు వెతకండి...",
         bannerTitle: "ఉరూ ఎంటర్‌ప్రైజ్",
@@ -116,7 +112,6 @@ const translations = {
     },
     ta: {
         ticker: "⚠️ குறிப்பு: படங்கள் விளக்கத்திற்காக மட்டுமே.",
-        subtitle: "சான்றளிக்கப்பட்ட படிகங்கள் & வாஸ்து",
         chatNow: "உரையாட",
         searchPlaceholder: "பிரேஸ்லெட்டுகள் தேடவும்...",
         bannerTitle: "உரூ என்டர்பிரைஸ்",
@@ -199,7 +194,7 @@ const products = [
             en: 'Specially energized natural stone bracelet designed for Aries (Mesha Rashi) natives. Combines Carnelian for drive and Tiger Eye for confidence and protection.',
             hi: 'मेष राशि के जातकों के लिए विशेष रूप से ऊर्जावान प्राकृतिक पत्थर का ब्रेसलेट। इसमें ऊर्जा के लिए कार्नेलियन और आत्मविश्वास के लिए टाइगर आई का संयोजन है।',
             mr: 'मेष राशीच्या लोकांसाठी विशेषतः ऊर्जावान बनवलेले नैसर्गिक दगडाचे ब्रेसलेट. यात ऊर्जेसाठी कार्नेलियन आणि आत्मविश्वासासाठी टायगर आय आहे.',
-            te: 'మేష రాశివారి కోసం ప్రత్యేకంగా శక్తివంతం చేయబడిన సహజ రాతి బ్రాస్‌లెట్. ఉత్సాహం కోసం కార్నెలియన్ और ఆత్మవిశ్వాసం కోసం టైగర్ ఐ కలపబడ్డాయి.',
+            te: 'మేష రాశివారి కోసం ప్రత్యేకంగా శక్తివంతం చేయబడిన సహజ రాతి బ్రాస్‌లెట్. ఉత్సాహం కోసం కార్నెలియన్ और आత్మవిశ్వाసం కోసం టైగర్ ఐ కలపబడ్డాయి.',
             ta: 'மேஷ ராசிக்காரர்களுக்காக பிரத்யேகமாக ஆற்றல் ஊட்டப்பட்ட இயற்கை கல் பிரேஸ்லெட். உத்வேகத்திற்கு கார்னிலியனும், பாதுகாப்பிற்கு டைகர் ஐயும் இணைக்கப்பட்டுள்ளது.'
         },
         meeshoLink: 'https://meesho.com',
