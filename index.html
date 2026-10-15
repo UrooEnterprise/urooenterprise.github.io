@@ -19,7 +19,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg-light); color: var(--text-main); }
 
-        /* Top Trust Banner */
         .top-banner {
             background-color: #262626;
             color: #fff;
@@ -29,7 +28,6 @@
             font-weight: 500;
         }
 
-        /* Meesho Style Header */
         header {
             background: #fff;
             border-bottom: 1px solid var(--border-color);
@@ -60,29 +58,6 @@
             color: var(--text-muted);
         }
 
-        /* Search Bar Mock */
-        .search-bar {
-            flex: 1;
-            max-width: 500px;
-            margin: 0 20px;
-            display: flex;
-            align-items: center;
-            background: #f8f8f8;
-            border: 1px solid #d1d1d1;
-            border-radius: 4px;
-            padding: 8px 12px;
-        }
-
-        .search-bar input {
-            width: 100%;
-            border: none;
-            background: transparent;
-            outline: none;
-            font-size: 13px;
-            color: var(--text-main);
-        }
-
-        /* Main Container & Grid */
         .main-container {
             max-width: 1200px;
             margin: 16px auto;
@@ -103,7 +78,6 @@
             gap: 12px;
         }
 
-        /* Meesho Style Product Card */
         .product-card {
             background: #fff;
             border-radius: 6px;
@@ -211,7 +185,6 @@
             margin-bottom: 10px;
         }
 
-        /* Action Buttons */
         .card-actions {
             padding: 0 12px 12px 12px;
             display: flex;
@@ -248,17 +221,7 @@
         .amz { color: #ff9900; }
         .msh { color: var(--meesho-pink); }
 
-        .loading-box {
-            text-align: center;
-            grid-column: 1 / -1;
-            padding: 40px;
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        /* Mobile Adjustments */
         @media (max-width: 768px) {
-            .search-bar { display: none; } /* Hide search bar on compact mobile view if needed */
             #product-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
             .main-container { padding: 0 6px; }
         }
@@ -276,81 +239,202 @@
                 <h1>Uroo Enterprise</h1>
                 <p>Trusted Reseller & Direct Store</p>
             </div>
-            <div class="search-bar">
-                <input type="text" placeholder="Try Search 'Citrine Bracelet', 'Vastu Tortoise' ...">
-            </div>
         </div>
     </header>
 
     <div class="main-container">
         <div class="section-title">Trending Spiritual & Gemstone Collections</div>
-        <div id="product-grid">
-            <div class="loading-box">Loading catalog...</div>
-        </div>
+        <div id="product-grid"></div>
     </div>
 
     <script>
-        async function loadMeeshoStyleCatalog() {
-            try {
-                const response = await fetch('products.md?t=' + new Date().getTime());
-                if (!response.ok) throw new Error("Could not load products.md");
-                
-                const markdownText = await response.text();
-                const lines = markdownText.split('\n').map(l => l.trim()).filter(l => l.startsWith('|'));
-                
-                if (lines.length < 3) throw new Error("Invalid table format");
+        // Your complete product catalog stored safely inside JavaScript
+        const PRODUCTS = [
+            {
+                sku: "GoldenHematiteBracelet01",
+                title: "Golden Hematite Beads Bracelet for Men and Women, Stylish Golden Tone Stone Bracelet",
+                price: 199,
+                mrp: 599,
+                category: "Bracelets",
+                stock: "In Stock",
+                image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500",
+                amazon: "https://amazon.in",
+                meesho: "https://meesho.com"
+            },
+            {
+                sku: "SilverHematiteBracelet01",
+                title: "Silver Hematite Beads Bracelet for Men and Women, Stylish Silver Tone Stone Bracelet",
+                price: 199,
+                mrp: 599,
+                category: "Bracelets",
+                stock: "In Stock",
+                image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500",
+                amazon: "https://amazon.in",
+                meesho: "https://meesho.com"
+            },
+            {
+                sku: "CarnelianBracelet01",
+                title: "Carnelian Stone Beads Bracelet for Men and Women, Orange Stone Bracelet",
+                price: 199,
+                mrp: 599,
+                category: "Bracelets",
+                stock: "Out of Stock",
+                image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500",
+                amazon: "https://amazon.in",
+                meesho: "https://meesho.com"
+            },
+            {
+                sku: "RoseQuartzBracelet01",
+                title: "Rose Quartz Stone Beads Bracelet for Men and Women, Pink Crystal Bracelet",
+                price: 199,
+                mrp: 599,
+                category: "Bracelets",
+                stock: "In Stock",
+                image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500",
+                amazon: "https://amazon.in",
+                meesho: "https://meesho.com"
+            },
+            {
+                sku: "BlackObsidianBracelet01",
+                title: "Black Obsidian Beads Bracelet for Men and Women, Minimalist Jewellery",
+                price: 199,
+                mrp: 599,
+                category: "Bracelets",
+                stock: "In Stock",
+                image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500",
+                amazon: "https://amazon.in",
+                meesho: "https://meesho.com"
+            },
+            {
+                sku: "RashiCapricornMakarBracelet01",
+                title: "Capricorn Zodiac Bracelet (Makar Rashi) Garnet & Milky Quartz",
+                price: 299,
+                mrp: 999,
+                category: "Rashi Bracelet",
+                stock: "In Stock",
+                image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500",
+                amazon: "https://amazon.in",
+                meesho: "https://meesho.com"
+            },
+            {
+                sku: "RashiGeminiMithunBracelet01",
+                title: "Gemini Zodiac Bracelet (Mithun Rashi) Aventurine & Quartz",
+                price: 299,
+                mrp: 999,
+                category: "Rashi Bracelet",
+                stock: "In Stock",
+                image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500",
+                amazon: "https://amazon.in",
+                meesho: "https://meesho.com"
+            },
+            {
+                sku: "RashiLibraTulaBracelet01",
+                title: "Libra Zodiac Bracelet (Tula Rashi) Lapis Lazuli & Howlite",
+                price: 299,
+                mrp: 999,
+                category: "Rashi Bracelet",
+                stock: "In Stock",
+                image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500",
+                amazon: "https://amazon.in",
+                meesho: "https://meesho.com"
+            },
+            {
+                sku: "RashiLeoSinghBracelet01",
+                title: "Leo Zodiac Bracelet (Singh Rashi) Stylish Beads Jewellery",
+                price: 299,
+                mrp: 999,
+                category: "Rashi Bracelet",
+                stock: "In Stock",
+                image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500",
+                amazon: "https://amazon.in",
+                meesho: "https://meesho.com"
+            },
+            {
+                sku: "MachhmaniPendantBrown01",
+                title: "Machhmani Pendant Brown - Authentic Spiritual Pendant",
+                price: 349,
+                mrp: 1199,
+                category: "Vastu/Spiritual",
+                stock: "In Stock",
+                image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500",
+                amazon: "https://amazon.in",
+                meesho: "https://meesho.com"
+            },
+            {
+                sku: "MachhmaniPendantWhite01",
+                title: "Machhmani Pendant White - Authentic Spiritual Pendant",
+                price: 349,
+                mrp: 1199,
+                category: "Vastu/Spiritual",
+                stock: "In Stock",
+                image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500",
+                amazon: "https://amazon.in",
+                meesho: "https://meesho.com"
+            },
+            {
+                sku: "TortoisePyrite01",
+                title: "Kachua Pyrite - Original Pyrite Tortoise for Wealth",
+                price: 249,
+                mrp: 999,
+                category: "Vastu/Spiritual",
+                stock: "In Stock",
+                image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500",
+                amazon: "https://amazon.in",
+                meesho: "https://meesho.com"
+            },
+            {
+                sku: "TortoiseDhanyog01",
+                title: "Kachua Dhanyog - Vastu Tortoise for Financial Growth",
+                price: 249,
+                mrp: 999,
+                category: "Vastu/Spiritual",
+                stock: "In Stock",
+                image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500",
+                amazon: "https://amazon.in",
+                meesho: "https://meesho.com"
+            }
+        ];
 
-                const productContainer = document.getElementById('product-grid');
-                productContainer.innerHTML = '';
+        function renderStore() {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
 
-                for (let i = 2; i < lines.length; i++) {
-                    const cols = lines[i].split('|').map(c => c.trim()).filter(c => c !== '');
-                    if (cols.length < 10) continue;
+            PRODUCTS.forEach(product => {
+                const isOutStock = product.stock.toLowerCase().includes('out');
+                const discount = product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0;
 
-                    const [sku, title, price, mrp, category, stock, image, amazon, meesho, description] = cols;
-                    const isOutStock = stock.toLowerCase().includes('out');
-
-                    // Calculate mock discount percentage dynamically
-                    const pNum = parseFloat(price) || 0;
-                    const mNum = parseFloat(mrp) || pNum;
-                    const discount = mNum > pNum ? Math.round(((mNum - pNum) / mNum) * 100) : 0;
-
-                    const cardHTML = `
-                        <div class="product-card">
-                            ${isOutStock ? '<div class="out-of-stock-tag">Sold Out</div>' : ''}
-                            <div class="image-box">
-                                <img src="${image}" alt="${title}" loading="lazy">
+                const card = `
+                    <div class="product-card">
+                        ${isOutStock ? '<div class="out-of-stock-tag">Sold Out</div>' : ''}
+                        <div class="image-box">
+                            <img src="${product.image}" alt="${product.title}" loading="lazy">
+                        </div>
+                        <div class="card-details">
+                            <span class="category-tag">${product.category}</span>
+                            <div class="product-title" title="${product.title}">${product.title}</div>
+                            <div class="price-section">
+                                <span class="current-price">₹${product.price}</span>
+                                <span class="mrp-price">₹${product.mrp}</span>
+                                ${discount > 0 ? `<span class="discount-badge">${discount}% off</span>` : ''}
                             </div>
-                            <div class="card-details">
-                                <span class="category-tag">${category}</span>
-                                <div class="product-title" title="${title}">${title}</div>
-                                <div class="price-section">
-                                    <span class="current-price">₹${price}</span>
-                                    <span class="mrp-price">₹${mrp}</span>
-                                    ${discount > 0 ? `<span class="discount-badge">${discount}% off</span>` : ''}
-                                </div>
-                                <div class="rating-pill">4.2 ★ <span style="font-weight:normal; font-size:10px; margin-left:2px;">(120)</span></div>
-                            </div>
-                            <div class="card-actions">
-                                <button class="buy-now-btn" ${isOutStock ? 'disabled' : ''} onclick="alert('Proceeding to Direct UPI Checkout for: ${sku}')">
-                                    ${isOutStock ? 'Out of Stock' : 'Buy Now'}
-                                </button>
-                                <div class="external-links">
-                                    <a href="${amazon}" target="_blank" class="amz">Amazon ↗</a>
-                                    <a href="${meesho}" target="_blank" class="msh">Meesho ↗</a>
-                                </div>
+                            <div class="rating-pill">4.2 ★ <span style="font-weight:normal; font-size:10px; margin-left:2px;">(120)</span></div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="buy-now-btn" ${isOutStock ? 'disabled' : ''} onclick="alert('Proceeding to Direct UPI Checkout for: ${product.sku}')">
+                                ${isOutStock ? 'Out of Stock' : 'Buy Now'}
+                            </button>
+                            <div class="external-links">
+                                <a href="${product.amazon}" target="_blank" class="amz">Amazon ↗</a>
+                                <a href="${product.meesho}" target="_blank" class="msh">Meesho ↗</a>
                             </div>
                         </div>
-                    `;
-                    productContainer.innerHTML += cardHTML;
-                }
-            } catch (error) {
-                console.error(error);
-                document.getElementById('product-grid').innerHTML = '<div class="loading-box" style="color: red;">Failed to load catalog. Please check your products.md file.</div>';
-            }
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
         }
 
-        window.addEventListener('DOMContentLoaded', loadMeeshoStyleCatalog);
+        window.addEventListener('DOMContentLoaded', renderStore);
     </script>
 </body>
 </html>
