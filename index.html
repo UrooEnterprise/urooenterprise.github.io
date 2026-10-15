@@ -3,74 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uroo Enterprise - Crystals, Vastu & Spiritual Store</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Uroo Enterprise - Store</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f9f9f9; color: #333; }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { margin: 0; color: #1a1a1a; }
+        p { color: #666; }
+        
+        /* Product Grid */
+        #product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Product Card */
+        .product-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            background: #fff;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .out-of-stock-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4d4d;
+            color: #fff;
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .category { font-size: 12px; color: #888; text-transform: uppercase; margin-top: 10px; display: block; }
+        .title { font-size: 16px; font-weight: bold; margin: 6px 0; color: #222; }
+        .desc { font-size: 13px; color: #555; margin-bottom: 12px; line-height: 1.4; }
+        
+        .price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .price { font-size: 18px; font-weight: bold; color: #2e7d32; }
+        .mrp { font-size: 14px; color: #888; text-decoration: line-through; }
+
+        .buy-btn {
+            width: 100%;
+            padding: 10px;
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .buy-btn:hover { background: #115293; }
+        .buy-btn:disabled { background: #cccccc; color: #666; cursor: not-allowed; }
+
+        .marketplaces {
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            border-top: 1px solid #eee;
+            padding-top: 8px;
+        }
+        .marketplaces a { text-decoration: none; font-weight: 500; }
+        .amazon-link { color: #ff9900; }
+        .meesho-link { color: #d81b60; }
+    </style>
 </head>
 <body>
 
-    <!-- Language Selector Bar for 5 Languages -->
-    <div class="language-bar">
-        <span>🌐 Lang:</span>
-        <button id="lang-en" class="lang-btn active" onclick="changeLanguage('en')">English</button>
-        <button id="lang-hi" class="lang-btn" onclick="changeLanguage('hi')">हिंदी</button>
-        <button id="lang-mr" class="lang-btn" onclick="changeLanguage('mr')">मराठी</button>
-        <button id="lang-te" class="lang-btn" onclick="changeLanguage('te')">తెలుగు</button>
-        <button id="lang-ta" class="lang-btn" onclick="changeLanguage('ta')">தமிழ்</button>
-    </div>
-
-    <!-- Top Disclaimer Ticker -->
-    <div class="disclaimer-ticker">
-        <marquee behavior="scroll" direction="left" scrollamount="5">
-            ⚠️ Note: Images are for illustration purposes only. Actual color or size may vary slightly due to natural gemstone properties.
-        </marquee>
-    </div>
-
-    <!-- Header / Navbar with Quick WhatsApp Button (Subtitle removed) -->
-    <header class="main-header">
-        <div class="header-top-row">
-            <div class="logo-container" onclick="navigateTo('home')">
-                <h1>Uroo Enterprise</h1>
-            </div>
-            <a href="https://wa.me/919016406623?text=Hello%20Uroo%20Enterprise,%20I%20have%20an%20inquiry%20regarding%20your%20products." target="_blank" class="top-wa-btn">
-                <i class="fa-brands fa-whatsapp" style="font-size:14px;"></i> Chat Now
-            </a>
-        </div>
-        <div class="header-search">
-            <input type="text" id="searchInput" placeholder="Search bracelets, rashi, pyrite..." oninput="handleSearchInput(event)">
-            <i class="fa-solid fa-magnifying-glass"></i>
-        </div>
+    <header>
+        <h1>Uroo Enterprise</h1>
+        <p>Original Gemstones, Vastu Decor & Spiritual Accessories</p>
     </header>
 
-    <!-- Quick Category Jump Bar with Thumbnails -->
-    <nav class="quick-jump-bar">
-        <button onclick="navigateTo('category', 'bracelets')">
-            <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100" class="jump-thumb"> Bracelets
-        </button>
-        <button onclick="navigateTo('category', 'zodiac')">
-            <img src="https://images.unsplash.com/photo-1611591475583-8a3bc2e93542?w=100" class="jump-thumb"> Zodiac
-        </button>
-        <button onclick="navigateTo('category', 'vastu')">
-            <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=100" class="jump-thumb"> Vastu
-        </button>
-        <button onclick="navigateTo('category', 'jewellery')">
-            <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=100" class="jump-thumb"> Jewellery
-        </button>
-    </nav>
+    <!-- Product Grid Container -->
+    <div id="product-grid">
+        <p style="text-align: center; grid-column: 1 / -1; color: #666;">Loading products...</p>
+    </div>
 
-    <!-- Main Content App Wrapper -->
-    <main id="app-container">
-        <!-- Dynamic content injected via JavaScript -->
-    </main>
+    <script>
+        async function loadStoreProducts() {
+            try {
+                // Fetch the CSV file from the root of your GitHub repository
+                const response = await fetch('products.csv?' + new Date().getTime()); // Cache-buster added
+                if (!response.ok) throw new Error("Could not load products.csv");
+                
+                const csvText = await response.text();
+                
+                // Split rows and clean empty lines
+                const rows = csvText.split('\n').map(row => row.trim()).filter(row => row.length > 0);
+                if (rows.length < 2) return;
+                
+                const headers = rows[0].split(',').map(h => h.trim());
+                const productContainer = document.getElementById('product-grid');
+                productContainer.innerHTML = '';
 
-    <!-- Footer -->
-    <footer class="main-footer" style="padding: 20px 16px; text-align: center; font-size: 11px; color: #666; background: #fff; margin-top: 30px; border-top: 1px solid #eee;">
-        <p style="font-weight:600; color:#4a154b; font-size:13px; margin-bottom:6px;">Uroo Enterprise</p>
-        <p>Official Marketplace Seller on Meesho & Amazon</p>
-        <p style="margin-top: 8px;">&copy; 2026 Uroo Enterprise. All rights reserved.</p>
-    </footer>
+                // Loop through product rows
+                for (let i = 1; i < rows.length; i++) {
+                    const values = rows[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || rows[i].split(',');
+                    const product = {};
+                    
+                    headers.forEach((header, index) => {
+                        let val = values[index] ? values[index].trim() : '';
+                        if (val.startsWith('"') && val.endsWith('"')) {
+                            val = val.slice(1, -1); // Strip quotes
+                        }
+                        product[header] = val;
+                    });
 
-    <script src="products.js"></script>
+                    const isOutStock = product.stock && product.stock.toLowerCase().includes('out');
+
+                    const cardHTML = `
+                        <div class="product-card">
+                            ${isOutStock ? '<span class="out-of-stock-badge">Out of Stock</span>' : ''}
+                            <img src="${product.image}" alt="${product.title}">
+                            <div>
+                                <span class="category">${product.category}</span>
+                                <div class="title">${product.title}</div>
+                                <div class="desc">${product.description}</div>
+                            </div>
+                            <div>
+                                <div class="price-row">
+                                    <span class="price">₹${product.price}</span>
+                                    <span class="mrp">₹${product.mrp}</span>
+                                </div>
+                                <button class="buy-btn" ${isOutStock ? 'disabled' : ''} onclick="handleCheckout('${product.sku}', '${product.title}', ${product.price})">
+                                    ${isOutStock ? 'Sold Out' : 'Buy Direct (UPI)'}
+                                </button>
+                                <div class="marketplaces">
+                                    <a href="${product.amazon}" target="_blank" class="amazon-link">View on Amazon</a>
+                                    <a href="${product.meesho}" target="_blank" class="meesho-link">View on Meesho</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    productContainer.innerHTML += cardHTML;
+                }
+            } catch (error) {
+                console.error("Error loading products:", error);
+                document.getElementById('product-grid').innerHTML = '<p style="text-align: center; color: red; grid-column: 1 / -1;">Failed to load catalog. Please check your products.csv file format.</p>';
+            }
+        }
+
+        function handleCheckout(sku, title, price) {
+            alert(`Selected: ${title} (${sku}) for ₹${price}\nNext step: Connecting this to your Google Sheet order backend & UPI payment link!`);
+        }
+
+        window.addEventListener('DOMContentLoaded', loadStoreProducts);
+    </script>
 </body>
 </html>
