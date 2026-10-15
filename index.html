@@ -12,7 +12,7 @@
             --bg-light: #f4f4f4;
             --text-main: #333333;
             --text-muted: #666666;
-            --success-green: #388e3c;
+            --success-green: #16a34a;
             --border-color: #e0e0e0;
         }
 
@@ -193,9 +193,9 @@
             gap: 6px;
         }
 
-        .buy-now-btn {
+        .upi-btn {
             width: 100%;
-            background: var(--meesho-pink);
+            background: #0f172a;
             color: white;
             border: none;
             padding: 9px;
@@ -204,17 +204,29 @@
             font-weight: 600;
             cursor: pointer;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
             transition: background 0.2s;
         }
 
-        .buy-now-btn:hover { background: var(--meesho-pink-dark); }
-        .buy-now-btn:disabled { background: #cccccc; cursor: not-allowed; }
+        .upi-btn:hover { background: #1e293b; }
+        .upi-btn:disabled { background: #cccccc; cursor: not-allowed; }
+
+        .prepaid-notice {
+            font-size: 10px;
+            color: var(--success-green);
+            text-align: center;
+            font-weight: 600;
+            margin-top: 1px;
+        }
 
         /* Authentic Brand Buttons */
         .marketplace-buttons {
             display: flex;
             gap: 6px;
-            margin-top: 2px;
+            margin-top: 4px;
         }
 
         .mkt-btn {
@@ -233,7 +245,6 @@
         }
         .mkt-btn:hover { filter: brightness(0.95); }
 
-        /* Authentic Amazon Gold/Yellow Theme */
         .amazon-btn {
             background-color: #f0c14b;
             background-image: linear-gradient(to bottom,#f7dfa5,#f0c14b);
@@ -241,7 +252,6 @@
             color: #111;
         }
 
-        /* Authentic Meesho Pink/Magenta Theme */
         .meesho-btn {
             background-color: #d91b5c;
             border: 1px solid #b8124b;
@@ -257,7 +267,7 @@
 <body>
 
     <div class="top-banner">
-        Lowest Prices In India • Cash on Delivery Available • Free Delivery on UPI Orders
+        Lowest Prices In India • Direct Website Orders are Prepaid UPI Only
     </div>
 
     <header>
@@ -446,9 +456,10 @@
                             <div class="rating-pill">4.2 ★ <span style="font-weight:normal; font-size:10px; margin-left:2px;">(120)</span></div>
                         </div>
                         <div class="card-actions">
-                            <button class="buy-now-btn" ${isOutStock ? 'disabled' : ''} onclick="alert('Proceeding to Direct UPI Checkout for: ${product.sku}')">
-                                ${isOutStock ? 'Out of Stock' : 'Buy Direct (UPI)'}
+                            <button class="upi-btn" ${isOutStock ? 'disabled' : ''} onclick="alert('Initiating UPI Payment Gateway for: ${product.sku}')">
+                                📱 Pay via UPI (₹${product.price})
                             </button>
+                            <div class="prepaid-notice">✓ Prepaid Only (Fast Dispatch)</div>
                             <div class="marketplace-buttons">
                                 <a href="${product.amazon}" target="_blank" class="mkt-btn amazon-btn">📦 Order on Amazon</a>
                                 <a href="${product.meesho}" target="_blank" class="mkt-btn meesho-btn">🛍️ Order on Meesho</a>
