@@ -10,7 +10,6 @@
         h1 { margin: 0; color: #1a1a1a; }
         p { color: #666; }
         
-        /* Product Grid */
         #product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -19,7 +18,6 @@
             margin: 0 auto;
         }
         
-        /* Product Card */
         .product-card {
             border: 1px solid #e0e0e0;
             border-radius: 8px;
@@ -71,7 +69,6 @@
             font-weight: bold;
             font-size: 14px;
         }
-        .buy-btn:hover { background: #115293; }
         .buy-btn:disabled { background: #cccccc; color: #666; cursor: not-allowed; }
 
         .marketplaces {
@@ -94,63 +91,52 @@
         <p>Original Gemstones, Vastu Decor & Spiritual Accessories</p>
     </header>
 
-    <!-- Product Grid Container -->
     <div id="product-grid">
         <p style="text-align: center; grid-column: 1 / -1; color: #666;">Loading products...</p>
     </div>
 
     <script>
-        async function loadStoreProducts() {
+        async function loadMarkdownCatalog() {
             try {
-                // Fetch the CSV file from the root of your GitHub repository
-                const response = await fetch('products.csv?' + new Date().getTime()); // Cache-buster added
-                if (!response.ok) throw new Error("Could not load products.csv");
+                const response = await fetch('products.md?t=' + new Date().getTime());
+                if (!response.ok) throw new Error("Could not load products.md");
                 
-                const csvText = await response.text();
+                const markdownText = await response.text();
+                const lines = markdownText.split('\n').map(l => l.trim()).filter(l => l.startsWith('|'));
                 
-                // Split rows and clean empty lines
-                const rows = csvText.split('\n').map(row => row.trim()).filter(row => row.length > 0);
-                if (rows.length < 2) return;
-                
-                const headers = rows[0].split(',').map(h => h.trim());
+                if (lines.length < 3) throw new Error("Invalid table format");
+
                 const productContainer = document.getElementById('product-grid');
                 productContainer.innerHTML = '';
 
-                // Loop through product rows
-                for (let i = 1; i < rows.length; i++) {
-                    const values = rows[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || rows[i].split(',');
-                    const product = {};
-                    
-                    headers.forEach((header, index) => {
-                        let val = values[index] ? values[index].trim() : '';
-                        if (val.startsWith('"') && val.endsWith('"')) {
-                            val = val.slice(1, -1); // Strip quotes
-                        }
-                        product[header] = val;
-                    });
+                // Start from line 2 to skip header and separator lines
+                for (let i = 2; i < lines.length; i++) {
+                    const cols = lines[i].split('|').map(c => c.trim()).filter(c => c !== '');
+                    if (cols.length < 10) continue;
 
-                    const isOutStock = product.stock && product.stock.toLowerCase().includes('out');
+                    const [sku, title, price, mrp, category, stock, image, amazon, meesho, description] = cols;
+                    const isOutStock = stock.toLowerCase().includes('out');
 
                     const cardHTML = `
                         <div class="product-card">
                             ${isOutStock ? '<span class="out-of-stock-badge">Out of Stock</span>' : ''}
-                            <img src="${product.image}" alt="${product.title}">
+                            <img src="${image}" alt="${title}">
                             <div>
-                                <span class="category">${product.category}</span>
-                                <div class="title">${product.title}</div>
-                                <div class="desc">${product.description}</div>
+                                <span class="category">${category}</span>
+                                <div class="title">${title}</div>
+                                <div class="desc">${description}</div>
                             </div>
                             <div>
                                 <div class="price-row">
-                                    <span class="price">₹${product.price}</span>
-                                    <span class="mrp">₹${product.mrp}</span>
+                                    <span class="price">₹${price}</span>
+                                    <span class="mrp">₹${mrp}</span>
                                 </div>
-                                <button class="buy-btn" ${isOutStock ? 'disabled' : ''} onclick="handleCheckout('${product.sku}', '${product.title}', ${product.price})">
+                                <button class="buy-btn" ${isOutStock ? 'disabled' : ''} onclick="alert('Checkout for ${sku}')">
                                     ${isOutStock ? 'Sold Out' : 'Buy Direct (UPI)'}
                                 </button>
                                 <div class="marketplaces">
-                                    <a href="${product.amazon}" target="_blank" class="amazon-link">View on Amazon</a>
-                                    <a href="${product.meesho}" target="_blank" class="meesho-link">View on Meesho</a>
+                                    <a href="${amazon}" target="_blank" class="amazon-link">Amazon</a>
+                                    <a href="${meesho}" target="_blank" class="meesho-link">Meesho</a>
                                 </div>
                             </div>
                         </div>
@@ -158,16 +144,12 @@
                     productContainer.innerHTML += cardHTML;
                 }
             } catch (error) {
-                console.error("Error loading products:", error);
-                document.getElementById('product-grid').innerHTML = '<p style="text-align: center; color: red; grid-column: 1 / -1;">Failed to load catalog. Please check your products.csv file format.</p>';
+                console.error(error);
+                document.getElementById('product-grid').innerHTML = '<p style="text-align: center; color: red; grid-column: 1 / -1;">Failed to load catalog. Please check products.md file.</p>';
             }
         }
 
-        function handleCheckout(sku, title, price) {
-            alert(`Selected: ${title} (${sku}) for ₹${price}\nNext step: Connecting this to your Google Sheet order backend & UPI payment link!`);
-        }
-
-        window.addEventListener('DOMContentLoaded', loadStoreProducts);
+        window.addEventListener('DOMContentLoaded', loadMarkdownCatalog);
     </script>
 </body>
 </html>
