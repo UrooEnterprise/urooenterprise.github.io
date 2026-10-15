@@ -3,309 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uroo Enterprise | Original Gemstones & Spiritual Decor</title>
-    <!-- Google Fonts for Modern Typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Uroo Enterprise - Online Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1e293b;
-            --accent: #2563eb;
-            --accent-hover: #1d4ed8;
-            --success: #16a34a;
-            --danger: #dc2626;
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            --meesho-pink: #d91b5c;
+            --meesho-pink-dark: #b8124b;
+            --bg-light: #f4f4f4;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --success-green: #388e3c;
+            --border-color: #e0e0e0;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.5; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-main); }
 
-        /* Modern Header & Announcement Bar */
-        .announcement-bar {
-            background: var(--primary);
+        /* Top Trust Banner */
+        .top-banner {
+            background-color: #262626;
             color: #fff;
             text-align: center;
-            font-size: 13px;
-            padding: 8px 16px;
+            font-size: 12px;
+            padding: 6px 10px;
             font-weight: 500;
         }
 
+        /* Meesho Style Header */
         header {
             background: #fff;
             border-bottom: 1px solid var(--border-color);
-            padding: 20px 24px;
-            text-align: center;
             position: sticky;
             top: 0;
-            z-index: 100;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
         }
 
-        header h1 { font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
-        header p { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
-
-        /* Hero Trust Badges */
-        .trust-badges {
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px 16px;
             display: flex;
-            justify-content: center;
-            gap: 24px;
-            background: #fff;
-            padding: 12px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        /* Container & Grid */
-        .container {
-            max-width: 1280px;
-            margin: 32px auto;
-            padding: 0 20px;
+        .logo-area h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--meesho-pink);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-area p {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Search Bar Mock */
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 20px;
+            display: flex;
+            align-items: center;
+            background: #f8f8f8;
+            border: 1px solid #d1d1d1;
+            border-radius: 4px;
+            padding: 8px 12px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 13px;
+            color: var(--text-main);
+        }
+
+        /* Main Container & Grid */
+        .main-container {
+            max-width: 1200px;
+            margin: 16px auto;
+            padding: 0 10px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: #111;
+            padding-left: 6px;
         }
 
         #product-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 12px;
         }
 
-        /* Modern Product Card */
+        /* Meesho Style Product Card */
         .product-card {
-            background: var(--card-bg);
+            background: #fff;
+            border-radius: 6px;
             border: 1px solid var(--border-color);
-            border-radius: var(--radius);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: var(--shadow);
+            transition: box-shadow 0.2s ease;
         }
 
         .product-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-hover);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
-        .image-container {
+        .image-box {
             position: relative;
             width: 100%;
-            height: 240px;
-            overflow: hidden;
-            background: #f1f5f9;
+            height: 210px;
+            background: #f9f9f9;
         }
 
         .product-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-
-        .product-card:hover img {
-            transform: scale(1.05);
-        }
-
-        .out-of-stock-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: var(--danger);
-            color: #fff;
-            padding: 5px 10px;
-            font-size: 11px;
-            font-weight: 700;
-            border-radius: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            z-index: 2;
-        }
-
-        .card-body {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        .category {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 6px;
-        }
-
-        .title {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-main);
-            margin-bottom: 8px;
-            line-height: 1.4;
-        }
-
-        .desc {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-            line-height: 1.5;
-            flex-grow: 1;
-        }
-
-        .card-footer {
-            padding: 0 20px 20px 20px;
-        }
-
-        .price-row {
-            display: flex;
-            align-items: baseline;
-            gap: 10px;
-            margin-bottom: 14px;
-        }
-
-        .price {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--success);
-        }
-
-        .mrp {
-            font-size: 14px;
-            color: var(--text-muted);
-            text-decoration: line-through;
-        }
-
-        .buy-btn {
-            width: 100%;
-            padding: 12px;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: background 0.2s ease;
-        }
-
-        .buy-btn:hover { background: var(--accent-hover); }
-        .buy-btn:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; }
-
-        .marketplaces {
-            margin-top: 14px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 12px;
-        }
-
-        .marketplaces a { text-decoration: none; font-weight: 600; transition: opacity 0.2s; }
-        .marketplaces a:hover { opacity: 0.8; }
-        .amazon-link { color: #d97706; }
-        .meesho-link { color: #db2777; }
-
-        /* Loading Skeleton / States */
-        .loading-state {
-            text-align: center;
-            grid-column: 1 / -1;
-            padding: 60px;
-            color: var(--text-muted);
-            font-size: 16px;
-            font-weight: 500;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="announcement-bar">
-        ✨ Free Shipping Across India on All Prepaid UPI Orders | 100% Original Certified Gemstones
-    </div>
-
-    <header>
-        <h1>Uroo Enterprise</h1>
-        <p>Original Gemstones, Vastu Decor & Spiritual Accessories</p>
-    </header>
-
-    <div class="trust-badges">
-        <span>🛡️ Certified Original</span>
-        <span>⚡ Fast Dispatch</span>
-        <span>🔒 Secure UPI Checkout</span>
-    </div>
-
-    <div class="container">
-        <div id="product-grid">
-            <div class="loading-state">Loading your catalog...</div>
-        </div>
-    </div>
-
-    <script>
-        async function loadMarkdownCatalog() {
-            try {
-                const response = await fetch('products.md?t=' + new Date().getTime());
-                if (!response.ok) throw new Error("Could not load products.md");
-                
-                const markdownText = await response.text();
-                const lines = markdownText.split('\n').map(l => l.trim()).filter(l => l.startsWith('|'));
-                
-                if (lines.length < 3) throw new Error("Invalid table format");
-
-                const productContainer = document.getElementById('product-grid');
-                productContainer.innerHTML = '';
-
-                for (let i = 2; i < lines.length; i++) {
-                    const cols = lines[i].split('|').map(c => c.trim()).filter(c => c !== '');
-                    if (cols.length < 10) continue;
-
-                    const [sku, title, price, mrp, category, stock, image, amazon, meesho, description] = cols;
-                    const isOutStock = stock.toLowerCase().includes('out');
-
-                    const cardHTML = `
-                        <div class="product-card">
-                            ${isOutStock ? '<span class="out-of-stock-badge">Sold Out</span>' : ''}
-                            <div class="image-container">
-                                <img src="${image}" alt="${title}" loading="lazy">
-                            </div>
-                            <div class="card-body">
-                                <span class="category">${category}</span>
-                                <div class="title">${title}</div>
-                                <div class="desc">${description}</div>
-                            </div>
-                            <div class="card-footer">
-                                <div class="price-row">
-                                    <span class="price">₹${price}</span>
-                                    <span class="mrp">₹${mrp}</span>
-                                </div>
-                                <button class="buy-btn" ${isOutStock ? 'disabled' : ''} onclick="alert('Checkout initiated for SKU: ${sku}')">
-                                    ${isOutStock ? 'Currently Unavailable' : 'Buy Direct (UPI)'}
-                                </button>
-                                <div class="marketplaces">
-                                    <a href="${amazon}" target="_blank" class="amazon-link">View on Amazon →</a>
-                                    <a href="${meesho}" target="_blank" class="meesho-link">View on Meesho →</a>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    productContainer.innerHTML += cardHTML;
-                }
-            } catch (error) {
-                console.error(error);
-                document.getElementById('product-grid').innerHTML = '<div class="loading-state" style="color: var(--danger);">Failed to load store catalog. Please check your products.md file.</div>';
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', loadMarkdownCatalog);
-    </script>
-</body>
-</html>
