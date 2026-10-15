@@ -128,3 +128,229 @@
         }
 
         .product-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .out-of-stock-tag {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 3px 8px;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+
+        .card-details {
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .category-tag {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .product-title {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.3;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 34px;
+        }
+
+        .price-section {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .current-price {
+            font-size: 17px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .mrp-price {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        .discount-badge {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--success-green);
+        }
+
+        .rating-pill {
+            display: inline-flex;
+            align-items: center;
+            background: #388e3c;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            width: fit-content;
+            margin-bottom: 10px;
+        }
+
+        /* Action Buttons */
+        .card-actions {
+            padding: 0 12px 12px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .buy-now-btn {
+            width: 100%;
+            background: var(--meesho-pink);
+            color: white;
+            border: none;
+            padding: 9px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.2s;
+        }
+
+        .buy-now-btn:hover { background: var(--meesho-pink-dark); }
+        .buy-now-btn:disabled { background: #cccccc; cursor: not-allowed; }
+
+        .external-links {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            padding-top: 4px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .external-links a { text-decoration: none; font-weight: 500; }
+        .amz { color: #ff9900; }
+        .msh { color: var(--meesho-pink); }
+
+        .loading-box {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 40px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .search-bar { display: none; } /* Hide search bar on compact mobile view if needed */
+            #product-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .main-container { padding: 0 6px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-banner">
+        Lowest Prices In India • Cash on Delivery Available • Free Delivery on UPI Orders
+    </div>
+
+    <header>
+        <div class="header-container">
+            <div class="logo-area">
+                <h1>Uroo Enterprise</h1>
+                <p>Trusted Reseller & Direct Store</p>
+            </div>
+            <div class="search-bar">
+                <input type="text" placeholder="Try Search 'Citrine Bracelet', 'Vastu Tortoise' ...">
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="section-title">Trending Spiritual & Gemstone Collections</div>
+        <div id="product-grid">
+            <div class="loading-box">Loading catalog...</div>
+        </div>
+    </div>
+
+    <script>
+        async function loadMeeshoStyleCatalog() {
+            try {
+                const response = await fetch('products.md?t=' + new Date().getTime());
+                if (!response.ok) throw new Error("Could not load products.md");
+                
+                const markdownText = await response.text();
+                const lines = markdownText.split('\n').map(l => l.trim()).filter(l => l.startsWith('|'));
+                
+                if (lines.length < 3) throw new Error("Invalid table format");
+
+                const productContainer = document.getElementById('product-grid');
+                productContainer.innerHTML = '';
+
+                for (let i = 2; i < lines.length; i++) {
+                    const cols = lines[i].split('|').map(c => c.trim()).filter(c => c !== '');
+                    if (cols.length < 10) continue;
+
+                    const [sku, title, price, mrp, category, stock, image, amazon, meesho, description] = cols;
+                    const isOutStock = stock.toLowerCase().includes('out');
+
+                    // Calculate mock discount percentage dynamically
+                    const pNum = parseFloat(price) || 0;
+                    const mNum = parseFloat(mrp) || pNum;
+                    const discount = mNum > pNum ? Math.round(((mNum - pNum) / mNum) * 100) : 0;
+
+                    const cardHTML = `
+                        <div class="product-card">
+                            ${isOutStock ? '<div class="out-of-stock-tag">Sold Out</div>' : ''}
+                            <div class="image-box">
+                                <img src="${image}" alt="${title}" loading="lazy">
+                            </div>
+                            <div class="card-details">
+                                <span class="category-tag">${category}</span>
+                                <div class="product-title" title="${title}">${title}</div>
+                                <div class="price-section">
+                                    <span class="current-price">₹${price}</span>
+                                    <span class="mrp-price">₹${mrp}</span>
+                                    ${discount > 0 ? `<span class="discount-badge">${discount}% off</span>` : ''}
+                                </div>
+                                <div class="rating-pill">4.2 ★ <span style="font-weight:normal; font-size:10px; margin-left:2px;">(120)</span></div>
+                            </div>
+                            <div class="card-actions">
+                                <button class="buy-now-btn" ${isOutStock ? 'disabled' : ''} onclick="alert('Proceeding to Direct UPI Checkout for: ${sku}')">
+                                    ${isOutStock ? 'Out of Stock' : 'Buy Now'}
+                                </button>
+                                <div class="external-links">
+                                    <a href="${amazon}" target="_blank" class="amz">Amazon ↗</a>
+                                    <a href="${meesho}" target="_blank" class="msh">Meesho ↗</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    productContainer.innerHTML += cardHTML;
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('product-grid').innerHTML = '<div class="loading-box" style="color: red;">Failed to load catalog. Please check your products.md file.</div>';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadMeeshoStyleCatalog);
+    </script>
+</body>
+</html>
