@@ -1,525 +1,68 @@
-const appContainer = document.getElementById('app-container');
-const searchInput = document.getElementById('searchInput');
+async function loadStoreProducts() {
+    try {
+        // Fetch the CSV file directly from your GitHub repository
+        const response = await window.fetch('products.csv');
+        const csvText = await response.text();
+        
+        // Parse CSV data into rows
+        const rows = csvText.split('\n').map(row => row.trim()).filter(row => row.length > 0);
+        const headers = rows[0].split(',');
+        
+        const productContainer = document.getElementById('product-grid'); // Make sure you have a <div id="product-grid"></div> in your HTML
+        productContainer.innerHTML = ''; // Clear previous content
 
-// Business Contact Details
-const WHATSAPP_NUMBER = "919016406623"; 
-const INSTAGRAM_URL = "https://www.instagram.com/urooenterprise/";
-const FACEBOOK_URL = "https://www.facebook.com/people/Uroo-Enterprise/61577735529706/";
-const SUPPORT_EMAIL = "UrooEnterprise@gmail.com";
-
-let currentLang = 'en';
-
-const translations = {
-    en: {
-        ticker: "⚠️ Note: Images are for illustration purposes only. Actual color or size may vary slightly due to natural gemstone properties.",
-        chatNow: "Chat Now",
-        searchPlaceholder: "Search bracelets, rashi, pyrite...",
-        bannerTitle: "Uroo Enterprise",
-        bannerDesc: "Certified Crystals, Vastu & Spiritual Collection",
-        marketplaceTag: "🛒 Officially available on Meesho & Amazon",
-        exploreCategories: "Explore Categories",
-        featuredColl: "Featured Collections",
-        aboutTitle: "About Uroo Enterprise",
-        aboutDesc: "Welcome to Uroo Enterprise! We specialize in premium quality natural crystal bracelets, zodiac rashi items, authentic Vastu remedies, and spiritual accessories.",
-        aboutMarketplace: "🛍️ Trusted Marketplace Seller: Shop directly here or on Meesho & Amazon.",
-        connectWithUs: "Connect With Us:",
-        instagram: "Instagram",
-        facebook: "Facebook",
-        whatsapp: "WhatsApp",
-        viewOnMeesho: "Meesho",
-        viewOnAmazon: "Amazon",
-        chatWhatsApp: "WhatsApp",
-        customizableBadge: "Customizable",
-        customNotice: "✨ Customization Available! Want a specific wrist size or stone mix?",
-        chatCustom: "Chat for Customization",
-        youMightLike: "You Might Also Like",
-        rights: "© 2026 Uroo Enterprise. All rights reserved."
-    },
-    hi: {
-        ticker: "⚠️ नोट: छवियां केवल चित्रण के उद्देश्य से हैं। प्राकृतिक रत्न गुणों के कारण वास्तविक रंग या आकार थोड़ा भिन्न हो सकता है।",
-        chatNow: "चैट करें",
-        searchPlaceholder: "ब्रेसलेट, राशि, पाइराइट खोजें...",
-        bannerTitle: "उरू एंटरप्राइज",
-        bannerDesc: "प्रमाणित क्रिस्टल, वास्तु और आध्यात्मिक संग्रह",
-        marketplaceTag: "🛒 मीशो और अमेज़न पर आधिकारिक रूप से उपलब्ध",
-        exploreCategories: "श्रेणियां देखें",
-        featuredColl: "विशेष संग्रह",
-        aboutTitle: "उरू एंटरप्राइज के बारे में",
-        aboutDesc: "उरू एंटरप्राइज में आपका स्वागत है! हम प्रीमियम गुणवत्ता वाले प्राकृतिक क्रिस्टल ब्रेसलेट, राशि उत्पाद, प्रामाणिक वास्तु उपाय प्रदान करते हैं।",
-        aboutMarketplace: "🛍️ विश्वसनीय विक्रेता: सीधे या मीशो और अमेज़न पर खरीदारी करें।",
-        connectWithUs: "हमसे जुड़ें:",
-        instagram: "इंस्टाग्राम",
-        facebook: "फेसबुक",
-        whatsapp: "व्हाट्सएप",
-        viewOnMeesho: "मीशो",
-        viewOnAmazon: "अमेज़न",
-        chatWhatsApp: "व्हाट्सएप",
-        customizableBadge: "कस्टमाइज़ेबल",
-        customNotice: "✨ कस्टमाइज़ेशन उपलब्ध! अपनी कलाई का आकार या पत्थरों का मिश्रण चाहते हैं?",
-        chatCustom: "चैट करें",
-        youMightLike: "आपको यह भी पसंद आ सकता है",
-        rights: "© 2026 उरू एंटरप्राइज। सर्वाधिकार सुरक्षित।"
-    },
-    mr: {
-        ticker: "⚠️ टीप: प्रतिमा केवळ मनोरंजनासाठी आहेत. नैसर्गिक रत्नांच्या गुणधर्मामुळे रंग किंवा आकारात बदल होऊ शकतो.",
-        chatNow: "चॅट करा",
-        searchPlaceholder: "ब्रेसलेट, राशी शोधा...",
-        bannerTitle: "उरू एंटरप्राइज",
-        bannerDesc: "प्रमाणित क्रिस्टल्स, वास्तू आणि आध्यात्मिक संग्रह",
-        marketplaceTag: "🛒 मीशो और अमेझॉनवर अधिकृतपणे उपलब्ध",
-        exploreCategories: "श्रेण्या पहा",
-        featuredColl: "प्रमुख संग्रह",
-        aboutTitle: "उरू एंटरप्राइज बद्दल",
-        aboutDesc: "उरू एंटरप्राइजमध्ये आपले स्वागत आहे!",
-        aboutMarketplace: "🛍️ विश्वासू विक्रेता: थेट किंवा मीशो आणि अमेझॉनवरून खरेदी करा.",
-        connectWithUs: "आमच्याशी कनेक्ट व्हा:",
-        instagram: "इन्स्टाग्राम",
-        facebook: "फेसबुक",
-        whatsapp: "व्हॉट्सॲप",
-        viewOnMeesho: "मीशो",
-        viewOnAmazon: "अमेझॉन",
-        chatWhatsApp: "व्हॉट्सॲप",
-        customizableBadge: "कस्टमाइझ करण्यायोग्य",
-        customNotice: "✨ कस्टमायझेशन उपलब्ध!",
-        chatCustom: "चॅट करा",
-        youMightLike: "तुम्हाला हे देखील आवडेल",
-        rights: "© 2026 उरू एंटरप्राइज."
-    },
-    te: {
-        ticker: "⚠️ గమనిక: చిత్రాలు వివరణ ప్రయోజనాల కోసం మాత్రమే.",
-        chatNow: "చాట్ చేయండి",
-        searchPlaceholder: "బ్రాస్‌లెట్లు వెతకండి...",
-        bannerTitle: "ఉరూ ఎంటర్‌ప్రైజ్",
-        bannerDesc: "ధృవీకరించబడిన క్రిస్టల్స్, వాస్తు సేకరణ",
-        marketplaceTag: "🛒 మీషో మరియు అమెజాన్‌లో అందుబాటులో ఉంది",
-        exploreCategories: "వర్గాలను అన్వేషించండి",
-        featuredColl: "ఫీచర్ చేసిన సేకరణలు",
-        aboutTitle: "ఉరూ ఎంటర్‌ప్రైజ్ గురించి",
-        aboutDesc: "ఉరూ ఎంటర్‌ప్రైజ్‌కి స్వాగతం!",
-        aboutMarketplace: "🛍️ విశ్వసనీయ విక్రేత.",
-        connectWithUs: "మాతో కనెక్ట్ అవ్వండి:",
-        instagram: "ఇన్‌స్టాగ్రామ్",
-        facebook: "ఫేస్‌బుక్",
-        whatsapp: "వాట్సాప్",
-        viewOnMeesho: "మీషో",
-        viewOnAmazon: "అమెజాన్",
-        chatWhatsApp: "వాట్సాప్",
-        customizableBadge: "అనుకూలీకరించదగినది",
-        customNotice: "✨ అనుకూలీకరణ అందుబాటులో ఉంది!",
-        chatCustom: "చాట్ చేయండి",
-        youMightLike: "మీకు ఇవి కూడా నచ్చవచ్చు",
-        rights: "© 2026 ఉరూ ఎంటర్‌ప్రైజ్."
-    },
-    ta: {
-        ticker: "⚠️ குறிப்பு: படங்கள் விளக்கத்திற்காக மட்டுமே.",
-        chatNow: "உரையாட",
-        searchPlaceholder: "பிரேஸ்லெட்டுகள் தேடவும்...",
-        bannerTitle: "உரூ என்டர்பிரைஸ்",
-        bannerDesc: "சான்றளிக்கப்பட்ட படிகங்கள் சேகரிப்பு",
-        marketplaceTag: "🛒 மீஷோ மற்றும் அமேசானில் கிடைக்கின்றன",
-        exploreCategories: "வகைகளைக் காண்க",
-        featuredColl: "சிறப்பு சேகரிப்புகள்",
-        aboutTitle: "உரூ என்டர்பிரைஸ் பற்றி",
-        aboutDesc: "உரூ என்டர்பிரைஸுக்கு உங்களை வரவேற்கிறோம்!",
-        aboutMarketplace: "🛍️ நம்பகமான விற்பனையாளர்.",
-        connectWithUs: "எங்களை தொடர்பு கொள்ள:",
-        instagram: "இன்ஸ்டாகிராம்",
-        facebook: "பேஸ்புக்",
-        whatsapp: "வாட்ஸ்அப்",
-        viewOnMeesho: "மீஷோ",
-        viewOnAmazon: "அமேசான்",
-        chatWhatsApp: "வாட்ஸ்அப்",
-        customizableBadge: "விருப்பப்படி மாற்றலாம்",
-        customNotice: "✨ விருப்பத்தேர்வு உண்டு!",
-        chatCustom: "பேசுக",
-        youMightLike: "உங்களுக்கு இதுவும் பிடிக்கலாம்",
-        rights: "© 2026 உரூ என்டர்பிரைஸ்."
-    }
-};
-
-const categories = [
-    { id: 'bracelets', name: { en: 'Bracelets', hi: 'ब्रेसलेट', mr: 'ब्रेसलेट', te: 'బ్రాస్‌లెట్లు', ta: 'பிரேஸ்லெட்டுகள்' }, image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400' },
-    { id: 'zodiac', name: { en: 'Zodiac / Rashi Bracelets', hi: 'राशि ब्रेसलेट', mr: 'राशी ब्रेसलेट', te: 'రాశి బ్రాస్‌లెట్లు', ta: 'ராசி பிரேஸ்லெட்டுகள்' }, image: 'https://images.unsplash.com/photo-1611591475583-8a3bc2e93542?w=400' },
-    { id: 'vastu', name: { en: 'Spiritual / Vastu Items', hi: 'आध्यात्मिक / वास्तु वस्तुएं', mr: 'आध्यात्मिक / वास्तू वस्तू', te: 'ఆధ్యాత్మిక / వాస్తు వస్తువులు', ta: 'ஆன்மீக / வாஸ்து பொருட்கள்' }, image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400' },
-    { id: 'jewellery', name: { en: 'Imitation Jewellery', hi: 'इमीिटेशन ज्वैलरी', mr: 'इमिटेशन दागिने', te: 'ఇమిటేషన్ జ్యువెల్లరీ', ta: 'imitations நகைகள்' }, image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400' }
-];
-
-const products = [
-    {
-        id: 1,
-        category: 'bracelets',
-        name: {
-            en: 'Original Citrine Abundance & Wealth Bracelet',
-            hi: 'ओरिजिनल सिट्रीन धन और समृद्धि ब्रेसलेट',
-            mr: 'ओरिजनल सिट्रीन संपत्ती आणि समृद्धी ब्रेसलेट',
-            te: 'అసలైన సిట్రిన్ సంపద & ఐశ్వర్య బ్రాస్‌లెట్',
-            ta: 'ஒரிஜினல் சிட்ரின் செல்வம் & செழிப்பு பிரேஸ்லெட்'
-        },
-        price: 349,
-        originalPrice: 799,
-        customizable: true,
-        images: [
-            'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600',
-            'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600'
-        ],
-        description: {
-            en: 'Natural Citrine crystal bracelet known as the Merchant Stone for attracting financial success, business growth, and positive energy.',
-            hi: 'प्राकृतिक सिट्रीन क्रिस्टल ब्रेसलेट जिसे वित्तीय सफलता, व्यावसायिक विकास और सकारात्मक ऊर्जा आकर्षित करने के लिए मर्चेंट स्टोन के रूप में जाना जाता है।',
-            mr: 'आर्थिक यश, व्यवसाय वृद्धी आणि सकारात्मक ऊर्जा आकर्षित करण्यासाठी मर्चेंट स्टोन म्हणून ओळखले जाणारे नैसर्गिक सिट्रीन क्रिस्टल ब्रेसलेट.',
-            te: 'ఆర్థిక విజయం, వ్యాపార అభివృద్ధి మరియు సానుకూల శక్తిని ఆకర్షించడానికి మర్చెంట్ స్టోన్‌గా పిలువబడే సహజ సిట్రిన్ క్రిస్టల్ బ్రాస్‌లెట్.',
-            ta: 'நிதி வெற்றி, வணிக வளர்ச்சி மற்றும் நேர்மறை ஆற்றலை ஈர்க்கும் வணிக கல் என்று அழைக்கப்படும் இயற்கை சிட்ரின் படிக பிரேஸ்லெட்.'
-        },
-        meeshoLink: 'https://meesho.com',
-        amazonLink: 'https://amazon.in',
-        whatsappMessage: 'Hello Uroo Enterprise, I want to buy Citrine Abundance Bracelet.'
-    },
-    {
-        id: 2,
-        category: 'zodiac',
-        name: {
-            en: 'Aries (Mesha) Zodiac Bracelet – Carnelian & Tiger Eye',
-            hi: 'मेष राशि ब्रेसलेट – कार्नेलियन और टाइगर आई',
-            mr: 'मेष राशी ब्रेसलेट – कार्नेलियन आणि टायगर आय',
-            te: 'మేష రాశి బ్రాస్‌లెట్ – కార్నెలియన్ & టైగర్ ఐ',
-            ta: 'மேஷ ராசி பிரேஸ்லெட் – கார்னிலியன் & டைகர் ஐ'
-        },
-        price: 299,
-        originalPrice: 699,
-        customizable: true,
-        images: [
-            'https://images.unsplash.com/photo-1611591475583-8a3bc2e93542?w=600',
-            'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600'
-        ],
-        description: {
-            en: 'Specially energized natural stone bracelet designed for Aries (Mesha Rashi) natives. Combines Carnelian for drive and Tiger Eye for confidence and protection.',
-            hi: 'मेष राशि के जातकों के लिए विशेष रूप से ऊर्जावान प्राकृतिक पत्थर का ब्रेसलेट। इसमें ऊर्जा के लिए कार्नेलियन और आत्मविश्वास के लिए टाइगर आई का संयोजन है।',
-            mr: 'मेष राशीच्या लोकांसाठी विशेषतः ऊर्जावान बनवलेले नैसर्गिक दगडाचे ब्रेसलेट. यात ऊर्जेसाठी कार्नेलियन आणि आत्मविश्वासासाठी टायगर आय आहे.',
-            te: 'మేష రాశివారి కోసం ప్రత్యేకంగా శక్తివంతం చేయబడిన సహజ రాతి బ్రాస్‌లెట్. ఉత్సాహం కోసం కార్నెలియన్ और आత్మవిశ్వाసం కోసం టైగర్ ఐ కలపబడ్డాయి.',
-            ta: 'மேஷ ராசிக்காரர்களுக்காக பிரத்யேகமாக ஆற்றல் ஊட்டப்பட்ட இயற்கை கல் பிரேஸ்லெட். உத்வேகத்திற்கு கார்னிலியனும், பாதுகாப்பிற்கு டைகர் ஐயும் இணைக்கப்பட்டுள்ளது.'
-        },
-        meeshoLink: 'https://meesho.com',
-        amazonLink: 'https://amazon.in',
-        whatsappMessage: 'Hello Uroo Enterprise, I want to buy Aries Mesha Zodiac Bracelet.'
-    },
-    {
-        id: 3,
-        category: 'vastu',
-        name: {
-            en: 'Pyrite 7 Horse Vastu Frame & Tortoise Set',
-            hi: 'पाइराइट 7 हॉर्स वास्तु फ्रेम और कछुआ सेट',
-            mr: 'पायराईट ७ हॉर्स वास्तू फ्रेम आणि कासव संच',
-            te: 'పైరైట్ 7 హార్స్ వాస్తు ఫ్రేమ్ & తాబేలు సెట్',
-            ta: 'பைரைட் 7 குதிரை வாஸ்து பிரேம் & ஆமை தொகுப்பு'
-        },
-        price: 599,
-        originalPrice: 1299,
-        customizable: false,
-        images: [
-            'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600',
-            'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=600'
-        ],
-        description: {
-            en: 'Powerful Vastu remedy featuring running horses and original Pyrite stones to accelerate career progress, wealth flow, and positive energy.',
-            hi: 'करियर की प्रगति, धन के प्रवाह और सकारात्मक ऊर्जा को तेज करने के लिए दौड़ते घोड़ों और मूल पाइराइट पत्थरों वाला शक्तिशाली वास्तु उपाय।',
-            mr: 'करिअरची प्रगती, संपत्तीचा प्रवाह आणि सकारात्मक ऊर्जा वाढवण्यासाठी धावणारे घोडे आणि अस्सल पायराईट दगडांचा शक्तिशाली वास्तू उपाय.',
-            te: 'కెరీర్ పురోగతి, ధన ప్రవాహం మరియు సానుకూల శక్తిని వేగవంతం చేయడానికి పరుగెత్తుతున్న గుర్రాలు మరియు ఒరిజినల్ పైరైట్ రాళ్లతో శక్తివంతమైన వాస్తు నివారణ.',
-            ta: 'தொழில் முன்னேற்றம், பண வரவு மற்றும் நேர்மறை ஆற்றலை அதிகரிக்க ஓடும் குதிரைகள் மற்றும் ஒரிஜினல் பைரைட் கற்கள் கொண்ட சக்திவாய்ந்த வாஸ்து தீர்வு.'
-        },
-        meeshoLink: 'https://meesho.com',
-        amazonLink: 'https://amazon.in',
-        whatsappMessage: 'Hello Uroo Enterprise, I want to buy Pyrite Vastu Frame.'
-    },
-    {
-        id: 4,
-        category: 'jewellery',
-        name: {
-            en: 'Evil Eye Heart Pendant with Golden Chain',
-            hi: 'गोल्डन चेन के साथ इविल आई हार्ट पेंडेंट',
-            mr: 'गोल्डन चेनसह इव्हिल आय हार्ट पेंडंट',
-            te: 'గోల్డెన్ చెయిన్‌తో ఈవిల్ ఐ హార్ట్ లాకెట్',
-            ta: 'கோல்டன் செயனுடன் ஈவில் ஐ ஹார்ட் லாக்கெட்டு'
-        },
-        price: 249,
-        originalPrice: 599,
-        customizable: false,
-        images: [
-            'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600',
-            'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=600'
-        ],
-        description: {
-            en: 'Stylish heart-shaped evil eye pendant on a durable golden finish chain, combining daily fashion with powerful protective symbolism.',
-            hi: 'टिकाऊ गोल्डन फिनिश चेन पर स्टाइलिश दिल के आकार का इविल आई पेंडेंट, जो दैनिक फैशन और शक्तिशाली सुरक्षात्मक प्रतीकवाद को जोड़ता है।',
-            mr: 'टिकाऊ गोल्डन फिनिश चेनवर स्टायलिश हार्ट-शेप इव्हिल आय पेंडंट, जे दररोजच्या फॅशनसह संरक्षणात्मक प्रतीक जोडते.',
-            te: 'మన్నికైన గోల్డెన్ ఫినిష్ చెయిన్‌పై స్టైలిష్ హార్ట్-షేప్ ఈవిల్ ఐ లాకెట్, రోజువారీ ఫ్యాషన్‌తో పాటు రక్షణను అందిస్తుంది.',
-            ta: 'நீடித்த தங்க நிற செயினில் ஸ்டைலான இதய வடிவிலான ஈவில் ஐ லாக்கெட், அன்றாட ஃபேஷன் மற்றும் பாதுகாப்பை வழங்குகிறது.'
-        },
-        meeshoLink: 'https://meesho.com',
-        amazonLink: 'https://amazon.in',
-        whatsappMessage: 'Hello Uroo Enterprise, I want to buy Evil Eye Heart Pendant.'
-    }
-];
-
-function changeLanguage(lang) {
-    currentLang = lang;
-    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(`lang-${lang}`).classList.add('active');
-    renderCurrentState();
-}
-
-window.addEventListener('popstate', (event) => {
-    renderCurrentState();
-});
-
-function navigateTo(view, param = null) {
-    history.pushState({ view, param }, '', '');
-    renderCurrentState();
-}
-
-function renderCurrentState() {
-    const state = history.state || { view: 'home', param: null };
-    if (state.view === 'home') {
-        showHome(false);
-    } else if (state.view === 'category') {
-        showCategory(state.param, false);
-    } else if (state.view === 'product') {
-        showProductDetail(state.param, false);
-    } else if (state.view === 'search') {
-        handleSearch(state.param, false);
-    } else {
-        showHome(false);
-    }
-}
-
-function showHome(pushHistory = true) {
-    if (pushHistory) {
-        history.pushState({ view: 'home', param: null }, '', '');
-    }
-    const t = translations[currentLang];
-
-    let html = `
-        <div class="home-banner">
-            <h2>${t.bannerTitle}</h2>
-            <p>${t.bannerDesc}</p>
-            <div class="banner-marketplace-tag">${t.marketplaceTag}</div>
-        </div>
-
-        <div class="section-title">${t.exploreCategories}</div>
-        <div class="category-grid">
-    `;
-
-    categories.forEach(cat => {
-        html += `
-            <div class="category-card" onclick="navigateTo('category', '${cat.id}')">
-                <img src="${cat.image}" alt="${cat.name[currentLang]}">
-                <h3>${cat.name[currentLang]}</h3>
-            </div>
-        `;
-    });
-
-    html += `</div><div class="section-title">${t.featuredColl}</div><div class="product-grid">`;
-
-    products.forEach(p => {
-        html += createProductCardHTML(p);
-    });
-
-    html += `</div>`;
-
-    html += `
-        <div class="about-section">
-            <h3>${t.aboutTitle}</h3>
-            <p>${t.aboutDesc}</p>
-            <p style="margin-top: 10px;">${t.aboutMarketplace}</p>
+        // Loop through each product row (skipping the header row)
+        for (let i = 1; i < rows.length; i++) {
+            // Simple CSV line parser handling commas
+            const values = rows[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || rows[i].split(',');
+            const product = {};
             
-            <div class="social-connect-box">
-                <p>${t.connectWithUs}</p>
-                <div class="social-icons-row">
-                    <a href="${INSTAGRAM_URL}" target="_blank" class="social-btn insta"><i class="fa-brands fa-instagram"></i> ${t.instagram}</a>
-                    <a href="${FACEBOOK_URL}" target="_blank" class="social-btn fb"><i class="fa-brands fa-facebook"></i> ${t.facebook}</a>
-                    <a href="https://wa.me/${WHATSAPP_NUMBER}?text=Hello%20Uroo%20Enterprise" target="_blank" class="social-btn wa"><i class="fa-brands fa-whatsapp"></i> ${t.whatsapp}</a>
-                </div>
-                <p class="email-text"><i class="fa-solid fa-envelope"></i> ${SUPPORT_EMAIL}</p>
-            </div>
-        </div>
-    `;
+            headers.forEach((header, index) => {
+                let val = values[index] ? values[index].trim() : '';
+                // Remove surrounding quotes if present
+                if (val.startsWith('"') && val.endsWith('"')) {
+                    val = val.slice(1, -1);
+                }
+                product[header.trim()] = val;
+            });
 
-    appContainer.innerHTML = html;
-    window.scrollTo(0, 0);
-}
+            const isOutStock = product.stock && product.stock.toLowerCase().includes('out');
 
-function showCategory(catId, pushHistory = true) {
-    if (pushHistory) {
-        history.pushState({ view: 'category', param: catId }, '', '');
-    }
-    const cat = categories.find(c => c.id === catId);
-    const catProducts = products.filter(p => p.category === catId);
-    const t = translations[currentLang];
+            // Build the product card HTML dynamically
+            const cardHTML = `
+                <div class="product-card" style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin: 10px; background: #fff; position: relative;">
+                    ${isOutStock ? '<span style="position: absolute; top: 10px; right: 10px; background: #ff4d4d; color: #fff; padding: 4px 8px; font-size: 12px; border-radius: 4px;">Out of Stock</span>' : ''}
+                    
+                    <img src="${product.image}" alt="${product.title}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 6px;">
+                    <span style="font-size: 12px; color: #666; text-transform: uppercase;">${product.category}</span>
+                    <h3 style="font-size: 16px; margin: 8px 0;">${product.title}</h3>
+                    <p style="font-size: 14px; color: #444; margin-bottom: 12px;">${product.description}</p>
+                    
+                    <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px;">
+                        <span style="font-size: 18px; font-weight: bold; color: #2e7d32;">₹${product.price}</span>
+                        <span style="font-size: 14px; color: #888; text-decoration: line-through;">₹${product.mrp}</span>
+                    </div>
 
-    let html = `
-        <div class="section-title" style="margin-top:16px;">${cat ? cat.name[currentLang] : 'Products'} (${catProducts.length})</div>
-        <div class="product-grid">
-    `;
-
-    if(catProducts.length === 0) {
-        html += `<p style="padding:16px; font-size:13px;">No products added in this category yet. Check back soon or chat on WhatsApp!</p>`;
-    } else {
-        catProducts.forEach(p => {
-            html += createProductCardHTML(p);
-        });
-    }
-
-    html += `</div>`;
-    appContainer.innerHTML = html;
-    window.scrollTo(0, 0);
-}
-
-function createProductCardHTML(p) {
-    const t = translations[currentLang];
-    return `
-        <div class="product-card" onclick="navigateTo('product', ${p.id})">
-            ${p.customizable ? `<span class="customization-badge">${t.customizableBadge}</span>` : ''}
-            <img src="${p.images[0]}" alt="${p.name[currentLang]}">
-            <div class="product-info">
-                <div class="product-name">${p.name[currentLang]}</div>
-                <div>
-                    <span class="product-price">Rs. ${p.price}</span>
-                    <span class="product-original-price">Rs. ${p.originalPrice}</span>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-function showProductDetail(productId, pushHistory = true) {
-    if (pushHistory) {
-        history.pushState({ view: 'product', param: productId }, '', '');
-    }
-    const p = products.find(item => item.id === productId);
-    if (!p) return;
-    const t = translations[currentLang];
-
-    let thumbHTML = '';
-    p.images.forEach((img, idx) => {
-        thumbHTML += `<img src="${img}" class="thumb-img ${idx === 0 ? 'active' : ''}" onclick="changeMainImage(this, '${img}')">`;
-    });
-
-    let recommendedHTML = '';
-    const related = products.filter(item => item.id !== productId).slice(0, 3);
-    related.forEach(rel => {
-        recommendedHTML += createProductCardHTML(rel);
-    });
-
-    let customizationBoxHTML = '';
-    if (p.customizable) {
-        const customMsg = encodeURIComponent(`Hello Uroo Enterprise, I want custom wrist size / stone combination for: ${p.name.en}`);
-        customizationBoxHTML = `
-            <div class="custom-notice-box">
-                <p>${t.customNotice}</p>
-                <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${customMsg}" target="_blank" class="btn-custom-wa">
-                    <i class="fa-brands fa-whatsapp"></i> ${t.chatCustom}
-                </a>
-            </div>
-        `;
-    }
-
-    let html = `
-        <div class="detail-container">
-            <div class="image-gallery">
-                <img src="${p.images[0]}" id="mainImageDisplay" class="main-img-view" alt="${p.name[currentLang]}">
-            </div>
-            <div class="thumbnail-strip">
-                ${thumbHTML}
-            </div>
-            <div class="detail-content">
-                <h2 class="detail-title">${p.name[currentLang]}</h2>
-                <div class="detail-price-box">
-                    <span class="detail-price">Rs. ${p.price}</span>
-                    <span class="product-original-price" style="font-size:14px;">Rs. ${p.originalPrice}</span>
-                </div>
-
-                ${customizationBoxHTML}
-
-                <div class="detail-desc">
-                    <p>${p.description[currentLang]}</p>
-                </div>
-                
-                <div class="legal-disclaimer">
-                    ⚠️ <strong>Disclaimer:</strong> ${t.ticker}
-                </div>
-
-                <div class="recommendations-section">
-                    <h3>${t.youMightLike}</h3>
-                    <div class="product-grid" style="padding:0;">
-                        ${recommendedHTML}
+                    <div style="display: flex; gap: 8px;">
+                        ${isOutStock ? 
+                            `<button disabled style="flex: 1; padding: 10px; background: #cccccc; color: #666; border: none; border-radius: 4px; cursor: not-allowed;">Sold Out</button>` :
+                            `<button onclick="openCheckout('${product.sku}', '${product.title}',${product.price}, '${product.hsn}', '${product.gst}')" style="flex: 1; padding: 10px; background: #1976d2; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Buy Direct (UPI)</button>`
+                        }
+                    </div>
+                    
+                    <div style="margin-top: 10px; display: flex; justify-content: space-between; font-size: 12px;">
+                        <a href="${product.amazon}" target="_blank" style="color: #ff9900; text-decoration: none;">View on Amazon</a>
+                        <a href="${product.meesho}" target="_blank" style="color: #d81b60; text-decoration: none;">View on Meesho</a>
                     </div>
                 </div>
-            </div>
-
-            <!-- Fixed Bottom Buying Buttons -->
-            <div class="action-bar">
-                <a href="${p.meeshoLink}" target="_blank" class="btn-meesho"><i class="fa-solid fa-bag-shopping"></i> ${t.viewOnMeesho}</a>
-                <a href="${p.amazonLink}" target="_blank" class="btn-amazon"><i class="fa-brands fa-amazon"></i> ${t.viewOnAmazon}</a>
-                <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(p.whatsappMessage)}" target="_blank" class="btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> ${t.chatWhatsApp}</a>
-            </div>
-        </div>
-    `;
-
-    appContainer.innerHTML = html;
-    window.scrollTo(0, 0);
-}
-
-function changeMainImage(element, src) {
-    document.getElementById('mainImageDisplay').src = src;
-    document.querySelectorAll('.thumb-img').forEach(img => img.classList.remove('active'));
-    element.classList.add('active');
-}
-
-function handleSearchInput(event) {
-    const query = event.target.value.toLowerCase().trim();
-    if(query === '') {
-        showHome(true);
-        return;
-    }
-    navigateTo('search', query);
-}
-
-function handleSearch(query, pushHistory = true) {
-    if (pushHistory) {
-        history.pushState({ view: 'search', param: query }, '', '');
-    }
-    const filtered = products.filter(p => p.name[currentLang].toLowerCase().includes(query) || p.description[currentLang].toLowerCase().includes(query));
-
-    let html = `
-        <div class="section-title" style="margin-top:16px;">Search Results (${filtered.length})</div>
-        <div class="product-grid">
-    `;
-
-    if(filtered.length === 0) {
-        html += `<p style="padding:16px; font-size:13px;">No products found matching "${query}".</p>`;
-    } else {
-        filtered.forEach(p => {
-            html += createProductCardHTML(p);
-        });
-    }
-
-    html += `</div>`;
-    appContainer.innerHTML = html;
-}
-
-function checkUrlParameters() {
-    const params = new URLSearchParams(window.location.search);
-    const productId = params.get('product');
-    const categoryId = params.get('category');
-
-    if (productId) {
-        history.replaceState({ view: 'product', param: parseInt(productId) }, '', '');
-        showProductDetail(parseInt(productId), false);
-    } else if (categoryId) {
-        history.replaceState({ view: 'category', param: categoryId }, '', '');
-        showCategory(categoryId, false);
-    } else {
-        history.replaceState({ view: 'home', param: null }, '', '');
-        showHome(false);
+            `;
+            
+            productContainer.innerHTML += cardHTML;
+        }
+    } catch (error) {
+        console.error("Error loading products catalog:", error);
     }
 }
 
-checkUrlParameters();
+// Run the function when the page loads
+window.addEventListener('DOMContentLoaded', loadStoreProducts);
