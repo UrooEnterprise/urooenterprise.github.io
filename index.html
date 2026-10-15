@@ -185,6 +185,7 @@
             margin-bottom: 10px;
         }
 
+        /* Action Buttons */
         .card-actions {
             padding: 0 12px 12px 12px;
             display: flex;
@@ -209,17 +210,43 @@
         .buy-now-btn:hover { background: var(--meesho-pink-dark); }
         .buy-now-btn:disabled { background: #cccccc; cursor: not-allowed; }
 
-        .external-links {
+        /* Authentic Brand Buttons */
+        .marketplace-buttons {
             display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            padding-top: 4px;
-            border-top: 1px solid #f0f0f0;
+            gap: 6px;
+            margin-top: 2px;
         }
 
-        .external-links a { text-decoration: none; font-weight: 500; }
-        .amz { color: #ff9900; }
-        .msh { color: var(--meesho-pink); }
+        .mkt-btn {
+            flex: 1;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 7px 4px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            transition: filter 0.2s;
+        }
+        .mkt-btn:hover { filter: brightness(0.95); }
+
+        /* Authentic Amazon Gold/Yellow Theme */
+        .amazon-btn {
+            background-color: #f0c14b;
+            background-image: linear-gradient(to bottom,#f7dfa5,#f0c14b);
+            border: 1px solid #a88734;
+            color: #111;
+        }
+
+        /* Authentic Meesho Pink/Magenta Theme */
+        .meesho-btn {
+            background-color: #d91b5c;
+            border: 1px solid #b8124b;
+            color: #fff;
+        }
 
         @media (max-width: 768px) {
             #product-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -248,7 +275,6 @@
     </div>
 
     <script>
-        // Your complete product catalog stored safely inside JavaScript
         const PRODUCTS = [
             {
                 sku: "GoldenHematiteBracelet01",
@@ -421,11 +447,11 @@
                         </div>
                         <div class="card-actions">
                             <button class="buy-now-btn" ${isOutStock ? 'disabled' : ''} onclick="alert('Proceeding to Direct UPI Checkout for: ${product.sku}')">
-                                ${isOutStock ? 'Out of Stock' : 'Buy Now'}
+                                ${isOutStock ? 'Out of Stock' : 'Buy Direct (UPI)'}
                             </button>
-                            <div class="external-links">
-                                <a href="${product.amazon}" target="_blank" class="amz">Amazon ↗</a>
-                                <a href="${product.meesho}" target="_blank" class="msh">Meesho ↗</a>
+                            <div class="marketplace-buttons">
+                                <a href="${product.amazon}" target="_blank" class="mkt-btn amazon-btn">📦 Order on Amazon</a>
+                                <a href="${product.meesho}" target="_blank" class="mkt-btn meesho-btn">🛍️ Order on Meesho</a>
                             </div>
                         </div>
                     </div>
