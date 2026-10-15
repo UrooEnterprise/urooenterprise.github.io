@@ -3,96 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uroo Enterprise - Store</title>
+    <title>Uroo Enterprise | Original Gemstones & Spiritual Decor</title>
+    <!-- Google Fonts for Modern Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f9f9f9; color: #333; }
-        header { text-align: center; margin-bottom: 30px; }
-        h1 { margin: 0; color: #1a1a1a; }
-        p { color: #666; }
-        
+        :root {
+            --primary: #1e293b;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.5; }
+
+        /* Modern Header & Announcement Bar */
+        .announcement-bar {
+            background: var(--primary);
+            color: #fff;
+            text-align: center;
+            font-size: 13px;
+            padding: 8px 16px;
+            font-weight: 500;
+        }
+
+        header {
+            background: #fff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 24px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        header h1 { font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
+        header p { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Hero Trust Badges */
+        .trust-badges {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            background: #fff;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Container & Grid */
+        .container {
+            max-width: 1280px;
+            margin: 32px auto;
+            padding: 0 20px;
+        }
+
         #product-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
         }
-        
+
+        /* Modern Product Card */
         .product-card {
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 16px;
-            background: #fff;
-            position: relative;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: var(--shadow);
         }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .image-container {
+            position: relative;
+            width: 100%;
+            height: 240px;
+            overflow: hidden;
+            background: #f1f5f9;
+        }
+
         .product-card img {
             width: 100%;
-            height: 200px;
+            height: 100%;
             object-fit: cover;
-            border-radius: 6px;
+            transition: transform 0.3s ease;
         }
+
+        .product-card:hover img {
+            transform: scale(1.05);
+        }
+
         .out-of-stock-badge {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #ff4d4d;
+            top: 12px;
+            right: 12px;
+            background: var(--danger);
             color: #fff;
-            padding: 4px 8px;
-            font-size: 12px;
-            border-radius: 4px;
-            font-weight: bold;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 2;
         }
-        .category { font-size: 12px; color: #888; text-transform: uppercase; margin-top: 10px; display: block; }
-        .title { font-size: 16px; font-weight: bold; margin: 6px 0; color: #222; }
-        .desc { font-size: 13px; color: #555; margin-bottom: 12px; line-height: 1.4; }
-        
+
+        .card-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .category {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+        }
+
+        .title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .card-footer {
+            padding: 0 20px 20px 20px;
+        }
+
         .price-row {
             display: flex;
             align-items: baseline;
-            gap: 8px;
-            margin-bottom: 12px;
+            gap: 10px;
+            margin-bottom: 14px;
         }
-        .price { font-size: 18px; font-weight: bold; color: #2e7d32; }
-        .mrp { font-size: 14px; color: #888; text-decoration: line-through; }
+
+        .price {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .mrp {
+            font-size: 14px;
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
 
         .buy-btn {
             width: 100%;
-            padding: 10px;
-            background: #1976d2;
+            padding: 12px;
+            background: var(--accent);
             color: #fff;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
             font-size: 14px;
+            transition: background 0.2s ease;
         }
-        .buy-btn:disabled { background: #cccccc; color: #666; cursor: not-allowed; }
+
+        .buy-btn:hover { background: var(--accent-hover); }
+        .buy-btn:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; }
 
         .marketplaces {
-            margin-top: 12px;
+            margin-top: 14px;
             display: flex;
             justify-content: space-between;
             font-size: 12px;
-            border-top: 1px solid #eee;
-            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
         }
-        .marketplaces a { text-decoration: none; font-weight: 500; }
-        .amazon-link { color: #ff9900; }
-        .meesho-link { color: #d81b60; }
+
+        .marketplaces a { text-decoration: none; font-weight: 600; transition: opacity 0.2s; }
+        .marketplaces a:hover { opacity: 0.8; }
+        .amazon-link { color: #d97706; }
+        .meesho-link { color: #db2777; }
+
+        /* Loading Skeleton / States */
+        .loading-state {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 60px;
+            color: var(--text-muted);
+            font-size: 16px;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
+
+    <div class="announcement-bar">
+        ✨ Free Shipping Across India on All Prepaid UPI Orders | 100% Original Certified Gemstones
+    </div>
 
     <header>
         <h1>Uroo Enterprise</h1>
         <p>Original Gemstones, Vastu Decor & Spiritual Accessories</p>
     </header>
 
-    <div id="product-grid">
-        <p style="text-align: center; grid-column: 1 / -1; color: #666;">Loading products...</p>
+    <div class="trust-badges">
+        <span>🛡️ Certified Original</span>
+        <span>⚡ Fast Dispatch</span>
+        <span>🔒 Secure UPI Checkout</span>
+    </div>
+
+    <div class="container">
+        <div id="product-grid">
+            <div class="loading-state">Loading your catalog...</div>
+        </div>
     </div>
 
     <script>
@@ -109,7 +264,6 @@
                 const productContainer = document.getElementById('product-grid');
                 productContainer.innerHTML = '';
 
-                // Start from line 2 to skip header and separator lines
                 for (let i = 2; i < lines.length; i++) {
                     const cols = lines[i].split('|').map(c => c.trim()).filter(c => c !== '');
                     if (cols.length < 10) continue;
@@ -119,24 +273,26 @@
 
                     const cardHTML = `
                         <div class="product-card">
-                            ${isOutStock ? '<span class="out-of-stock-badge">Out of Stock</span>' : ''}
-                            <img src="${image}" alt="${title}">
-                            <div>
+                            ${isOutStock ? '<span class="out-of-stock-badge">Sold Out</span>' : ''}
+                            <div class="image-container">
+                                <img src="${image}" alt="${title}" loading="lazy">
+                            </div>
+                            <div class="card-body">
                                 <span class="category">${category}</span>
                                 <div class="title">${title}</div>
                                 <div class="desc">${description}</div>
                             </div>
-                            <div>
+                            <div class="card-footer">
                                 <div class="price-row">
                                     <span class="price">₹${price}</span>
                                     <span class="mrp">₹${mrp}</span>
                                 </div>
-                                <button class="buy-btn" ${isOutStock ? 'disabled' : ''} onclick="alert('Checkout for ${sku}')">
-                                    ${isOutStock ? 'Sold Out' : 'Buy Direct (UPI)'}
+                                <button class="buy-btn" ${isOutStock ? 'disabled' : ''} onclick="alert('Checkout initiated for SKU: ${sku}')">
+                                    ${isOutStock ? 'Currently Unavailable' : 'Buy Direct (UPI)'}
                                 </button>
                                 <div class="marketplaces">
-                                    <a href="${amazon}" target="_blank" class="amazon-link">Amazon</a>
-                                    <a href="${meesho}" target="_blank" class="meesho-link">Meesho</a>
+                                    <a href="${amazon}" target="_blank" class="amazon-link">View on Amazon →</a>
+                                    <a href="${meesho}" target="_blank" class="meesho-link">View on Meesho →</a>
                                 </div>
                             </div>
                         </div>
@@ -145,7 +301,7 @@
                 }
             } catch (error) {
                 console.error(error);
-                document.getElementById('product-grid').innerHTML = '<p style="text-align: center; color: red; grid-column: 1 / -1;">Failed to load catalog. Please check products.md file.</p>';
+                document.getElementById('product-grid').innerHTML = '<div class="loading-state" style="color: var(--danger);">Failed to load store catalog. Please check your products.md file.</div>';
             }
         }
 
