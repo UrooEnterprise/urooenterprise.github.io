@@ -3,47 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uroo Enterprise - Official Store | Gemstones & Spiritual Decor</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Uroo Enterprise | Official Spiritual & Gemstone Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
+            --spiritual-primary: #1e1b4b; /* Deep spiritual indigo */
+            --spiritual-accent: #b45309;  /* Sacred gold */
+            --spiritual-accent-light: #f59e0b;
             --meesho-pink: #d91b5c;
-            --meesho-pink-dark: #b8124b;
-            --amazon-orange: #ff9900;
-            --bg-light: #f1f3f6;
-            --text-main: #212121;
-            --text-muted: #666666;
-            --success-green: #388e3c;
-            --border-color: #e0e0e0;
+            --bg-light: #fdfcfb;        /* Warm sacred paper tone */
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --success-green: #15803d;
+            --border-color: #e5e7eb;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background-color: var(--bg-light); color: var(--text-main); }
 
-        /* Announcement Bar */
+        /* Spiritual Announcement Bar */
         .top-banner {
-            background-color: #172337;
-            color: #fff;
+            background-color: var(--spiritual-primary);
+            color: #fde047;
             text-align: center;
             font-size: 12px;
-            padding: 7px 16px;
+            padding: 8px 16px;
             font-weight: 500;
+            letter-spacing: 0.3px;
         }
 
         /* Professional Header */
         header {
-            background: #2874f0; /* Professional marketplace blue header */
-            color: #fff;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .header-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 10px 16px;
+            padding: 14px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -53,26 +55,29 @@
         .logo-area h1 {
             font-size: 22px;
             font-weight: 700;
-            color: #fff;
+            color: var(--spiritual-primary);
             letter-spacing: -0.5px;
         }
 
         .logo-area span {
-            color: #fffa65;
+            color: var(--spiritual-accent);
             font-size: 11px;
             font-weight: 600;
             display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         /* Search Bar */
         .search-box {
             flex: 1;
-            max-width: 550px;
+            max-width: 500px;
             display: flex;
-            background: #fff;
-            border-radius: 2px;
+            background: #f9fafb;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
         }
 
         .search-box input {
@@ -81,28 +86,34 @@
             border: none;
             outline: none;
             font-size: 14px;
+            background: transparent;
         }
 
         .search-box button {
-            background: #ffe11b;
+            background: var(--spiritual-primary);
             border: none;
-            padding: 0 16px;
+            padding: 0 18px;
             font-weight: 600;
             cursor: pointer;
-            color: #2874f0;
+            color: #fff;
+            transition: background 0.2s;
         }
 
-        /* Category Filter Navigation Bar */
+        .search-box button:hover {
+            background: var(--spiritual-accent);
+        }
+
+        /* Category Filter Bar */
         .category-nav {
-            background: #fff;
+            background: #ffffff;
             border-bottom: 1px solid var(--border-color);
-            padding: 10px 16px;
+            padding: 12px 16px;
             display: flex;
             gap: 10px;
             overflow-x: auto;
             white-space: nowrap;
             position: sticky;
-            top: 56px;
+            top: 61px;
             z-index: 999;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
@@ -111,71 +122,72 @@
             height: 4px;
         }
         .category-nav::-webkit-scrollbar-thumb {
-            background: #ccc;
+            background: #d1d5db;
             border-radius: 4px;
         }
 
         .cat-chip {
-            background: #f0f2f5;
-            border: 1px solid #dcdcdc;
-            padding: 6px 14px;
-            border-radius: 16px;
+            background: #f3f4f6;
+            border: 1px solid var(--border-color);
+            padding: 6px 16px;
+            border-radius: 20px;
             font-size: 13px;
             font-weight: 600;
-            color: #484848;
+            color: var(--text-muted);
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .cat-chip:hover, .cat-chip.active {
-            background: #2874f0;
+            background: var(--spiritual-primary);
             color: #fff;
-            border-color: #2874f0;
+            border-color: var(--spiritual-primary);
         }
 
-        /* Main Store Layout */
+        /* Main Container */
         .main-container {
             max-width: 1200px;
-            margin: 16px auto;
-            padding: 0 10px;
+            margin: 20px auto;
+            padding: 0 12px;
         }
 
         .results-info {
             font-size: 13px;
             color: var(--text-muted);
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             padding-left: 4px;
             font-weight: 500;
         }
 
         #product-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 16px;
         }
 
         /* Product Card */
         .product-card {
-            background: #fff;
-            border-radius: 4px;
+            background: #ffffff;
+            border-radius: 10px;
             border: 1px solid var(--border-color);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
-            transition: box-shadow 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .product-card:hover {
-            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -5px rgba(30, 27, 75, 0.08);
         }
 
         .image-box {
             position: relative;
             width: 100%;
-            height: 210px;
-            background: #f9f9f9;
+            height: 220px;
+            background: #f3f4f6;
         }
 
         .product-card img {
@@ -193,12 +205,12 @@
             padding: 3px 8px;
             font-size: 10px;
             font-weight: 700;
-            border-radius: 3px;
+            border-radius: 4px;
             text-transform: uppercase;
         }
 
         .card-details {
-            padding: 10px 12px;
+            padding: 12px;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
@@ -206,23 +218,24 @@
 
         .category-tag {
             font-size: 10px;
-            color: #878787;
+            color: var(--spiritual-accent);
             text-transform: uppercase;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 4px;
+            letter-spacing: 0.5px;
         }
 
         .product-title {
             font-size: 13px;
-            color: #212121;
-            line-height: 1.3;
+            color: var(--text-main);
+            line-height: 1.35;
             margin-bottom: 8px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            height: 34px;
-            font-weight: 500;
+            height: 36px;
+            font-weight: 600;
         }
 
         .price-section {
@@ -233,39 +246,39 @@
         }
 
         .current-price {
-            font-size: 17px;
+            font-size: 18px;
             font-weight: 700;
-            color: #212121;
+            color: var(--spiritual-primary);
         }
 
         .mrp-price {
             font-size: 12px;
-            color: #878787;
+            color: var(--text-muted);
             text-decoration: line-through;
         }
 
         .discount-badge {
             font-size: 11px;
             font-weight: 700;
-            color: #388e3c;
+            color: var(--success-green);
         }
 
         .rating-pill {
             display: inline-flex;
             align-items: center;
-            background: #388e3c;
+            background: #15803d;
             color: white;
             font-size: 11px;
             font-weight: 600;
             padding: 2px 6px;
-            border-radius: 3px;
+            border-radius: 4px;
             width: fit-content;
             margin-bottom: 10px;
         }
 
         /* Action Buttons */
         .card-actions {
-            padding: 0 10px 10px 10px;
+            padding: 0 12px 12px 12px;
             display: flex;
             flex-direction: column;
             gap: 6px;
@@ -282,7 +295,7 @@
             font-size: 11px;
             font-weight: 600;
             padding: 8px 4px;
-            border-radius: 3px;
+            border-radius: 6px;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -295,26 +308,26 @@
         .action-btn:hover { opacity: 0.9; }
 
         .meesho-btn {
-            background-color: #d91b5c;
+            background-color: var(--meesho-pink);
             color: #fff;
         }
 
         .amazon-btn {
-            background-color: #ff9900;
+            background-color: #f59e0b;
             color: #111;
             font-weight: 700;
         }
 
         .whatsapp-order-btn {
-            background-color: #25d366;
+            background-color: #15803d;
             color: #fff;
             width: 100%;
         }
 
         .whatsapp-inquiry-btn {
-            background-color: #f0f2f5;
-            color: #334155;
-            border: 1px solid #dcdcdc;
+            background-color: #f3f4f6;
+            color: #374151;
+            border: 1px solid var(--border-color);
             width: 100%;
         }
 
@@ -328,8 +341,8 @@
         }
 
         @media (max-width: 768px) {
-            #product-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-            .header-container { flex-direction: column; align-items: stretch; gap: 8px; }
+            #product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .header-container { flex-direction: column; align-items: stretch; gap: 10px; }
             .search-box { max-width: 100%; }
         }
     </style>
@@ -337,14 +350,14 @@
 <body>
 
     <div class="top-banner">
-        🔥 100% Original Certified Gemstones • Free Delivery on Direct WhatsApp UPI Orders
+        📿 100% Certified Original Gemstones & Vastu Artifacts • Direct WhatsApp UPI Orders Get Priority Dispatch
     </div>
 
     <header>
         <div class="header-container">
             <div class="logo-area">
                 <h1>Uroo Enterprise</h1>
-                <span>Official Online Catalog</span>
+                <span>Sacred & Spiritual Catalog</span>
             </div>
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="Search bracelets, rashi items, vastu decor..." oninput="filterProducts()">
@@ -353,13 +366,11 @@
         </div>
     </header>
 
-    <!-- Interactive Category Filter Bar -->
-    <div class="category-nav" id="categoryNav">
-        <!-- Generated dynamically via JavaScript -->
-    </div>
+    <!-- Category Filter Navigation Bar -->
+    <div class="category-nav" id="categoryNav"></div>
 
     <div class="main-container">
-        <div class="results-info" id="resultsInfo">Showing all products</div>
+        <div class="results-info" id="resultsInfo">Showing all collections</div>
         <div id="product-grid"></div>
     </div>
 
@@ -409,7 +420,6 @@
         const WHATSAPP_NUMBER = "919016406623";
         let activeCategory = "All";
 
-        // Initialize Category Filter Chips
         function initCategories() {
             const categories = ["All", ...new Set(PRODUCTS.map(p => p.category))];
             const nav = document.getElementById('categoryNav');
@@ -429,7 +439,6 @@
             });
         }
 
-        // Render & Filter Products based on Category and Search Query
         function filterProducts() {
             const query = document.getElementById('searchInput').value.toLowerCase().trim();
             const grid = document.getElementById('product-grid');
@@ -444,7 +453,7 @@
             document.getElementById('resultsInfo').textContent = `Showing ${filtered.length} products ${activeCategory !== 'All' ? 'in ' + activeCategory : ''}`;
 
             if (filtered.length === 0) {
-                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">No products found matching your search.</div>`;
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #6b7280;">No sacred items found matching your search.</div>`;
                 return;
             }
 
@@ -469,7 +478,7 @@
                                 <span class="mrp-price">₹${product.mrp}</span>
                                 ${discount > 0 ? `<span class="discount-badge">${discount}% off</span>` : ''}
                             </div>
-                            <div class="rating-pill">4.2 ★ <span style="font-weight:normal; font-size:10px; margin-left:2px;">(120)</span></div>
+                            <div class="rating-pill">4.9 ★ <span style="font-weight:normal; font-size:10px; margin-left:2px;">(148)</span></div>
                         </div>
                         <div class="card-actions">
                             <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${orderMessage}" target="_blank" class="action-btn whatsapp-order-btn" ${isOutStock ? 'style="pointer-events:none; background:#ccc;"' : ''}>
