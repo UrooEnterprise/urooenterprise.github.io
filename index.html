@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#183b32">
+  <meta name="description" content="Browse our product collection and choose how you'd like to order.">
+  <title>Uroo Store | Shop Online</title>
+  <style>
+    :root{--green:#183b32;--green2:#245849;--cream:#fbf8f2;--ink:#202721;--muted:#68736d;--line:#e5e8e3;--white:#fff;--gold:#c49b54}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    a{color:inherit}.topbar{background:var(--green);color:#fff;padding:10px 16px;text-align:center;font-size:12px;letter-spacing:.03em}
+    header{background:rgba(251,248,242,.96);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+    .header-inner{max-width:1180px;margin:auto;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{font-family:Georgia,serif;font-size:25px;font-weight:700;letter-spacing:.02em;color:var(--green);text-decoration:none}.header-note{font-size:12px;color:var(--muted)}
+    main{max-width:1180px;margin:auto;padding:0 16px 48px}
+    .hero{padding:28px 0 22px}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--green2);font-weight:800}
+    h1{font-family:Georgia,serif;font-size:clamp(30px,7vw,48px);line-height:1.06;margin:8px 0 10px;max-width:650px;color:var(--green)}
+    .hero p{margin:0;color:var(--muted);max-width:620px;line-height:1.55;font-size:14px}
+    .tools{display:grid;grid-template-columns:1fr;gap:10px;margin:16px 0 18px}
+    input,select{width:100%;min-height:46px;border:1px solid #d9dfd9;border-radius:12px;padding:11px 13px;background:#fff;color:var(--ink);font:inherit;font-size:14px}
+    .result-line{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:16px 0 12px;color:var(--muted);font-size:13px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .card{min-width:0;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 2px 8px rgba(24,59,50,.035)}
+    .photo{aspect-ratio:1/1;background:#f0eee8;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+    .photo img{width:100%;height:100%;object-fit:cover;display:block}
+    .placeholder{font-family:Georgia,serif;color:#8d978e;text-align:center;padding:16px;font-size:14px}
+    .stock-badge{position:absolute;left:8px;top:8px;background:#fff;color:var(--green);border-radius:20px;padding:5px 8px;font-size:10px;font-weight:800}
+    .stock-badge.out{background:#fbe9e7;color:#9b3028}
+    .card-body{padding:11px;display:flex;flex-direction:column;gap:7px;flex:1}
+    .category{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .product-title{font-family:Georgia,serif;font-size:16px;line-height:1.22;margin:0}
+    .sku{font-size:10px;color:var(--muted);overflow-wrap:anywhere}
+    .prices{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin-top:2px}.price{font-size:18px;font-weight:800;color:var(--green)}.mrp{font-size:12px;color:#89918b;text-decoration:line-through}
+    .description{font-size:12px;line-height:1.45;color:var(--muted);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+    .actions{display:grid;gap:7px;margin-top:auto;padding-top:5px}
+    .btn{display:flex;align-items:center;justify-content:center;gap:6px;min-height:42px;border-radius:10px;padding:9px 8px;text-align:center;text-decoration:none;font-weight:750;font-size:12px;border:1px solid transparent}
+    .btn-primary{background:var(--green);color:white}.btn-wa{background:#e8f8ee;color:#116b38;border-color:#c5ebd1}.btn-market{background:#fff;color:var(--green);border-color:#dce3dc}
+    .btn.disabled{background:#f1f2ef;color:#9ca49d;border-color:#e4e6e1;pointer-events:none}
+    .empty{grid-column:1/-1;text-align:center;padding:40px 12px;color:var(--muted)}
+    .footer{background:var(--green);color:#fff;padding:26px 16px;text-align:center;font-size:12px;line-height:1.6}.footer strong{font-family:Georgia,serif;font-size:20px}
+    .wa-float{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:20;background:#20bd5a;color:#fff;text-decoration:none;border-radius:28px;padding:13px 16px;box-shadow:0 5px 20px #0002;font-weight:800;font-size:13px}
+    .notice{font-size:11px;color:var(--muted);line-height:1.5;margin:12px 0 0}
+    @media(min-width:620px){.tools{grid-template-columns:1.5fr 1fr}.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.card-body{padding:14px}.product-title{font-size:18px}.btn{font-size:13px}}
+    @media(min-width:900px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.hero{padding-top:44px}.tools{max-width:760px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  </style>
+</head>
+<body>
+  <div class="topbar">Thoughtfully selected products · Shop your way</div>
+  <header><div class="header-inner"><a class="brand" href="./">Uroo Store</a><span class="header-note">Questions? Chat with us on WhatsApp</span></div></header>
+  <main>
+    <section class="hero">
+      <div class="eyebrow">The collection</div>
+      <h1>Find something<br>you’ll love.</h1>
+      <p>Browse the collection, compare buying options, or message us with a question about any product.</p>
+    </section>
+    <section aria-label="Product filters">
+      <div class="tools">
+        <input id="search" type="search" placeholder="Search products or SKU…" aria-label="Search products">
+        <select id="category" aria-label="Filter by category"><option value="">All categories</option></select>
+      </div>
+      <div class="result-line"><span id="count">Loading products…</span><span>Prices in INR (₹)</span></div>
+      <div class="grid" id="products" aria-live="polite"></div>
+      <p class="notice">Marketplace links appear when they have been added to the product catalogue. Product images and links can be updated in <code>products.json</code>.</p>
+    </section>
+  </main>
+  <footer class="footer"><strong>Uroo Store</strong><br>Thank you for visiting our store.</footer>
+  <a class="wa-float" id="general-wa" href="#" target="_blank" rel="noopener">WhatsApp us</a>
+<script>
+  // WhatsApp number in international format: India country code + 10-digit mobile, digits only.
+  const WHATSAPP_NUMBER = "919016406623";
+  const productsEl = document.getElementById("products");
+  const searchEl = document.getElementById("search");
+  const categoryEl = document.getElementById("category");
+  const countEl = document.getElementById("count");
+  let catalogue = [];
+
+  function waLink(product, kind) {
+    const pageUrl = new URL("./", window.location.href).href + "#product-" + encodeURIComponent(product.sku);
+    const firstLine = kind === "order" ? "Hi! I'd like to order this product from your store:" : "Hi! I have a question about this product:";
+    const message = [
+      firstLine,
+      "Product: " + (product.title || "Product"),
+      "SKU: " + (product.sku || "Not listed"),
+      "Price: " + (product.price !== "" ? "₹" + product.price : "Please confirm price"),
+      "Product link: " + pageUrl,
+      kind === "order" ? "Please help me place the order." : "Could you please share more details?"
+    ].join("\n");
+    return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);
+  }
+  function safeText(value) {
+    return String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+  function validUrl(value) {
+    try { const u = new URL(value); return u.protocol === "https:" || u.protocol === "http:" ? u.href : ""; } catch { return ""; }
+  }
+  function priceMarkup(p) {
+    const price = p.price !== "" ? `<span class="price">₹${safeText(p.price)}</span>` : `<span class="price">Contact for price</span>`;
+    const mrp = p.mrp !== "" && Number(p.mrp) > Number(p.price) ? `<span class="mrp">₹${safeText(p.mrp)}</span>` : "";
+    return `<div class="prices">${price}${mrp}</div>`;
+  }
+  function cardMarkup(p) {
+    const out = /out|sold/i.test(p.stock || "");
+    const image = (p.images || []).map(validUrl).find(Boolean);
+    const amazon = validUrl(p.amazonUrl);
+    const meesho = validUrl(p.meeshoUrl);
+    const orderHref = out ? "" : waLink(p, "order");
+    const imageMarkup = image ? `<img loading="lazy" src="${safeText(image)}" alt="${safeText(p.title)}" onerror="this.remove();this.parentElement.insertAdjacentHTML('beforeend','<div class=&quot;placeholder&quot;>Product image coming soon</div>')">` : `<div class="placeholder">Product image coming soon</div>`;
+    return `<article class="card" id="product-${safeText(p.sku)}">
+      <div class="photo">${imageMarkup}<span class="stock-badge ${out ? "out" : ""}">${out ? "Out of stock" : "In stock"}</span></div>
+      <div class="card-body">
+        <div class="category">${safeText(p.category || "Collection")}</div>
+        <h2 class="product-title">${safeText(p.title || "Untitled product")}</h2>
+        <div class="sku">SKU: ${safeText(p.sku || "—")}</div>
+        ${priceMarkup(p)}
+        ${p.description ? `<div class="description">${safeText(p.description)}</div>` : ""}
+        <div class="actions">
+          <a class="btn ${out ? "disabled" : "btn-primary"}" ${out ? 'aria-disabled="true"' : `href="${safeText(orderHref)}" target="_blank" rel="noopener"`}>${out ? "Currently unavailable" : "Buy from My Store"}</a>
+          <a class="btn btn-market ${amazon ? "" : "disabled"}" ${amazon ? `href="${safeText(amazon)}" target="_blank" rel="noopener"` : 'aria-disabled="true"'}>Buy on Amazon</a>
+          <a class="btn btn-market ${meesho ? "" : "disabled"}" ${meesho ? `href="${safeText(meesho)}" target="_blank" rel="noopener"` : 'aria-disabled="true"'}>Buy on Meesho</a>
+          <a class="btn btn-wa" href="${safeText(waLink(p, "inquiry"))}" target="_blank" rel="noopener">☏ Enquire on WhatsApp</a>
+        </div>
+      </div>
+    </article>`;
+  }
+  function render() {
+    const q = searchEl.value.trim().toLowerCase();
+    const category = categoryEl.value;
+    const filtered = catalogue.filter(p => {
+      const haystack = [p.title,p.sku,p.category,p.description,p.benefits].join(" ").toLowerCase();
+      return (!q || haystack.includes(q)) && (!category || p.category === category);
+    });
+    countEl.textContent = `${filtered.length} product${filtered.length === 1 ? "" : "s"}`;
+    productsEl.innerHTML = filtered.length ? filtered.map(cardMarkup).join("") : `<div class="empty">No products found. Try another search.</div>`;
+    if (location.hash.startsWith("#product-")) {
+      const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      if (target) setTimeout(() => target.scrollIntoView({block:"start"}), 150);
+    }
+  }
+  document.getElementById("general-wa").href = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent("Hi! I have a question about your store.");
+  searchEl.addEventListener("input", render);
+  categoryEl.addEventListener("change", render);
+  fetch("./products.json").then(r => { if (!r.ok) throw new Error("Could not load products.json"); return r.json(); })
+    .then(data => {
+      catalogue = Array.isArray(data) ? data : [];
+      const categories = [...new Set(catalogue.map(p => p.category).filter(Boolean))].sort();
+      categories.forEach(c => { const o = document.createElement("option"); o.value = c; o.textContent = c; categoryEl.appendChild(o); });
+      render();
+    })
+    .catch(() => {
+      countEl.textContent = "Catalogue could not be loaded";
+      productsEl.innerHTML = `<div class="empty">Please check that <code>products.json</code> is in the same folder as <code>index.html</code>.</div>`;
+    });
+</script>
+</body>
+</html>
