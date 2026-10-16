@@ -3,85 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uroo Enterprise - Online Store</title>
+    <title>Uroo Enterprise - Official Store | Gemstones & Spiritual Decor</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --meesho-pink: #d91b5c;
             --meesho-pink-dark: #b8124b;
-            --whatsapp-green: #25d366;
-            --bg-light: #f4f4f4;
-            --text-main: #333333;
+            --amazon-orange: #ff9900;
+            --bg-light: #f1f3f6;
+            --text-main: #212121;
             --text-muted: #666666;
-            --success-green: #16a34a;
+            --success-green: #388e3c;
             --border-color: #e0e0e0;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg-light); color: var(--text-main); }
 
+        /* Announcement Bar */
         .top-banner {
-            background-color: #262626;
+            background-color: #172337;
             color: #fff;
             text-align: center;
             font-size: 12px;
-            padding: 6px 10px;
+            padding: 7px 16px;
             font-weight: 500;
         }
 
+        /* Professional Header */
         header {
-            background: #fff;
-            border-bottom: 1px solid var(--border-color);
+            background: #2874f0; /* Professional marketplace blue header */
+            color: #fff;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .header-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 12px 16px;
+            padding: 10px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 20px;
         }
 
         .logo-area h1 {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
-            color: var(--meesho-pink);
+            color: #fff;
             letter-spacing: -0.5px;
         }
 
-        .logo-area p {
+        .logo-area span {
+            color: #fffa65;
             font-size: 11px;
-            color: var(--text-muted);
+            font-weight: 600;
+            display: block;
         }
 
+        /* Search Bar */
+        .search-box {
+            flex: 1;
+            max-width: 550px;
+            display: flex;
+            background: #fff;
+            border-radius: 2px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .search-box button {
+            background: #ffe11b;
+            border: none;
+            padding: 0 16px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #2874f0;
+        }
+
+        /* Category Filter Navigation Bar */
+        .category-nav {
+            background: #fff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 16px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            white-space: nowrap;
+            position: sticky;
+            top: 56px;
+            z-index: 999;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .category-nav::-webkit-scrollbar {
+            height: 4px;
+        }
+        .category-nav::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        .cat-chip {
+            background: #f0f2f5;
+            border: 1px solid #dcdcdc;
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #484848;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cat-chip:hover, .cat-chip.active {
+            background: #2874f0;
+            color: #fff;
+            border-color: #2874f0;
+        }
+
+        /* Main Store Layout */
         .main-container {
             max-width: 1200px;
             margin: 16px auto;
             padding: 0 10px;
         }
 
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 14px;
-            color: #111;
-            padding-left: 6px;
+        .results-info {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            padding-left: 4px;
+            font-weight: 500;
         }
 
         #product-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-            gap: 14px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
         }
 
+        /* Product Card */
         .product-card {
             background: #fff;
-            border-radius: 6px;
+            border-radius: 4px;
             border: 1px solid var(--border-color);
             overflow: hidden;
             display: flex;
@@ -92,13 +168,13 @@
         }
 
         .product-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
         }
 
         .image-box {
             position: relative;
             width: 100%;
-            height: 220px;
+            height: 210px;
             background: #f9f9f9;
         }
 
@@ -130,7 +206,7 @@
 
         .category-tag {
             font-size: 10px;
-            color: var(--text-muted);
+            color: #878787;
             text-transform: uppercase;
             font-weight: 600;
             margin-bottom: 4px;
@@ -138,7 +214,7 @@
 
         .product-title {
             font-size: 13px;
-            color: var(--text-muted);
+            color: #212121;
             line-height: 1.3;
             margin-bottom: 8px;
             display: -webkit-box;
@@ -146,6 +222,7 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
             height: 34px;
+            font-weight: 500;
         }
 
         .price-section {
@@ -158,19 +235,19 @@
         .current-price {
             font-size: 17px;
             font-weight: 700;
-            color: #000;
+            color: #212121;
         }
 
         .mrp-price {
             font-size: 12px;
-            color: var(--text-muted);
+            color: #878787;
             text-decoration: line-through;
         }
 
         .discount-badge {
             font-size: 11px;
             font-weight: 700;
-            color: var(--success-green);
+            color: #388e3c;
         }
 
         .rating-pill {
@@ -181,12 +258,12 @@
             font-size: 11px;
             font-weight: 600;
             padding: 2px 6px;
-            border-radius: 4px;
+            border-radius: 3px;
             width: fit-content;
             margin-bottom: 10px;
         }
 
-        /* 4 Action Buttons Layout */
+        /* Action Buttons */
         .card-actions {
             padding: 0 10px 10px 10px;
             display: flex;
@@ -205,7 +282,7 @@
             font-size: 11px;
             font-weight: 600;
             padding: 8px 4px;
-            border-radius: 4px;
+            border-radius: 3px;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -217,17 +294,15 @@
         }
         .action-btn:hover { opacity: 0.9; }
 
-        /* Brand & Action Button Colors */
         .meesho-btn {
             background-color: #d91b5c;
             color: #fff;
         }
 
         .amazon-btn {
-            background-color: #f0c14b;
-            background-image: linear-gradient(to bottom,#f7dfa5,#f0c14b);
-            border: 1px solid #a88734;
+            background-color: #ff9900;
             color: #111;
+            font-weight: 700;
         }
 
         .whatsapp-order-btn {
@@ -237,8 +312,9 @@
         }
 
         .whatsapp-inquiry-btn {
-            background-color: #e2e8f0;
+            background-color: #f0f2f5;
             color: #334155;
+            border: 1px solid #dcdcdc;
             width: 100%;
         }
 
@@ -253,85 +329,129 @@
 
         @media (max-width: 768px) {
             #product-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-            .main-container { padding: 0 6px; }
+            .header-container { flex-direction: column; align-items: stretch; gap: 8px; }
+            .search-box { max-width: 100%; }
         }
     </style>
 </head>
 <body>
 
     <div class="top-banner">
-        Lowest Prices In India • Direct WhatsApp Orders are Prepaid UPI Only
+        🔥 100% Original Certified Gemstones • Free Delivery on Direct WhatsApp UPI Orders
     </div>
 
     <header>
         <div class="header-container">
             <div class="logo-area">
                 <h1>Uroo Enterprise</h1>
-                <p>Trusted Reseller & Direct Store</p>
+                <span>Official Online Catalog</span>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search bracelets, rashi items, vastu decor..." oninput="filterProducts()">
+                <button onclick="filterProducts()">Search</button>
             </div>
         </div>
     </header>
 
+    <!-- Interactive Category Filter Bar -->
+    <div class="category-nav" id="categoryNav">
+        <!-- Generated dynamically via JavaScript -->
+    </div>
+
     <div class="main-container">
-        <div class="section-title">Trending Spiritual & Gemstone Collections</div>
+        <div class="results-info" id="resultsInfo">Showing all products</div>
         <div id="product-grid"></div>
     </div>
 
     <script>
-        // Full product catalog loaded from your dataset (38 products)
+        // Full product catalog (38 products)
         const PRODUCTS = [
-            {category: "Crystal Bracelets", sku: "BracHemGold", title: "Pyrite Hematite Bracelet (Golden)", description: "Description1", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracHemSilver", title: "Pyrite Hematite Bracelet (Silver)", description: "Description2", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracBlackObsidian", title: "Black Obsidian Bracelet", description: "Description3", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracGreenAventurine", title: "Green Aventurine Money Bracelet", description: "Description4", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracRoseQuartz", title: "Rose Quartz Love & Harmony Bracelet", description: "Description5", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracCitrineWealth", title: "Natural Citrine Wealth Bracelet", description: "Description6", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracTigerEye", title: "Original Tiger Eye Protection Bracelet", description: "Description7", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracAmethyst", title: "Amethyst Calm & Stress Relief Bracelet", description: "Description8", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracSevenChakra", title: "7 Chakra Healing Balancing Bracelet", description: "Description9", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracPyriteOriginal", title: "Original Peruvian Pyrite Wealth Bracelet", description: "Description10", stock: "In Stock", mrp: 1299, price: 399, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiAries", title: "Aries Zodiac Rashi Bracelet", description: "Description11", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiTaurus", title: "Taurus Zodiac Rashi Bracelet", description: "Description12", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiGemini", title: "Gemini Zodiac Rashi Bracelet", description: "Description13", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiCancer", title: "Cancer Zodiac Rashi Bracelet", description: "Description14", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiLeo", title: "Leo Zodiac Rashi Bracelet", description: "Description15", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiVirgo", title: "Virgo Zodiac Rashi Bracelet", description: "Description16", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiLibra", title: "Libra Zodiac Rashi Bracelet", description: "Description17", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiScorpio", title: "Scorpio Zodiac Rashi Bracelet", description: "Description18", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiSagittarius", title: "Sagittarius Zodiac Rashi Bracelet", description: "Description19", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiCapricorn", title: "Capricorn Zodiac Rashi Bracelet", description: "Description20", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiAquarius", title: "Aquarius Zodiac Rashi Bracelet", description: "Description21", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiPisces", title: "Pisces Zodiac Rashi Bracelet", description: "Description22", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Mala & Pendant", sku: "MachhmaniBrown", title: "Machhmani Pendant Brown", description: "Description23", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Mala & Pendant", sku: "MachhmaniWhite", title: "Machhmani Pendant White", description: "Description24", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Mala & Pendant", sku: "RudrakshaMala54", title: "Original Rudraksha Mala (54+1 Beads)", description: "Description25", stock: "In Stock", mrp: 999, price: 249, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Mala & Pendant", sku: "KarungaliMala", title: "Original Karungali (Ebony Wood) Mala", description: "Description26", stock: "In Stock", mrp: 1299, price: 399, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Anklets", sku: "AnkletPyrite", title: "Pyrite Stone Protection Anklet", description: "Description27", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Anklets", sku: "AnkletBlackTourmaline", title: "Black Tourmaline Evil Eye Anklet", description: "Description28", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Vastu & Prosperity", sku: "TortoisePyrite", title: "Kachua Pyrite (Vastu Tortoise)", description: "Description29", stock: "In Stock", mrp: 999, price: 249, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Vastu & Prosperity", sku: "TortoiseDhanyog", title: "Kachua Dhanyog for Wealth", description: "Description30", stock: "In Stock", mrp: 999, price: 249, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Vastu & Prosperity", sku: "PyramidBrass", title: "Brass Vastu Pyramid Yantram", description: "Description31", stock: "In Stock", mrp: 1499, price: 499, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Vastu & Prosperity", sku: "SevenHorseFrame", title: "7 Running Horse Pyrite Frame", description: "Description32", stock: "In Stock", mrp: 1999, price: 599, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Jewellery", sku: "RingEvilEye", title: "Evil Eye Protection Silver Ring", description: "Description33", stock: "In Stock", mrp: 799, price: 199, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Jewellery", sku: "PendantTreeOfLife", title: "Crystal Tree of Life Pendant", description: "Description34", stock: "In Stock", mrp: 899, price: 249, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Jewellery", sku: "BraceletCitrineChunk", title: "Citrine Raw Stone Statement Bracelet", description: "Description35", stock: "In Stock", mrp: 1299, price: 399, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Jewellery", sku: "BraceletGarnet", title: "Natural Garnet Energy Bracelet", description: "Description36", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Jewellery", sku: "BraceletLapisLazuli", title: "Lapis Lazuli Wisdom Bracelet", description: "Description37", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Jewellery", sku: "BraceletHowlite", title: "White Howlite Peace Bracelet", description: "Description38", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"}
+            {category: "Crystal Bracelets", sku: "BracHemGold", title: "Pyrite Hematite Bracelet (Golden)", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracHemSilver", title: "Pyrite Hematite Bracelet (Silver)", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracBlackObsidian", title: "Black Obsidian Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracGreenAventurine", title: "Green Aventurine Money Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracRoseQuartz", title: "Rose Quartz Love & Harmony Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracCitrineWealth", title: "Natural Citrine Wealth Bracelet", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracTigerEye", title: "Original Tiger Eye Protection Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracAmethyst", title: "Amethyst Calm & Stress Relief Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracSevenChakra", title: "7 Chakra Healing Balancing Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracPyriteOriginal", title: "Original Peruvian Pyrite Wealth Bracelet", stock: "In Stock", mrp: 1299, price: 399, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiAries", title: "Aries Zodiac Rashi Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiTaurus", title: "Taurus Zodiac Rashi Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiGemini", title: "Gemini Zodiac Rashi Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiCancer", title: "Cancer Zodiac Rashi Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiLeo", title: "Leo Zodiac Rashi Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiVirgo", title: "Virgo Zodiac Rashi Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiLibra", title: "Libra Zodiac Rashi Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiScorpio", title: "Scorpio Zodiac Rashi Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiSagittarius", title: "Sagittarius Zodiac Rashi Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiCapricorn", title: "Capricorn Zodiac Rashi Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiAquarius", title: "Aquarius Zodiac Rashi Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiPisces", title: "Pisces Zodiac Rashi Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Mala & Pendant", sku: "MachhmaniBrown", title: "Machhmani Pendant Brown", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Mala & Pendant", sku: "MachhmaniWhite", title: "Machhmani Pendant White", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Mala & Pendant", sku: "RudrakshaMala54", title: "Original Rudraksha Mala (54+1 Beads)", stock: "In Stock", mrp: 999, price: 249, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Mala & Pendant", sku: "KarungaliMala", title: "Original Karungali (Ebony Wood) Mala", stock: "In Stock", mrp: 1299, price: 399, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Anklets", sku: "AnkletPyrite", title: "Pyrite Stone Protection Anklet", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Anklets", sku: "AnkletBlackTourmaline", title: "Black Tourmaline Evil Eye Anklet", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Vastu & Prosperity", sku: "TortoisePyrite", title: "Kachua Pyrite (Vastu Tortoise)", stock: "In Stock", mrp: 999, price: 249, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Vastu & Prosperity", sku: "TortoiseDhanyog", title: "Kachua Dhanyog for Wealth", stock: "In Stock", mrp: 999, price: 249, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Vastu & Prosperity", sku: "PyramidBrass", title: "Brass Vastu Pyramid Yantram", stock: "In Stock", mrp: 1499, price: 499, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Vastu & Prosperity", sku: "SevenHorseFrame", title: "7 Running Horse Pyrite Frame", stock: "In Stock", mrp: 1999, price: 599, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Jewellery", sku: "RingEvilEye", title: "Evil Eye Protection Silver Ring", stock: "In Stock", mrp: 799, price: 199, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Jewellery", sku: "PendantTreeOfLife", title: "Crystal Tree of Life Pendant", stock: "In Stock", mrp: 899, price: 249, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Jewellery", sku: "BraceletCitrineChunk", title: "Citrine Raw Stone Statement Bracelet", stock: "In Stock", mrp: 1299, price: 399, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Jewellery", sku: "BraceletGarnet", title: "Natural Garnet Energy Bracelet", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Jewellery", sku: "BraceletLapisLazuli", title: "Lapis Lazuli Wisdom Bracelet", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Jewellery", sku: "BraceletHowlite", title: "White Howlite Peace Bracelet", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"}
         ];
 
-        // Configured WhatsApp Number (Prashant Parmar - 9016406623)
         const WHATSAPP_NUMBER = "919016406623";
+        let activeCategory = "All";
 
-        function renderStore() {
+        // Initialize Category Filter Chips
+        function initCategories() {
+            const categories = ["All", ...new Set(PRODUCTS.map(p => p.category))];
+            const nav = document.getElementById('categoryNav');
+            nav.innerHTML = '';
+
+            categories.forEach(cat => {
+                const chip = document.createElement('button');
+                chip.className = `cat-chip ${cat === activeCategory ? 'active' : ''}`;
+                chip.textContent = cat;
+                chip.onclick = () => {
+                    activeCategory = cat;
+                    document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    filterProducts();
+                };
+                nav.appendChild(chip);
+            });
+        }
+
+        // Render & Filter Products based on Category and Search Query
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
 
-            PRODUCTS.forEach(product => {
+            const filtered = PRODUCTS.filter(p => {
+                const matchesCat = (activeCategory === "All" || p.category === activeCategory);
+                const matchesSearch = p.title.toLowerCase().includes(query) || p.sku.toLowerCase().includes(query);
+                return matchesCat && matchesSearch;
+            });
+
+            document.getElementById('resultsInfo').textContent = `Showing ${filtered.length} products ${activeCategory !== 'All' ? 'in ' + activeCategory : ''}`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">No products found matching your search.</div>`;
+                return;
+            }
+
+            filtered.forEach(product => {
                 const isOutStock = product.stock.toLowerCase().includes('out');
                 const discount = product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0;
 
-                // Pre-formatted WhatsApp order and inquiry messages
                 const orderMessage = encodeURIComponent(`Hi Uroo Enterprise, I want to place a PREPAID UPI order for:\n\n*SKU:* ${product.sku}\n*Product:* ${product.title}\n*Price:* ₹${product.price}\n\nPlease share UPI payment details.`);
                 const inquiryMessage = encodeURIComponent(`Hi Uroo Enterprise, I have an inquiry regarding this product:\n\n*SKU:* ${product.sku}\n*Product:* ${product.title}\n\nPlease share more details.`);
 
@@ -352,18 +472,15 @@
                             <div class="rating-pill">4.2 ★ <span style="font-weight:normal; font-size:10px; margin-left:2px;">(120)</span></div>
                         </div>
                         <div class="card-actions">
-                            <!-- Option 1: WhatsApp Order (Prepaid UPI) -->
                             <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${orderMessage}" target="_blank" class="action-btn whatsapp-order-btn" ${isOutStock ? 'style="pointer-events:none; background:#ccc;"' : ''}>
                                 💬 Order on WhatsApp
                             </a>
                             <div class="prepaid-notice">✓ Prepaid UPI Orders Only</div>
 
-                            <!-- Option 2: WhatsApp Inquiry -->
                             <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${inquiryMessage}" target="_blank" class="action-btn whatsapp-inquiry-btn">
                                 ❓ Product Inquiry
                             </a>
 
-                            <!-- Option 3 & 4: Meesho & Amazon Buttons -->
                             <div class="btn-row">
                                 <a href="${product.meesho}" target="_blank" class="action-btn meesho-btn">🛍️ Meesho</a>
                                 <a href="${product.amazon}" target="_blank" class="action-btn amazon-btn">📦 Amazon</a>
@@ -375,7 +492,10 @@
             });
         }
 
-        window.addEventListener('DOMContentLoaded', renderStore);
+        window.addEventListener('DOMContentLoaded', () => {
+            initCategories();
+            filterProducts();
+        });
     </script>
 </body>
 </html>
