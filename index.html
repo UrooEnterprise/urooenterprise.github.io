@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Uroo Enterprise - App Store</title>
+    <title>Uroo Enterprise - Official Store</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -174,9 +174,7 @@
             height: 100%;
             object-fit: cover;
             z-index: 1;
-            transition: transform 0.3s ease;
         }
-        .app-cat-tile:hover img { transform: scale(1.05); }
 
         .app-cat-overlay {
             position: absolute;
@@ -275,7 +273,7 @@
             font-size: 13px;
         }
 
-        /* Product Detail View (App Sheet Style) */
+        /* Product Detail View (PDP) */
         .pdp-view-card {
             background: var(--card-bg);
             border-radius: 12px;
@@ -339,7 +337,7 @@
                 <div class="app-subtitle" id="appTopbarSubtitle">Spiritual & Gemstone Store</div>
             </div>
         </div>
-        <div class="topbar-search-icon" onclick="switchView('searchView', true)">🔍</div>
+        <div class="topbar-search-icon" onclick="navigateTo({view: 'searchView'})">🔍</div>
     </div>
 
     <!-- App Main Container -->
@@ -398,61 +396,60 @@
     </nav>
 
     <script>
-        // Full product catalog (38 products)
+        // Full product catalog with multiple image gallery support
         const PRODUCTS = [
-            {category: "Crystal Bracelets", sku: "BracHemGold", title: "Pyrite Hematite Bracelet (Golden)", description: "Attracts wealth, abundance, and positive energy. Handcrafted original citrine and pyrite beads for daily wear.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracHemSilver", title: "Pyrite Hematite Bracelet (Silver)", description: "Stylish silver tone stone bracelet designed for everyday minimal wear and positive aura protection.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracBlackObsidian", title: "Black Obsidian Bracelet", description: "Powerful grounding stone that forms a shield against negativity, emotional blockages, and psychic attack.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracGreenAventurine", title: "Green Aventurine Money Bracelet", description: "The stone of opportunity. Attracts financial luck, business growth, and new openings.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracRoseQuartz", title: "Rose Quartz Love & Harmony Bracelet", description: "Unconditional love crystal that restores trust, harmony, and emotional healing in relationships.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracCitrineWealth", title: "Natural Citrine Wealth Bracelet", description: "Merchant's stone that carries the power of sun, inspiring positivity, financial abundance, and success.", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracTigerEye", title: "Original Tiger Eye Protection Bracelet", description: "Enhances focus, inner strength, willpower, and protects the wearer from evil eye and negative energies.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracAmethyst", title: "Amethyst Calm & Stress Relief Bracelet", description: "Natural tranquilizer that relieves stress, balances mood swings, and spiritual awareness.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracSevenChakra", title: "7 Chakra Healing Balancing Bracelet", description: "Balances all seven energy centers in the body to promote physical health, emotional stability, and vitality.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Crystal Bracelets", sku: "BracPyriteOriginal", title: "Original Peruvian Pyrite Wealth Bracelet", description: "Authentic fool's gold known as a powerful magnet for wealth, prosperity, and career success.", stock: "In Stock", mrp: 1299, price: 399, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiAries", title: "Aries Zodiac Rashi Bracelet", description: "Customized astrological gemstone bead combination tailored specifically for Aries (Mesh Rashi).", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiTaurus", title: "Taurus Zodiac Rashi Bracelet", description: "Harmonizing crystal beads specially aligned for Taurus (Vrishabh Rashi) individuals.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiGemini", title: "Gemini Zodiac Rashi Bracelet", description: "Astrological crystal bracelet designed to enhance communication and luck for Gemini (Mithun Rashi).", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiCancer", title: "Cancer Zodiac Rashi Bracelet", description: "Soothing energy stones attuned to Cancer (Kark Rashi) emotional balance and intuition.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiLeo", title: "Leo Zodiac Rashi Bracelet", description: "Empowering zodiac bracelet designed for Leo (Singh Rashi) leadership and vitality.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiVirgo", title: "Virgo Zodiac Rashi Bracelet", description: "Astrological alignment beads crafted for Virgo (Kanya Rashi) focus and well-being.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiLibra", title: "Libra Zodiac Rashi Bracelet", description: "Balance and harmony crystals curated specifically for Libra (Tula Rashi).", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiScorpio", title: "Scorpio Zodiac Rashi Bracelet", description: "Transformational gemstone beads for Scorpio (Vrishchik Rashi) intensity and power.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiSagittarius", title: "Sagittarius Zodiac Rashi Bracelet", description: "Abundance and luck bracelet tailored for Sagittarius (Dhanu Rashi).", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiCapricorn", title: "Capricorn Zodiac Rashi Bracelet", description: "Discipline and prosperity crystal combination for Capricorn (Makar Rashi).", stock: "In Stock", mrp: 999, price: 299, image: "images/capricorn01.webp", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiAquarius", title: "Aquarius Zodiac Rashi Bracelet", description: "Innovative energy beads aligned for Aquarius (Kumbh Rashi).", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Rashi/Zodiac Bracelet", sku: "RashiPisces", title: "Pisces Zodiac Rashi Bracelet", description: "Spiritual intuition and peace crystals for Pisces (Meen Rashi).", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Mala & Pendant", sku: "MachhmaniBrown", title: "Machhmani Pendant Brown", description: "Authentic spiritual fish stone pendant known for attracting immense wealth and removing obstacles.", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Mala & Pendant", sku: "MachhmaniWhite", title: "Machhmani Pendant White", description: "Pure white machhmani spiritual pendant for divine grace and financial prosperity.", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Mala & Pendant", sku: "RudrakshaMala54", title: "Original Rudraksha Mala (54+1 Beads)", description: "Sacred 54+1 beads rudraksha mala for meditation, chanting, and positive spiritual vibrations.", stock: "In Stock", mrp: 999, price: 249, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Mala & Pendant", sku: "KarungaliMala", title: "Original Karungali (Ebony Wood) Mala", description: "Authentic ebony wood mala that absorbs negative energy and strengthens willpower.", stock: "In Stock", mrp: 1299, price: 399, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Anklets", sku: "AnkletPyrite", title: "Pyrite Stone Protection Anklet", description: "Handcrafted pyrite gemstone anklet providing continuous aura shielding and wealth attraction.", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Anklets", sku: "AnkletBlackTourmaline", title: "Black Tourmaline Evil Eye Anklet", description: "Combines black tourmaline and evil eye beads to ward off negative vibes and nazar.", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Vastu & Prosperity", sku: "TortoisePyrite", title: "Kachua Pyrite (Vastu Tortoise)", description: "Original pyrite tortoise for Vastu correction, career stability, and wealth accumulation at home/office.", stock: "In Stock", mrp: 999, price: 249, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Vastu & Prosperity", sku: "TortoiseDhanyog", title: "Kachua Dhanyog for Wealth", description: "Special Vastu artifact designed to open up financial channels and eliminate money blockages.", stock: "In Stock", mrp: 999, price: 249, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Vastu & Prosperity", sku: "PyramidBrass", title: "Brass Vastu Pyramid Yantram", description: "Authentic brass pyramid for neutralizing negative geopathic stress and energizing spaces.", stock: "In Stock", mrp: 1499, price: 499, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Vastu & Prosperity", sku: "SevenHorseFrame", title: "7 Running Horse Pyrite Frame", description: "Vastu energized 7 running horses wall frame embellished with pyrite for unstoppable career progress.", stock: "In Stock", mrp: 1999, price: 599, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Jewellery", sku: "RingEvilEye", title: "Evil Eye Protection Silver Ring", description: "Stylish adjustable silver ring featuring the protective evil eye emblem.", stock: "In Stock", mrp: 799, price: 199, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Jewellery", sku: "PendantTreeOfLife", title: "Crystal Tree of Life Pendant", description: "Wire-wrapped crystal gemstone tree of life pendant symbolizing growth, wisdom, and strength.", stock: "In Stock", mrp: 899, price: 249, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Jewellery", sku: "BraceletCitrineChunk", title: "Citrine Raw Stone Statement Bracelet", description: "Raw chunk citrine statement bracelet radiating high-frequency solar plexus energy.", stock: "In Stock", mrp: 1299, price: 399, image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Jewellery", sku: "BraceletGarnet", title: "Natural Garnet Energy Bracelet", description: "Deep red garnet gemstone beads that inspire passion, commitment, and vitality.", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Jewellery", sku: "BraceletLapisLazuli", title: "Lapis Lazuli Wisdom Bracelet", description: "Royal blue lapis lazuli stone bracelet for deep wisdom, truth, and inner power.", stock: "In Stock", mrp: 1199, price: 349, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
-            {category: "Jewellery", sku: "BraceletHowlite", title: "White Howlite Peace Bracelet", description: "Calming white marble-textured howlite beads for ultimate relaxation and patience.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"}
+            {category: "Crystal Bracelets", sku: "BracHemGold", title: "Pyrite Hematite Bracelet (Golden)", description: "Attracts wealth, abundance, and positive energy. Handcrafted original citrine and pyrite beads for daily wear.", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracHemSilver", title: "Pyrite Hematite Bracelet (Silver)", description: "Stylish silver tone stone bracelet designed for everyday minimal wear and positive aura protection.", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracBlackObsidian", title: "Black Obsidian Bracelet", description: "Powerful grounding stone that forms a shield against negativity, emotional blockages, and psychic attack.", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracGreenAventurine", title: "Green Aventurine Money Bracelet", description: "The stone of opportunity. Attracts financial luck, business growth, and new openings.", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracRoseQuartz", title: "Rose Quartz Love & Harmony Bracelet", description: "Unconditional love crystal that restores trust, harmony, and emotional healing in relationships.", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracCitrineWealth", title: "Natural Citrine Wealth Bracelet", description: "Merchant's stone that carries the power of sun, inspiring positivity, financial abundance, and success.", stock: "In Stock", mrp: 1199, price: 349, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracTigerEye", title: "Original Tiger Eye Protection Bracelet", description: "Enhances focus, inner strength, willpower, and protects the wearer from evil eye and negative energies.", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracAmethyst", title: "Amethyst Calm & Stress Relief Bracelet", description: "Natural tranquilizer that relieves stress, balances mood swings, and spiritual awareness.", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracSevenChakra", title: "7 Chakra Healing Balancing Bracelet", description: "Balances all seven energy centers in the body to promote physical health, emotional stability, and vitality.", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Crystal Bracelets", sku: "BracPyriteOriginal", title: "Original Peruvian Pyrite Wealth Bracelet", description: "Authentic fool's gold known as a powerful magnet for wealth, prosperity, and career success.", stock: "In Stock", mrp: 1299, price: 399, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiAries", title: "Aries Zodiac Rashi Bracelet", description: "Customized astrological gemstone bead combination tailored specifically for Aries (Mesh Rashi).", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiTaurus", title: "Taurus Zodiac Rashi Bracelet", description: "Harmonizing crystal beads specially aligned for Taurus (Vrishabh Rashi) individuals.", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiGemini", title: "Gemini Zodiac Rashi Bracelet", description: "Astrological crystal bracelet designed to enhance communication and luck for Gemini (Mithun Rashi).", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiCancer", title: "Cancer Zodiac Rashi Bracelet", description: "Soothing energy stones attuned to Cancer (Kark Rashi) emotional balance and intuition.", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiLeo", title: "Leo Zodiac Rashi Bracelet", description: "Empowering zodiac bracelet designed for Leo (Singh Rashi) leadership and vitality.", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiVirgo", title: "Virgo Zodiac Rashi Bracelet", description: "Astrological alignment beads crafted for Virgo (Kanya Rashi) focus and well-being.", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiLibra", title: "Libra Zodiac Rashi Bracelet", description: "Balance and harmony crystals curated specifically for Libra (Tula Rashi).", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiScorpio", title: "Scorpio Zodiac Rashi Bracelet", description: "Transformational gemstone beads for Scorpio (Vrishchik Rashi) intensity and power.", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiSagittarius", title: "Sagittarius Zodiac Rashi Bracelet", description: "Abundance and luck bracelet tailored for Sagittarius (Dhanu Rashi).", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiCapricorn", title: "Capricorn Zodiac Rashi Bracelet", description: "Discipline and prosperity crystal combination for Capricorn (Makar Rashi).", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiAquarius", title: "Aquarius Zodiac Rashi Bracelet", description: "Innovative energy beads aligned for Aquarius (Kumbh Rashi).", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Rashi/Zodiac Bracelet", sku: "RashiPisces", title: "Pisces Zodiac Rashi Bracelet", description: "Spiritual intuition and peace crystals for Pisces (Meen Rashi).", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Mala & Pendant", sku: "MachhmaniBrown", title: "Machhmani Pendant Brown", description: "Authentic spiritual fish stone pendant known for attracting immense wealth and removing obstacles.", stock: "In Stock", mrp: 1199, price: 349, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Mala & Pendant", sku: "MachhmaniWhite", title: "Machhmani Pendant White", description: "Pure white machhmani spiritual pendant for divine grace and financial prosperity.", stock: "In Stock", mrp: 1199, price: 349, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Mala & Pendant", sku: "RudrakshaMala54", title: "Original Rudraksha Mala (54+1 Beads)", description: "Sacred 54+1 beads rudraksha mala for meditation, chanting, and positive spiritual vibrations.", stock: "In Stock", mrp: 999, price: 249, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Mala & Pendant", sku: "KarungaliMala", title: "Original Karungali (Ebony Wood) Mala", description: "Authentic ebony wood mala that absorbs negative energy and strengthens willpower.", stock: "In Stock", mrp: 1299, price: 399, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Anklets", sku: "AnkletPyrite", title: "Pyrite Stone Protection Anklet", description: "Handcrafted pyrite gemstone anklet providing continuous aura shielding and wealth attraction.", stock: "In Stock", mrp: 1199, price: 349, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Anklets", sku: "AnkletBlackTourmaline", title: "Black Tourmaline Evil Eye Anklet", description: "Combines black tourmaline and evil eye beads to ward off negative vibes and nazar.", stock: "In Stock", mrp: 1199, price: 349, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Vastu & Prosperity", sku: "TortoisePyrite", title: "Kachua Pyrite (Vastu Tortoise)", description: "Original pyrite tortoise for Vastu correction, career stability, and wealth accumulation at home/office.", stock: "In Stock", mrp: 999, price: 249, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Vastu & Prosperity", sku: "TortoiseDhanyog", title: "Kachua Dhanyog for Wealth", description: "Special Vastu artifact designed to open up financial channels and eliminate money blockages.", stock: "In Stock", mrp: 999, price: 249, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Vastu & Prosperity", sku: "PyramidBrass", title: "Brass Vastu Pyramid Yantram", description: "Authentic brass pyramid for neutralizing negative geopathic stress and energizing spaces.", stock: "In Stock", mrp: 1499, price: 499, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Vastu & Prosperity", sku: "SevenHorseFrame", title: "7 Running Horse Pyrite Frame", description: "Vastu energized 7 running horses wall frame embellished with pyrite for unstoppable career progress.", stock: "In Stock", mrp: 1999, price: 599, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Jewellery", sku: "RingEvilEye", title: "Evil Eye Protection Silver Ring", description: "Stylish adjustable silver ring featuring the protective evil eye emblem.", stock: "In Stock", mrp: 799, price: 199, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Jewellery", sku: "PendantTreeOfLife", title: "Crystal Tree of Life Pendant", description: "Wire-wrapped crystal gemstone tree of life pendant symbolizing growth, wisdom, and strength.", stock: "In Stock", mrp: 899, price: 249, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Jewellery", sku: "BraceletCitrineChunk", title: "Citrine Raw Stone Statement Bracelet", description: "Raw chunk citrine statement bracelet radiating high-frequency solar plexus energy.", stock: "In Stock", mrp: 1299, price: 399, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Jewellery", sku: "BraceletGarnet", title: "Natural Garnet Energy Bracelet", description: "Deep red garnet gemstone beads that inspire passion, commitment, and vitality.", stock: "In Stock", mrp: 1199, price: 349, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Jewellery", sku: "BraceletLapisLazuli", title: "Lapis Lazuli Wisdom Bracelet", description: "Royal blue lapis lazuli stone bracelet for deep wisdom, truth, and inner power.", stock: "In Stock", mrp: 1199, price: 349, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
+            {category: "Jewellery", sku: "BraceletHowlite", title: "White Howlite Peace Bracelet", description: "Calming white marble-textured howlite beads for ultimate relaxation and patience.", stock: "In Stock", mrp: 999, price: 299, images: ["Images/capricorn01.webp"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"}
         ];
 
         // Visualization Cover Images per Category
         const CATEGORY_IMAGES = {
-            "Crystal Bracelets": "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500",
-            "Rashi/Zodiac Bracelet": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500",
-            "Mala & Pendant": "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500",
-            "Anklets": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500",
-            "Vastu & Prosperity": "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500",
-            "Jewellery": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500"
+            "Crystal Bracelets": "Images/capricorn01.webp",
+            "Rashi/Zodiac Bracelet": "Images/capricorn01.webp",
+            "Mala & Pendant": "Images/capricorn01.webp",
+            "Anklets": "Images/capricorn01.webp",
+            "Vastu & Prosperity": "Images/capricorn01.webp",
+            "Jewellery": "Images/capricorn01.webp"
         };
 
         const WHATSAPP_NUMBER = "919016406623";
 
-        // Navigation Controller with History State Support (Fixes Back Button Exit)
         function navigateTo(state, push = true) {
             if (push) {
                 history.pushState(state, "", "");
@@ -503,7 +500,6 @@
             if(el) el.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Initialize Home Dashboard
         function initHome() {
             const categories = [...new Set(PRODUCTS.map(p => p.category))];
             const catGrid = document.getElementById('homeCatGrid');
@@ -511,7 +507,7 @@
 
             categories.forEach(cat => {
                 const count = PRODUCTS.filter(p => p.category === cat).length;
-                const coverImg = CATEGORY_IMAGES[cat] || "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500";
+                const coverImg = CATEGORY_IMAGES[cat] || "Images/capricorn01.webp";
                 
                 const tile = document.createElement('div');
                 tile.className = 'app-cat-tile';
@@ -534,7 +530,6 @@
             });
         }
 
-        // Render Category Products View
         function renderCategoryProducts(catName) {
             const grid = document.getElementById('categoryProductGrid');
             grid.innerHTML = '';
@@ -545,15 +540,16 @@
             });
         }
 
-        // Create Product Card Helper
         function createProductCard(product) {
             const discount = product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0;
+            const mainImg = product.images && product.images.length > 0 ? product.images[0] : "Images/capricorn01.webp";
+            
             const card = document.createElement('div');
             card.className = 'app-product-card';
             card.onclick = () => navigateTo({ view: 'pdpView', sku: product.sku });
             card.innerHTML = `
                 <div class="app-card-img">
-                    <img src="${product.image}" alt="${product.title}" loading="lazy">
+                    <img src="${mainImg}" alt="${product.title}" loading="lazy">
                 </div>
                 <div class="app-card-body">
                     <div class="app-card-title">${product.title}</div>
@@ -567,7 +563,6 @@
             return card;
         }
 
-        // Render Product Detail Page (PDP)
         function renderPDP(sku) {
             const product = PRODUCTS.find(p => p.sku === sku);
             if (!product) return;
@@ -578,11 +573,20 @@
             const orderMessage = encodeURIComponent(`Hi Uroo Enterprise, I want to place a PREPAID UPI order for:\n\n*SKU:* ${product.sku}\n*Product:* ${product.title}\n*Price:* ₹${product.price}\n\nPlease share UPI payment details.`);
             const inquiryMessage = encodeURIComponent(`Hi Uroo Enterprise, I have an inquiry regarding this product:\n\n*SKU:* ${product.sku}\n*Product:* ${product.title}\n\nPlease share more details.`);
 
+            const imgList = product.images && product.images.length > 0 ? product.images : ["Images/capricorn01.webp"];
+
             const pdpCard = document.getElementById('pdpCardContent');
             pdpCard.innerHTML = `
                 <div class="pdp-img-container">
-                    <img src="${product.image}" alt="${product.title}">
+                    <img id="mainPdpImg" src="${imgList[0]}" alt="${product.title}">
                 </div>
+                ${imgList.length > 1 ? `
+                <div style="display: flex; gap: 8px; padding: 10px 16px; overflow-x: auto; background: #f8fafc; border-bottom: 1px solid var(--border-color);">
+                    ${imgList.map((imgUrl, index) => `
+                        <img src="${imgUrl}" alt="Thumbnail ${index + 1}" onclick="document.getElementById('mainPdpImg').src='${imgUrl}'" 
+                             style="width: 55px; height: 55px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid ${index === 0 ? 'var(--app-primary)' : 'var(--border-color)'};">
+                    `).join('')}
+                </div>` : ''}
                 <div class="pdp-content">
                     <div class="pdp-title">${product.title}</div>
                     <div class="pdp-price-box">
@@ -617,7 +621,6 @@
             });
         }
 
-        // Live App Search
         function handleAppSearch() {
             const query = document.getElementById('appSearchInput').value.toLowerCase().trim();
             const grid = document.getElementById('searchProductGrid');
