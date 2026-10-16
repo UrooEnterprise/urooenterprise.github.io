@@ -2,329 +2,287 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uroo Enterprise | Official Spiritual & Gemstone Store</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Uroo Enterprise - App Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --theme-primary: #1e1b4b;
-            --theme-accent: #d97706;
-            --bg-light: #f8fafc;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --success-green: #16a34a;
+            --app-primary: #1e1b4b;
+            --app-accent: #d97706;
             --meesho-pink: #d91b5c;
+            --bg-app: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --success-green: #16a34a;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--bg-light); color: var(--text-main); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-app); color: var(--text-main); padding-bottom: 70px; }
 
-        /* Announcement Bar */
-        .top-banner {
-            background-color: var(--theme-primary);
-            color: #fde047;
-            text-align: center;
-            font-size: 12px;
-            padding: 9px 16px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
-
-        /* Modern Header */
-        header {
+        /* App Top Bar */
+        .app-topbar {
             background: #ffffff;
-            border-bottom: 1px solid var(--border-color);
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
-        }
-
-        .header-container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 16px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-        }
-
-        .logo-area {
-            cursor: pointer;
-        }
-        .logo-area h1 {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--theme-primary);
-            letter-spacing: -0.5px;
-        }
-
-        .logo-area span {
-            color: var(--theme-accent);
-            font-size: 11px;
-            font-weight: 700;
-            display: block;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-        }
-
-        /* Search Bar */
-        .search-box {
-            flex: 1;
-            max-width: 450px;
-            display: flex;
-            background: #f1f5f9;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 10px 16px;
-            border: none;
-            outline: none;
-            font-size: 14px;
-            background: transparent;
-        }
-
-        .search-box button {
-            background: var(--theme-primary);
-            border: none;
-            padding: 0 18px;
-            font-weight: 600;
-            cursor: pointer;
-            color: #fff;
-        }
-
-        /* Breadcrumb / Navigation Bar */
-        .breadcrumb-bar {
-            background: #ffffff;
             border-bottom: 1px solid var(--border-color);
-            padding: 12px 24px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .topbar-left {
             display: flex;
             align-items: center;
-            gap: 8px;
-            max-width: 1280px;
-            margin: 0 auto;
+            gap: 12px;
         }
 
-        .breadcrumb-bar span {
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
             cursor: pointer;
-            color: var(--theme-primary);
-        }
-        .breadcrumb-bar span:hover { text-decoration: underline; }
-
-        /* Main Container */
-        .main-container {
-            max-width: 1280px;
-            margin: 24px auto;
-            padding: 0 20px;
+            color: var(--text-main);
+            display: none;
         }
 
-        /* Home Category Grid */
-        .home-banner {
+        .app-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--app-primary);
+        }
+
+        .app-subtitle {
+            font-size: 10px;
+            color: var(--app-accent);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .topbar-search-icon {
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        /* App Bottom Navigation Bar */
+        .app-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #ffffff;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 600;
+            gap: 3px;
+            width: 25%;
+        }
+
+        .nav-item span.icon {
+            font-size: 20px;
+        }
+
+        .nav-item.active {
+            color: var(--app-primary);
+        }
+
+        /* App Container */
+        .app-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 12px;
+        }
+
+        /* Views */
+        .app-view { display: none; }
+        .app-view.active { display: block; }
+
+        /* Home View Styles */
+        .app-banner-card {
             background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
             color: #fff;
-            padding: 40px 30px;
-            border-radius: 16px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        .home-banner h2 { font-size: 28px; margin-bottom: 8px; font-weight: 700; }
-        .home-banner p { font-size: 14px; color: #cbd5e1; max-width: 600px; margin: 0 auto; }
-
-        .section-title {
-            font-size: 20px;
-            font-weight: 700;
+            padding: 24px 20px;
+            border-radius: 14px;
             margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(30,27,75,0.15);
+        }
+        .app-banner-card h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+        .app-banner-card p { font-size: 12px; color: #cbd5e1; line-height: 1.4; }
+
+        .section-header {
+            font-size: 15px;
+            font-weight: 700;
             color: var(--text-main);
-        }
-
-        .category-home-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .category-card {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
+            margin: 16px 0 10px 4px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
+        }
+
+        /* App Category Grid */
+        .app-cat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .app-cat-tile {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
             justify-content: space-between;
             cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: transform 0.1s;
         }
+        .app-cat-tile:active { transform: scale(0.97); }
+        .app-cat-tile h4 { font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+        .app-cat-tile span { font-size: 11px; color: var(--text-muted); font-weight: 500; }
 
-        .category-card:hover {
-            transform: translateY(-3px);
-            border-color: var(--theme-primary);
-            box-shadow: 0 10px 20px -5px rgba(30, 27, 75, 0.08);
-        }
-
-        .category-card h3 { font-size: 16px; font-weight: 700; color: var(--text-main); }
-        .category-card span { font-size: 12px; color: var(--text-muted); font-weight: 600; display: block; margin-top: 4px; }
-        .category-card .arrow { font-size: 18px; color: var(--theme-primary); font-weight: bold; }
-
-        /* Product Grid (For Category View) */
-        #product-grid {
+        /* Product Grid (App Style) */
+        .app-product-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
         }
 
-        .product-card {
-            background: #ffffff;
-            border-radius: 12px;
+        .app-product-card {
+            background: var(--card-bg);
+            border-radius: 10px;
             border: 1px solid var(--border-color);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
-        .product-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08);
-        }
-
-        .image-box {
-            position: relative;
+        .app-card-img {
             width: 100%;
-            height: 220px;
+            height: 160px;
             background: #f1f5f9;
+            position: relative;
         }
-
-        .product-card img {
+        .app-card-img img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .out-of-stock-tag {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: #dc2626;
-            color: #fff;
-            padding: 4px 10px;
-            font-size: 10px;
-            font-weight: 700;
-            border-radius: 6px;
-            text-transform: uppercase;
-        }
-
-        .card-details {
-            padding: 14px;
+        .app-card-body {
+            padding: 10px;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
         }
 
-        .category-tag {
-            font-size: 10px;
-            color: var(--theme-accent);
-            text-transform: uppercase;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .product-title {
-            font-size: 14px;
+        .app-card-title {
+            font-size: 12px;
             color: var(--text-main);
-            line-height: 1.4;
-            margin-bottom: 8px;
+            font-weight: 500;
+            line-height: 1.3;
+            margin-bottom: 6px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            height: 38px;
-            font-weight: 600;
+            height: 32px;
         }
 
-        .price-section {
+        .app-card-price-row {
             display: flex;
             align-items: baseline;
-            gap: 8px;
-            margin-bottom: 6px;
+            gap: 6px;
+            margin-top: auto;
         }
 
-        .current-price {
-            font-size: 19px;
-            font-weight: 700;
-            color: var(--theme-primary);
-        }
+        .app-price { font-size: 15px; font-weight: 700; color: var(--app-primary); }
+        .app-mrp { font-size: 11px; color: var(--text-muted); text-decoration: line-through; }
+        .app-disc { font-size: 10px; font-weight: 700; color: var(--success-green); }
 
-        .mrp-price {
-            font-size: 13px;
-            color: var(--text-muted);
-            text-decoration: line-through;
-        }
-
-        .discount-badge {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--success-green);
-        }
-
-        /* Product Detail Page (PDP) View */
-        #productDetailView {
-            display: none;
-            background: #ffffff;
-            border-radius: 16px;
+        /* Search View */
+        .app-search-input-box {
+            display: flex;
+            background: #fff;
             border: 1px solid var(--border-color);
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 14px;
         }
-
-        .pdp-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .pdp-image-section img {
+        .app-search-input-box input {
             width: 100%;
-            height: 400px;
-            object-fit: cover;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
+            padding: 10px 14px;
+            border: none;
+            outline: none;
+            font-size: 13px;
         }
 
-        .pdp-info h2 { font-size: 24px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; }
-        .pdp-category { font-size: 12px; font-weight: 700; color: var(--theme-accent); text-transform: uppercase; margin-bottom: 8px; display: block; }
-        .pdp-price-row { display: flex; align-items: baseline; gap: 12px; margin: 16px 0; }
-        .pdp-price { font-size: 26px; font-weight: 700; color: var(--theme-primary); }
-        .pdp-mrp { font-size: 16px; color: var(--text-muted); text-decoration: line-through; }
-        .pdp-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; }
+        /* Product Detail View (App Sheet Style) */
+        .pdp-view-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .pdp-img-container {
+            width: 100%;
+            height: 300px;
+            background: #f1f5f9;
+        }
+        .pdp-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .pdp-content {
+            padding: 16px;
+        }
+        .pdp-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; line-height: 1.4; }
+        .pdp-price-box { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+        .pdp-cur-price { font-size: 22px; font-weight: 700; color: var(--app-primary); }
+        .pdp-old-price { font-size: 14px; color: var(--text-muted); text-decoration: line-through; }
+        .pdp-description { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; }
 
-        .pdp-actions {
+        .pdp-action-stack {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            max-width: 400px;
+            gap: 8px;
         }
-
-        .action-btn {
-            text-align: center;
+        .app-btn {
+            width: 100%;
+            padding: 11px;
+            border-radius: 8px;
             font-size: 13px;
             font-weight: 600;
-            padding: 12px;
-            border-radius: 8px;
+            text-align: center;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -332,74 +290,85 @@
             gap: 6px;
             cursor: pointer;
             border: none;
-            transition: filter 0.2s;
         }
-        .action-btn:hover { filter: brightness(0.95); }
-
-        .whatsapp-order-btn { background-color: #16a34a; color: #fff; font-size: 14px; font-weight: 700; }
-        .whatsapp-inquiry-btn { background-color: #f1f5f9; color: #334155; border: 1px solid var(--border-color); }
-        .btn-row { display: flex; gap: 8px; }
-        .meesho-btn { background-color: var(--meesho-pink); color: #fff; flex: 1; }
-        .amazon-btn { background-color: #fbbf24; color: #111; font-weight: 700; flex: 1; }
-
-        @media (max-width: 768px) {
-            .pdp-layout { grid-template-columns: 1fr; gap: 20px; }
-            .category-home-grid { grid-template-columns: 1fr; }
-            #product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-            .header-container { flex-direction: column; align-items: stretch; gap: 12px; }
-            .search-box { max-width: 100%; }
-        }
+        .whatsapp-order { background: #16a34a; color: #fff; font-weight: 700; font-size: 14px; }
+        .whatsapp-inquiry { background: #f8fafc; color: #334155; border: 1px solid var(--border-color); }
+        .market-row { display: flex; gap: 8px; }
+        .meesho-action { background: var(--meesho-pink); color: #fff; flex: 1; }
+        .amazon-action { background: #fbbf24; color: #111; font-weight: 700; flex: 1; }
     </style>
 </head>
 <body>
 
-    <div class="top-banner">
-        📿 100% Certified Original Gemstones & Vastu Artifacts • Direct WhatsApp UPI Orders Get Priority Dispatch
-    </div>
-
-    <header>
-        <div class="header-container">
-            <div class="logo-area" onclick="goHome()">
-                <h1>Uroo Enterprise</h1>
-                <span>Official Spiritual Catalog</span>
-            </div>
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search bracelets, rashi items, vastu decor..." oninput="handleSearch()">
-                <button>Search</button>
+    <!-- App Top Bar -->
+    <div class="app-topbar">
+        <div class="topbar-left">
+            <button class="back-btn" id="appBackBtn" onclick="goHome()">←</button>
+            <div>
+                <div class="app-title" id="appTopbarTitle">Uroo Enterprise</div>
+                <div class="app-subtitle" id="appTopbarSubtitle">Spiritual & Gemstone Store</div>
             </div>
         </div>
-    </header>
-
-    <div class="breadcrumb-bar" id="breadcrumbBar" style="display: none;">
-        <span onclick="goHome()">Home</span> &gt; <span id="breadcrumbCat" onclick="showCategoryView(currentCategory)">Category</span> <span id="breadcrumbProduct" style="display:none; color:var(--text-main);">&gt; Product</span>
+        <div class="topbar-search-icon" onclick="switchView('searchView')">🔍</div>
     </div>
 
-    <div class="main-container">
-        
-        <!-- VIEW 1: HOME CATEGORY SELECTOR -->
-        <div id="homeCategoryView">
-            <div class="home-banner">
-                <h2>Welcome to Uroo Enterprise</h2>
-                <p>Explore our exclusive collections of certified natural crystals, zodiac rashi items, spiritual malas, and vastu decor.</p>
+    <!-- App Main Container -->
+    <div class="app-container">
+
+        <!-- VIEW 1: HOME APP DASHBOARD -->
+        <div id="homeView" class="app-view active">
+            <div class="app-banner-card">
+                <h2>Certified Natural Crystals</h2>
+                <p>Explore exclusive Rashi bracelets, vastu decor, and sacred malas with direct WhatsApp UPI priority dispatch.</p>
             </div>
-            <div class="section-title">Select a Category to Explore</div>
-            <div class="category-home-grid" id="categoryHomeGrid"></div>
+            <div class="section-header">Categories</div>
+            <div class="app-cat-grid" id="homeCatGrid"></div>
+
+            <div class="section-header">Trending Collections</div>
+            <div class="app-product-grid" id="homeTrendingGrid"></div>
         </div>
 
-        <!-- VIEW 2: PRODUCT LISTING BY CATEGORY -->
-        <div id="categoryProductView" style="display: none;">
-            <div class="section-title" id="categoryViewTitle">Products</div>
-            <div id="product-grid"></div>
+        <!-- VIEW 2: CATEGORY PRODUCTS LIST -->
+        <div id="categoryView" class="app-view">
+            <div class="section-header" id="categoryViewTitle">Category Products</div>
+            <div class="app-product-grid" id="categoryProductGrid"></div>
         </div>
 
-        <!-- VIEW 3: PRODUCT DETAIL PAGE (PDP) -->
-        <div id="productDetailView">
-            <!-- Rendered dynamically -->
+        <!-- VIEW 3: SEARCH VIEW -->
+        <div id="searchView" class="app-view">
+            <div class="app-search-input-box">
+                <input type="text" id="appSearchInput" placeholder="Search crystals, bracelets, vastu items..." oninput="handleAppSearch()">
+            </div>
+            <div class="app-product-grid" id="searchProductGrid"></div>
+        </div>
+
+        <!-- VIEW 4: PRODUCT DETAIL PAGE (PDP) -->
+        <div id="pdpView" class="app-view">
+            <div class="pdp-view-card" id="pdpCardContent"></div>
+            <div class="section-header" style="margin-top: 24px;">Similar Recommendations</div>
+            <div class="app-product-grid" id="pdpRecommendedGrid"></div>
         </div>
 
     </div>
+
+    <!-- App Bottom Navigation Bar -->
+    <nav class="app-bottom-nav">
+        <button class="nav-item active" id="navHome" onclick="switchView('homeView')">
+            <span class="icon">🏠</span> Home
+        </button>
+        <button class="nav-item" id="navCategories" onclick="switchView('homeView'); scrollToCats();">
+            <span class="icon">📂</span> Categories
+        </button>
+        <button class="nav-item" id="navSearch" onclick="switchView('searchView')">
+            <span class="icon">🔍</span> Search
+        </button>
+        <button class="nav-item" onclick="window.open('https://wa.me/919016406623?text=Hi%20Uroo%20Enterprise,%20I%20have%20an%20inquiry.', '_blank')">
+            <span class="icon">💬</span> Support
+        </button>
+    </nav>
 
     <script>
+        // Full product catalog (38 products)
         const PRODUCTS = [
             {category: "Crystal Bracelets", sku: "BracHemGold", title: "Pyrite Hematite Bracelet (Golden)", description: "Attracts wealth, abundance, and positive energy. Handcrafted original citrine and pyrite beads for daily wear.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
             {category: "Crystal Bracelets", sku: "BracHemSilver", title: "Pyrite Hematite Bracelet (Silver)", description: "Stylish silver tone stone bracelet designed for everyday minimal wear and positive aura protection.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"},
@@ -442,210 +411,172 @@
         ];
 
         const WHATSAPP_NUMBER = "919016406623";
-        let currentCategory = "";
-        let currentProductSku = "";
 
-        // Initialize Home Page Category Cards
-        function initHomeCategories() {
+        // Navigation Controller
+        function switchView(viewId) {
+            document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+
+            document.querySelectorAll('.app-bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
+            if(viewId === 'homeView') document.getElementById('navHome').classList.add('active');
+            if(viewId === 'searchView') document.getElementById('navSearch').classList.add('active');
+
+            const backBtn = document.getElementById('appBackBtn');
+            if(viewId === 'homeView') {
+                backBtn.style.display = 'none';
+                document.getElementById('appTopbarTitle').textContent = "Uroo Enterprise";
+                document.getElementById('appTopbarSubtitle').textContent = "Spiritual & Gemstone Store";
+            } else {
+                backBtn.style.display = 'block';
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goHome() {
+            switchView('homeView');
+        }
+
+        function scrollToCats() {
+            const el = document.getElementById('homeCatGrid');
+            if(el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize Home Dashboard
+        function initHome() {
             const categories = [...new Set(PRODUCTS.map(p => p.category))];
-            const grid = document.getElementById('categoryHomeGrid');
-            grid.innerHTML = '';
+            const catGrid = document.getElementById('homeCatGrid');
+            catGrid.innerHTML = '';
 
             categories.forEach(cat => {
                 const count = PRODUCTS.filter(p => p.category === cat).length;
-                const card = document.createElement('div');
-                card.className = 'category-card';
-                card.innerHTML = `
-                    <div>
-                        <h3>${cat}</h3>
-                        <span>${count} Products Available</span>
-                    </div>
-                    <div class="arrow">➔</div>
+                const tile = document.createElement('div');
+                tile.className = 'app-cat-tile';
+                tile.innerHTML = `
+                    <h4>${cat}</h4>
+                    <span>${count} Items ➔</span>
                 `;
-                card.onclick = () => showCategoryView(cat);
-                grid.appendChild(card);
+                tile.onclick = () => showCategoryProducts(cat);
+                catGrid.appendChild(tile);
+            });
+
+            // Trending items (first 6 items)
+            const trendGrid = document.getElementById('homeTrendingGrid');
+            trendGrid.innerHTML = '';
+            PRODUCTS.slice(0, 6).forEach(product => {
+                trendGrid.appendChild(createProductCard(product));
             });
         }
 
-        // Show Category Product View
-        function showCategoryView(categoryName) {
-            currentCategory = categoryName;
-            document.getElementById('homeCategoryView').style.display = 'none';
-            document.getElementById('productDetailView').style.display = 'none';
-            document.getElementById('categoryProductView').style.display = 'block';
+        // Show Category Products View
+        function showCategoryProducts(catName) {
+            document.getElementById('appTopbarTitle').textContent = catName;
+            document.getElementById('appTopbarSubtitle').textContent = "Collection";
+            document.getElementById('categoryViewTitle').textContent = catName;
 
-            document.getElementById('breadcrumbBar').style.display = 'flex';
-            document.getElementById('breadcrumbCat').textContent = categoryName;
-            document.getElementById('breadcrumbProduct').style.display = 'none';
-            document.getElementById('categoryViewTitle').textContent = `Category: ${categoryName}`;
-
-            const grid = document.getElementById('product-grid');
+            const grid = document.getElementById('categoryProductGrid');
             grid.innerHTML = '';
-
-            const filtered = PRODUCTS.filter(p => p.category === categoryName);
+            const filtered = PRODUCTS.filter(p => p.category === catName);
 
             filtered.forEach(product => {
-                const isOutStock = product.stock.toLowerCase().includes('out');
-                const discount = product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0;
-
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.onclick = () => showProductDetail(product.sku);
-                card.innerHTML = `
-                    ${isOutStock ? '<div class="out-of-stock-tag">Sold Out</div>' : ''}
-                    <div class="image-box">
-                        <img src="${product.image}" alt="${product.title}" loading="lazy">
-                    </div>
-                    <div class="card-details">
-                        <span class="category-tag">${product.category}</span>
-                        <div class="product-title">${product.title}</div>
-                        <div class="price-section">
-                            <span class="current-price">₹${product.price}</span>
-                            <span class="mrp-price">₹${product.mrp}</span>
-                            ${discount > 0 ? `<span class="discount-badge">${discount}% off</span>` : ''}
-                        </div>
-                        <div style="font-size: 11px; color: var(--theme-primary); font-weight: 700; margin-top: 4px;">View Details & Buy ➔</div>
-                    </div>
-                `;
-                grid.appendChild(card);
+                grid.appendChild(createProductCard(product));
             });
+
+            switchView('categoryView');
+        }
+
+        // Create Product Card Helper
+        function createProductCard(product) {
+            const discount = product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0;
+            const card = document.createElement('div');
+            card.className = 'app-product-card';
+            card.onclick = () => showPDP(product.sku);
+            card.innerHTML = `
+                <div class="app-card-img">
+                    <img src="${product.image}" alt="${product.title}" loading="lazy">
+                </div>
+                <div class="app-card-body">
+                    <div class="app-card-title">${product.title}</div>
+                    <div class="app-card-price-row">
+                        <span class="app-price">₹${product.price}</span>
+                        <span class="app-mrp">₹${product.mrp}</span>
+                        ${discount > 0 ? `<span class="app-disc">${discount}%off</span>` : ''}
+                    </div>
+                </div>
+            `;
+            return card;
         }
 
         // Show Product Detail Page (PDP)
-        function showProductDetail(sku) {
-            currentProductSku = sku;
+        function showPDP(sku) {
             const product = PRODUCTS.find(p => p.sku === sku);
             if (!product) return;
 
-            document.getElementById('homeCategoryView').style.display = 'none';
-            document.getElementById('categoryProductView').style.display = 'none';
-            const pdpView = document.getElementById('productDetailView');
-            pdpView.style.display = 'block';
-
-            document.getElementById('breadcrumbBar').style.display = 'flex';
-            document.getElementById('breadcrumbCat').textContent = product.category;
-            document.getElementById('breadcrumbProduct').style.display = 'inline';
-            document.getElementById('breadcrumbProduct').textContent = product.title;
+            document.getElementById('appTopbarTitle').textContent = "Product Details";
+            document.getElementById('appTopbarSubtitle').textContent = product.category;
 
             const discount = product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0;
             const orderMessage = encodeURIComponent(`Hi Uroo Enterprise, I want to place a PREPAID UPI order for:\n\n*SKU:* ${product.sku}\n*Product:* ${product.title}\n*Price:* ₹${product.price}\n\nPlease share UPI payment details.`);
             const inquiryMessage = encodeURIComponent(`Hi Uroo Enterprise, I have an inquiry regarding this product:\n\n*SKU:* ${product.sku}\n*Product:* ${product.title}\n\nPlease share more details.`);
 
-            // Get Recommended Products (other products in same category or random)
-            const recommended = PRODUCTS.filter(p => p.category === product.category && p.sku !== product.sku).slice(0, 4);
-
-            pdpView.innerHTML = `
-                <div class="pdp-layout">
-                    <div class="pdp-image-section">
-                        <img src="${product.image}" alt="${product.title}">
-                    </div>
-                    <div class="pdp-info">
-                        <span class="pdp-category">${product.category} | SKU: ${product.sku}</span>
-                        <h2>${product.title}</h2>
-                        <div class="pdp-price-row">
-                            <span class="pdp-price">₹${product.price}</span>
-                            <span class="pdp-mrp">₹${product.mrp}</span>
-                            ${discount > 0 ? `<span class="discount-badge" style="font-size:14px;">${discount}% OFF</span>` : ''}
-                        </div>
-                        <p class="pdp-desc">${product.description}</p>
-                        
-                        <div class="pdp-actions">
-                            <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${orderMessage}" target="_blank" class="action-btn whatsapp-order-btn">
-                                💬 Order on WhatsApp (Prepaid UPI Only)
-                            </a>
-                            <div style="font-size: 11px; color: var(--success-green); font-weight: 700; text-align: center; margin-top: -6px;">✓ Fast Dispatch on Prepaid UPI Orders</div>
-
-                            <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${inquiryMessage}" target="_blank" class="action-btn whatsapp-inquiry-btn">
-                                ❓ Product Inquiry via WhatsApp
-                            </a>
-
-                            <div class="btn-row">
-                                <a href="${product.meesho}" target="_blank" class="action-btn meesho-btn">🛍️ Order on Meesho</a>
-                                <a href="${product.amazon}" target="_blank" class="action-btn amazon-btn">📦 Order on Amazon</a>
-                            </div>
-                        </div>
-                    </div>
+            const pdpCard = document.getElementById('pdpCardContent');
+            pdpCard.innerHTML = `
+                <div class="pdp-img-container">
+                    <img src="${product.image}" alt="${product.title}">
                 </div>
+                <div class="pdp-content">
+                    <div class="pdp-title">${product.title}</div>
+                    <div class="pdp-price-box">
+                        <span class="pdp-cur-price">₹${product.price}</span>
+                        <span class="pdp-old-price">₹${product.mrp}</span>
+                        ${discount > 0 ? `<span style="font-size:12px; font-weight:700; color:var(--success-green);">${discount}% OFF</span>` : ''}
+                    </div>
+                    <div class="pdp-description">${product.description}</div>
 
-                <div style="margin-top: 50px; border-top: 1px solid var(--border-color); padding-top: 30px;">
-                    <div class="section-title">Similar Recommended Products</div>
-                    <div id="recommendedGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px;"></div>
+                    <div class="pdp-action-stack">
+                        <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${orderMessage}" target="_blank" class="app-btn whatsapp-order">
+                            💬 Order on WhatsApp (Prepaid UPI Only)
+                        </a>
+                        <div style="font-size: 10px; color: var(--success-green); font-weight: 700; text-align: center;">✓ Fast Dispatch on Prepaid UPI Orders</div>
+
+                        <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${inquiryMessage}" target="_blank" class="app-btn whatsapp-inquiry">
+                            ❓ Product Inquiry via WhatsApp
+                        </a>
+
+                        <div class="market-row">
+                            <a href="${product.meesho}" target="_blank" class="app-btn meesho-action">🛍️ Meesho</a>
+                            <a href="${product.amazon}" target="_blank" class="app-btn amazon-action">📦 Amazon</a>
+                        </div>
+                    </div>
                 </div>
             `;
 
-            const recGrid = document.getElementById('recommendedGrid');
-            recommended.forEach(rec => {
-                const recCard = document.createElement('div');
-                recCard.className = 'product-card';
-                recCard.onclick = () => showProductDetail(rec.sku);
-                recCard.innerHTML = `
-                    <div class="image-box" style="height: 180px;">
-                        <img src="${rec.image}" alt="${rec.title}" loading="lazy">
-                    </div>
-                    <div class="card-details">
-                        <div class="product-title" style="height:32px;">${rec.title}</div>
-                        <div class="current-price">₹${rec.price}</div>
-                    </div>
-                `;
-                recGrid.appendChild(recCard);
+            // Recommended products in same category
+            const recGrid = document.getElementById('pdpRecommendedGrid');
+            recGrid.innerHTML = '';
+            PRODUCTS.filter(p => p.category === product.category && p.sku !== product.sku).slice(0, 4).forEach(rec => {
+                recGrid.appendChild(createProductCard(rec));
             });
 
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            switchView('pdpView');
         }
 
-        // Return to Home
-        function goHome() {
-            currentCategory = "";
-            document.getElementById('homeCategoryView').style.display = 'block';
-            document.getElementById('categoryProductView').style.display = 'none';
-            document.getElementById('productDetailView').style.display = 'none';
-            document.getElementById('breadcrumbBar').style.display = 'none';
-            document.getElementById('searchInput').value = '';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        // Live App Search
+        function handleAppSearch() {
+            const query = document.getElementById('appSearchInput').value.toLowerCase().trim();
+            const grid = document.getElementById('searchProductGrid');
+            grid.innerHTML = '';
 
-        // Search handler
-        function handleSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            if (query.length > 1) {
-                // If searching, jump to category view with all products matching query
-                document.getElementById('homeCategoryView').style.display = 'none';
-                document.getElementById('productDetailView').style.display = 'none';
-                document.getElementById('categoryProductView').style.display = 'block';
-                document.getElementById('breadcrumbBar').style.display = 'flex';
-                document.getElementById('breadcrumbCat').textContent = "Search Results";
-                document.getElementById('categoryViewTitle').textContent = `Search: "${query}"`;
+            if (query.length === 0) return;
 
-                const grid = document.getElementById('product-grid');
-                grid.innerHTML = '';
-                const filtered = PRODUCTS.filter(p => p.title.toLowerCase().includes(query) || p.sku.toLowerCase().includes(query));
-
-                if (filtered.length === 0) {
-                    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">No products found matching your search.</div>`;
-                    return;
-                }
-
-                filtered.forEach(product => {
-                    const card = document.createElement('div');
-                    card.className = 'product-card';
-                    card.onclick = () => showProductDetail(product.sku);
-                    card.innerHTML = `
-                        <div class="image-box"><img src="${product.image}" alt="${product.title}"></div>
-                        <div class="card-details">
-                            <span class="category-tag">${product.category}</span>
-                            <div class="product-title">${product.title}</div>
-                            <div class="current-price">₹${product.price}</div>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
-            } else if (query.length === 0 && currentCategory === "") {
-                goHome();
-            }
+            const filtered = PRODUCTS.filter(p => p.title.toLowerCase().includes(query) || p.sku.toLowerCase().includes(query));
+            filtered.forEach(product => {
+                grid.appendChild(createProductCard(product));
+            });
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            initHomeCategories();
+            initHome();
         });
     </script>
 </body>
