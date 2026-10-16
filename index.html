@@ -142,29 +142,59 @@
             align-items: center;
         }
 
-        /* App Category Grid */
+        /* App Category Grid with Visualisation Images */
         .app-cat-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 20px;
         }
 
         .app-cat-tile {
-            background: var(--card-bg);
+            position: relative;
+            height: 120px;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 16px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            transition: transform 0.1s;
+            justify-content: flex-end;
+            padding: 12px;
+            transition: transform 0.15s ease;
         }
         .app-cat-tile:active { transform: scale(0.97); }
-        .app-cat-tile h4 { font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
-        .app-cat-tile span { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+        .app-cat-tile img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            transition: transform 0.3s ease;
+        }
+        .app-cat-tile:hover img { transform: scale(1.05); }
+
+        .app-cat-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 70%);
+            z-index: 2;
+        }
+
+        .app-cat-content {
+            position: relative;
+            z-index: 3;
+            color: #fff;
+        }
+        .app-cat-content h4 { font-size: 13px; font-weight: 700; margin-bottom: 2px; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .app-cat-content span { font-size: 10px; color: #fbbf24; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* Product Grid (App Style) */
         .app-product-grid {
@@ -303,13 +333,13 @@
     <!-- App Top Bar -->
     <div class="app-topbar">
         <div class="topbar-left">
-            <button class="back-btn" id="appBackBtn" onclick="goHome()">←</button>
+            <button class="back-btn" id="appBackBtn" onclick="history.back()">←</button>
             <div>
                 <div class="app-title" id="appTopbarTitle">Uroo Enterprise</div>
                 <div class="app-subtitle" id="appTopbarSubtitle">Spiritual & Gemstone Store</div>
             </div>
         </div>
-        <div class="topbar-search-icon" onclick="switchView('searchView')">🔍</div>
+        <div class="topbar-search-icon" onclick="switchView('searchView', true)">🔍</div>
     </div>
 
     <!-- App Main Container -->
@@ -353,13 +383,13 @@
 
     <!-- App Bottom Navigation Bar -->
     <nav class="app-bottom-nav">
-        <button class="nav-item active" id="navHome" onclick="switchView('homeView')">
+        <button class="nav-item active" id="navHome" onclick="navigateTo({view: 'homeView'})">
             <span class="icon">🏠</span> Home
         </button>
-        <button class="nav-item" id="navCategories" onclick="switchView('homeView'); scrollToCats();">
+        <button class="nav-item" id="navCategories" onclick="navigateTo({view: 'homeView'}); scrollToCats();">
             <span class="icon">📂</span> Categories
         </button>
-        <button class="nav-item" id="navSearch" onclick="switchView('searchView')">
+        <button class="nav-item" id="navSearch" onclick="navigateTo({view: 'searchView'})">
             <span class="icon">🔍</span> Search
         </button>
         <button class="nav-item" onclick="window.open('https://wa.me/919016406623?text=Hi%20Uroo%20Enterprise,%20I%20have%20an%20inquiry.', '_blank')">
@@ -410,19 +440,33 @@
             {category: "Jewellery", sku: "BraceletHowlite", title: "White Howlite Peace Bracelet", description: "Calming white marble-textured howlite beads for ultimate relaxation and patience.", stock: "In Stock", mrp: 999, price: 299, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500", amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/"}
         ];
 
+        // Visualization Cover Images per Category
+        const CATEGORY_IMAGES = {
+            "Crystal Bracelets": "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500",
+            "Rashi/Zodiac Bracelet": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500",
+            "Mala & Pendant": "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500",
+            "Anklets": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500",
+            "Vastu & Prosperity": "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500",
+            "Jewellery": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500"
+        };
+
         const WHATSAPP_NUMBER = "919016406623";
 
-        // Navigation Controller
-        function switchView(viewId) {
+        // Navigation Controller with History State Support (Fixes Back Button Exit)
+        function navigateTo(state, push = true) {
+            if (push) {
+                history.pushState(state, "", "");
+            }
+
             document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
+            document.getElementById(state.view).classList.add('active');
 
             document.querySelectorAll('.app-bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
-            if(viewId === 'homeView') document.getElementById('navHome').classList.add('active');
-            if(viewId === 'searchView') document.getElementById('navSearch').classList.add('active');
+            if(state.view === 'homeView') document.getElementById('navHome').classList.add('active');
+            if(state.view === 'searchView') document.getElementById('navSearch').classList.add('active');
 
             const backBtn = document.getElementById('appBackBtn');
-            if(viewId === 'homeView') {
+            if(state.view === 'homeView') {
                 backBtn.style.display = 'none';
                 document.getElementById('appTopbarTitle').textContent = "Uroo Enterprise";
                 document.getElementById('appTopbarSubtitle').textContent = "Spiritual & Gemstone Store";
@@ -430,12 +474,29 @@
                 backBtn.style.display = 'block';
             }
 
+            if (state.view === 'categoryView') {
+                document.getElementById('appTopbarTitle').textContent = state.category;
+                document.getElementById('appTopbarSubtitle').textContent = "Collection";
+                document.getElementById('categoryViewTitle').textContent = state.category;
+                renderCategoryProducts(state.category);
+            } else if (state.view === 'pdpView') {
+                document.getElementById('appTopbarTitle').textContent = "Product Details";
+                renderPDP(state.sku);
+            } else if (state.view === 'searchView') {
+                document.getElementById('appTopbarTitle').textContent = "Search Catalog";
+                document.getElementById('appTopbarSubtitle').textContent = "Find items";
+            }
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function goHome() {
-            switchView('homeView');
-        }
+        window.addEventListener('popstate', (event) => {
+            if (event.state) {
+                navigateTo(event.state, false);
+            } else {
+                navigateTo({ view: 'homeView' }, false);
+            }
+        });
 
         function scrollToCats() {
             const el = document.getElementById('homeCatGrid');
@@ -450,17 +511,22 @@
 
             categories.forEach(cat => {
                 const count = PRODUCTS.filter(p => p.category === cat).length;
+                const coverImg = CATEGORY_IMAGES[cat] || "https://images.unsplash.com/photo-1611591475510-4414a38f38d3?w=500";
+                
                 const tile = document.createElement('div');
                 tile.className = 'app-cat-tile';
                 tile.innerHTML = `
-                    <h4>${cat}</h4>
-                    <span>${count} Items ➔</span>
+                    <img src="${coverImg}" alt="${cat}" loading="lazy">
+                    <div class="app-cat-overlay"></div>
+                    <div class="app-cat-content">
+                        <h4>${cat}</h4>
+                        <span>${count} Items ➔</span>
+                    </div>
                 `;
-                tile.onclick = () => showCategoryProducts(cat);
+                tile.onclick = () => navigateTo({ view: 'categoryView', category: cat });
                 catGrid.appendChild(tile);
             });
 
-            // Trending items (first 6 items)
             const trendGrid = document.getElementById('homeTrendingGrid');
             trendGrid.innerHTML = '';
             PRODUCTS.slice(0, 6).forEach(product => {
@@ -468,12 +534,8 @@
             });
         }
 
-        // Show Category Products View
-        function showCategoryProducts(catName) {
-            document.getElementById('appTopbarTitle').textContent = catName;
-            document.getElementById('appTopbarSubtitle').textContent = "Collection";
-            document.getElementById('categoryViewTitle').textContent = catName;
-
+        // Render Category Products View
+        function renderCategoryProducts(catName) {
             const grid = document.getElementById('categoryProductGrid');
             grid.innerHTML = '';
             const filtered = PRODUCTS.filter(p => p.category === catName);
@@ -481,8 +543,6 @@
             filtered.forEach(product => {
                 grid.appendChild(createProductCard(product));
             });
-
-            switchView('categoryView');
         }
 
         // Create Product Card Helper
@@ -490,7 +550,7 @@
             const discount = product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0;
             const card = document.createElement('div');
             card.className = 'app-product-card';
-            card.onclick = () => showPDP(product.sku);
+            card.onclick = () => navigateTo({ view: 'pdpView', sku: product.sku });
             card.innerHTML = `
                 <div class="app-card-img">
                     <img src="${product.image}" alt="${product.title}" loading="lazy">
@@ -507,12 +567,11 @@
             return card;
         }
 
-        // Show Product Detail Page (PDP)
-        function showPDP(sku) {
+        // Render Product Detail Page (PDP)
+        function renderPDP(sku) {
             const product = PRODUCTS.find(p => p.sku === sku);
             if (!product) return;
 
-            document.getElementById('appTopbarTitle').textContent = "Product Details";
             document.getElementById('appTopbarSubtitle').textContent = product.category;
 
             const discount = product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0;
@@ -551,14 +610,11 @@
                 </div>
             `;
 
-            // Recommended products in same category
             const recGrid = document.getElementById('pdpRecommendedGrid');
             recGrid.innerHTML = '';
             PRODUCTS.filter(p => p.category === product.category && p.sku !== product.sku).slice(0, 4).forEach(rec => {
                 recGrid.appendChild(createProductCard(rec));
             });
-
-            switchView('pdpView');
         }
 
         // Live App Search
@@ -577,6 +633,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             initHome();
+            history.replaceState({ view: 'homeView' }, "", "");
         });
     </script>
 </body>
