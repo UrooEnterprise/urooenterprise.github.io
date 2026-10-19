@@ -531,23 +531,23 @@
             modalBody.innerHTML = `
                 <div style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">
                     <strong>Item:</strong> ${escapeHtml(currentCheckoutProduct.title)}<br>
-                    <strong>Total Price / कुल मूल्य / மொத்த விலை:</strong> <span style="color:var(--app-primary); font-weight:700; font-size:15px;">₹${price}</span>
+                    <strong>Total Price:</strong> <span style="color:var(--app-primary); font-weight:700; font-size:15px;">₹${price}</span>
                 </div>
                 <form id="checkoutForm" onsubmit="submitCheckout(event)">
                     <div class="form-group">
-                        <label class="form-label">Full Name / पूरा नाम / முழு பெயர் *</label>
+                        <label class="form-label">Full Name *</label>
                         <input type="text" id="custName" class="form-input" required placeholder="Enter your full name">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">WhatsApp Number / व्हाट्सएप नंबर / வாட்ஸ்அப் எண் *</label>
+                        <label class="form-label">WhatsApp Number *</label>
                         <input type="tel" id="custPhone" class="form-input" required placeholder="10-digit mobile number">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Delivery Address / डिलीवरी का पता / டெலிவரி முகவரி *</label>
+                        <label class="form-label">Delivery Address *</label>
                         <textarea id="custAddress" class="form-input" rows="2" required placeholder="House No, Street, Landmark, City"></textarea>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Pincode / पिनकोड / அஞ்சல் குறியீடு *</label>
+                        <label class="form-label">Pincode *</label>
                         <input type="text" id="custPincode" class="form-input" required placeholder="6-digit pincode">
                     </div>
 
@@ -584,15 +584,15 @@
             const personalizedPayLink = `${window.location.origin}${window.location.pathname}?view=pay&sku=${encodeURIComponent(currentCheckoutProduct.sku)}&price=${price}&name=${encodeURIComponent(name)}`;
 
             const message = encodeURIComponent(
-                `🌟 *NEW ORDER / नया आर्डर / புதிய ஆர்டர்* 🌟\n\n` +
-                `🛍️ *Product / उत्पाद / பொருள்:* ${currentCheckoutProduct.title}\n` +
+                `🌟 *NEW ORDER* 🌟\n\n` +
+                `🛍️ *Product:* ${currentCheckoutProduct.title}\n` +
                 `🏷️ *SKU:* ${currentCheckoutProduct.sku}\n` +
-                `💰 *Total Price / कुल कीमत / மொத்தம்:* ₹${price}\n\n` +
-                `👤 *Customer Details / ग्राहक विवरण / வாடிக்கையாளர் விவரங்கள்:*\n` +
-                `• Name / नाम / பெயர்: ${name}\n` +
-                `• Phone / फोन / தொலைபேசி: ${phone}\n` +
-                `• Address / पता / முகவரி: ${address} - ${pincode}\n\n` +
-                `👇 *Click below to pay securely / सुरक्षित भुगतान के लिए यहाँ क्लिक करें / பாதுகாப்பாக பணம் செலுத்த கீழே கிளிக் செய்யவும்:*\n` +
+                `💰 *Total Price:* ₹${price}\n\n` +
+                `👤 *Customer Details:*\n` +
+                `• Name: ${name}\n` +
+                `• Phone: ${phone}\n` +
+                `• Address: ${address} - ${pincode}\n\n` +
+                `👇 *Click below to pay securely / भुगतान के लिए यहाँ क्लिक करें / பாதுகாப்பாக பணம் செலுத்த கீழே கிளிக் செய்யவும்:*\n` +
                 `${personalizedPayLink}\n\n` +
                 `✨ _Steps to Pay / भुगतान के चरण / செலுத்த வேண்டிய படிகள்:_ \n` +
                 `1️⃣ Tap the link above / ऊपर दिए गए लिंक पर टैप करें\n` +
