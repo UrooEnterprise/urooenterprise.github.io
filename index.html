@@ -425,7 +425,7 @@
                 </div>
 
                 <div style="margin: 20px 0;">
-                    <div style="font-size: 13px; font-weight: 700; color: var(--app-primary); margin-bottom: 10px;">Scan QR Code to Pay</div>
+                    <div style="font-size: 13px; font-weight: 700; color: var(--app-primary); margin-bottom: 10px;">📱 Scan QR Code to Pay / क्यूआर कोड स्कैन करें / QR கோ드를 ஸ்கேன் செய்யவும்</div>
                     <div id="qrcode" style="display: inline-block; margin-bottom: 14px;"></div>
                 </div>
 
@@ -531,32 +531,35 @@
             modalBody.innerHTML = `
                 <div style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">
                     <strong>Item:</strong> ${escapeHtml(currentCheckoutProduct.title)}<br>
-                    <strong>Total Price:</strong> <span style="color:var(--app-primary); font-weight:700; font-size:15px;">₹${price}</span>
+                    <strong>Total Price / कुल मूल्य / மொத்த விலை:</strong> <span style="color:var(--app-primary); font-weight:700; font-size:15px;">₹${price}</span>
                 </div>
                 <form id="checkoutForm" onsubmit="submitCheckout(event)">
                     <div class="form-group">
-                        <label class="form-label">Full Name *</label>
+                        <label class="form-label">Full Name / पूरा नाम / முழு பெயர் *</label>
                         <input type="text" id="custName" class="form-input" required placeholder="Enter your full name">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">WhatsApp Number *</label>
+                        <label class="form-label">WhatsApp Number / व्हाट्सएप नंबर / வாட்ஸ்அப் எண் *</label>
                         <input type="tel" id="custPhone" class="form-input" required placeholder="10-digit mobile number">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Delivery Address *</label>
+                        <label class="form-label">Delivery Address / डिलीवरी का पता / டெலிவரி முகவரி *</label>
                         <textarea id="custAddress" class="form-input" rows="2" required placeholder="House No, Street, Landmark, City"></textarea>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Pincode *</label>
+                        <label class="form-label">Pincode / पिनकोड / அஞ்சல் குறியீடு *</label>
                         <input type="text" id="custPincode" class="form-input" required placeholder="6-digit pincode">
                     </div>
 
                     <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:12px; margin:14px 0; font-size:12px; color:var(--text-muted); line-height:1.4;">
-                        ℹ️ This sends your order to WhatsApp and includes a <strong>personalized secure payment link</strong> for your customer!
+                        ✨ <strong>Easy Process / आसान प्रक्रिया / எளிதான முறை:</strong><br>
+                        1️⃣ Click below to send order on WhatsApp.<br>
+                        2️⃣ Tap the secure payment link received in WhatsApp.<br>
+                        3️⃣ Pay ₹${price} instantly via GPay/PhonePay/Paytm!
                     </div>
 
                     <button type="submit" class="app-btn whatsapp-order" style="margin-top:10px;">
-                        💬 Send Order & Get Personalized Payment Link
+                        💬 Send Order & Pay via WhatsApp / WhatsApp पर आर्डर भेजें
                     </button>
                 </form>
             `;
@@ -578,21 +581,23 @@
             const pincode = document.getElementById('custPincode').value.trim();
             const price = currentCheckoutProduct.price || 299;
 
-            // Generate a personalized payment URL pointing directly to your GitHub Pages store view=pay
             const personalizedPayLink = `${window.location.origin}${window.location.pathname}?view=pay&sku=${encodeURIComponent(currentCheckoutProduct.sku)}&price=${price}&name=${encodeURIComponent(name)}`;
 
             const message = encodeURIComponent(
-                `*NEW ORDER - Uroo Enterprise*\n\n` +
-                `*Product:* ${currentCheckoutProduct.title}\n` +
-                `*SKU:* ${currentCheckoutProduct.sku}\n` +
-                `*Total Price:* ₹${price}\n\n` +
-                `*Customer Details:*\n` +
-                `• Name: ${name}\n` +
-                `• Phone: ${phone}\n` +
-                `• Address: ${address} - ${pincode}\n\n` +
-                `*Secure Personalized Payment Link:*\n` +
+                `🌟 *NEW ORDER / नया आर्डर / புதிய ஆர்டர்* 🌟\n\n` +
+                `🛍️ *Product / उत्पाद / பொருள்:* ${currentCheckoutProduct.title}\n` +
+                `🏷️ *SKU:* ${currentCheckoutProduct.sku}\n` +
+                `💰 *Total Price / कुल कीमत / மொத்தம்:* ₹${price}\n\n` +
+                `👤 *Customer Details / ग्राहक विवरण / வாடிக்கையாளர் விவரங்கள்:*\n` +
+                `• Name / नाम / பெயர்: ${name}\n` +
+                `• Phone / फोन / தொலைபேசி: ${phone}\n` +
+                `• Address / पता / முகவரி: ${address} - ${pincode}\n\n` +
+                `👇 *Click below to pay securely / सुरक्षित भुगतान के लिए यहाँ क्लिक करें / பாதுகாப்பாக பணம் செலுத்த கீழே கிளிக் செய்யவும்:*\n` +
                 `${personalizedPayLink}\n\n` +
-                `_(Click the link above to pay ₹${price} instantly)_`
+                `✨ _Steps to Pay / भुगतान के चरण / செலுத்த வேண்டிய படிகள்:_ \n` +
+                `1️⃣ Tap the link above / ऊपर दिए गए लिंक पर टैप करें\n` +
+                `2️⃣ Pay ₹${price} via GPay/PhonePe/Paytm / भुगतान करें\n` +
+                `3️⃣ Share screenshot here / स्क्रीनशॉट यहाँ भेजें`
             );
 
             closeCheckoutModal();
@@ -611,10 +616,10 @@
             const detailsBox = document.getElementById('payDetailsBox');
             detailsBox.innerHTML = `
                 <div style="font-size: 13px; color: var(--text-main); line-height: 1.6;">
-                    <strong>Hello ${escapeHtml(name)},</strong><br>
-                    <strong>Item:</strong> ${escapeHtml(product.title)}<br>
-                    <strong>SKU:</strong> ${escapeHtml(product.sku)}<br>
-                    <strong>Amount to Pay:</strong> <span style="color: var(--app-primary); font-weight: 700; font-size: 16px;">₹${price}</span>
+                    👤 <strong>Hello / नमस्ते / வணக்கம் ${escapeHtml(name)},</strong><br>
+                    📦 <strong>Item / वस्तु / பொருள்:</strong> ${escapeHtml(product.title)}<br>
+                    🏷️ <strong>SKU:</strong> ${escapeHtml(product.sku)}<br>
+                    💳 <strong>Amount / राशि / தொகை:</strong> <span style="color: var(--app-primary); font-weight: 700; font-size: 16px;">₹${price}</span>
                 </div>
             `;
 
@@ -628,8 +633,8 @@
 
             const buttonsContainer = document.getElementById('upiButtonsContainer');
             buttonsContainer.innerHTML = `
-                <a href="${upiString}" class="app-btn" style="background: #2563eb; color: #fff; font-size: 14px; padding: 12px;">📱 Pay ₹${price} via Google Pay / PhonePe / Paytm</a>
-                <div style="font-size: 11px; color: var(--success-green); font-weight: 700; text-align: center; margin-top: 4px;">✓ Instant Direct UPI Transfer to Uroo Enterprise</div>
+                <a href="${upiString}" class="app-btn" style="background: #2563eb; color: #fff; font-size: 14px; padding: 12px;">📱 Pay ₹${price} via GPay / PhonePe / Paytm</a>
+                <div style="font-size: 11px; color: var(--success-green); font-weight: 700; text-align: center; margin-top: 4px;">✓ Instant Direct UPI Transfer / सुरक्षित भुगतान</div>
             `;
         }
 
@@ -805,7 +810,7 @@
                         <button onclick="openCheckoutModal('${product.sku}')" class="app-btn whatsapp-order">
                             💬 Order on WhatsApp & Pay via UPI
                         </button>
-                        <div style="font-size:10px; color:var(--success-green); font-weight:700; text-align:center;">✓ Personalized Secure Payment Link Generated in WhatsApp</div>
+                        <div style="font-size:10px; color:var(--success-green); font-weight:700; text-align:center;">✨ Multilingual Visual Guide & Secure Link in WhatsApp</div>
 
                         <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${inquiryMessage}" target="_blank" rel="noopener noreferrer" class="app-btn whatsapp-inquiry">
                             ❓ Product Inquiry via WhatsApp
