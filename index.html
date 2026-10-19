@@ -10,6 +10,8 @@
     <meta property="og:image" content="/Images/capricorn01.webp">
     <meta property="og:type" content="website">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- QRCode.js for generating dynamic UPI QR codes -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --app-primary: #1e1b4b;
@@ -320,6 +322,64 @@
         .market-row { display: flex; gap: 8px; }
         .meesho-action { background: var(--meesho-pink); color: #fff; flex: 1; }
         .amazon-action { background: #fbbf24; color: #111; font-weight: 700; flex: 1; }
+
+        /* Checkout Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-sheet {
+            background: #fff;
+            width: 100%;
+            max-width: 600px;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px;
+            animation: slideUp 0.25s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        .modal-title { font-size: 16px; font-weight: 700; color: var(--app-primary); }
+        .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); }
+        .form-group { margin-bottom: 12px; }
+        .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+        }
+        .form-input:focus { border-color: var(--app-primary); }
+        .upi-qr-box {
+            text-align: center;
+            background: #f8fafc;
+            border: 1px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        #qrcode { display: inline-block; margin: 10px 0; }
+        .upi-apps-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -366,6 +426,19 @@
         </div>
     </div>
 
+    <!-- Checkout Modal Sheet -->
+    <div class="modal-overlay" id="checkoutModal">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <div class="modal-title" id="checkoutModalTitle">Prepaid UPI Checkout & WhatsApp Order</div>
+                <button class="modal-close" onclick="closeCheckoutModal()">✕</button>
+            </div>
+            <div id="checkoutModalBody">
+                <!-- Dynamic form and UPI payment view will render here -->
+            </div>
+        </div>
+    </div>
+
     <nav class="app-bottom-nav">
         <button class="nav-item active" id="navHome" onclick="navigateTo({view: 'homeView'})">
             <span class="icon">🏠</span> Home
@@ -384,46 +457,47 @@
     <script>
         const DEFAULT_IMAGE = "/Images/capricorn01.webp";
         const WHATSAPP_NUMBER = "919016406623";
+        const BUSINESS_UPI_ID = "9016406623@ptaxis"; // Update with your actual UPI ID if needed
 
         const PRODUCTS = [
-            { category: "Crystal Bracelets", sku: "BracHemGold", title: "Pyrite Hematite Bracelet (Golden)", description: "Description1", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Crystal Bracelets", sku: "BracHemSilver", title: "Pyrite Hematite Bracelet (Silver)", description: "Description2", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "" },
-            { category: "Crystal Bracelets", sku: "BracBlackObsidian", title: "Black Obsidian Bracelet", description: "Description3", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Crystal Bracelets", sku: "BracCarlenian", title: "Carnelian Bracelet", description: "Description4", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Crystal Bracelets", sku: "BracDhanyog", title: "Dhanyog Bracelet", description: "Description5", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Crystal Bracelets", sku: "BracTigerEye", title: "Tiger Eye Bracelet", description: "Description6", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Crystal Bracelets", sku: "BracTripleProtection", title: "Triple Protection Bracelet", description: "Description7", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Crystal Bracelets", sku: "BracAmethyst", title: "Amethyst Bracelet", description: "Description8", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Crystal Bracelets", sku: "BracCitrine", title: "Citrine Bracelet", description: "Description9", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Crystal Bracelets", sku: "BracClearQtz", title: "Clear Quartz Bracelet", description: "Description10", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Crystal Bracelets", sku: "BracGreenAven", title: "Green Aventurine Bracelet", description: "Description11", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Crystal Bracelets", sku: "BracGreenJade", title: "Green Jade Bracelet", description: "Description12", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Rashi/Zodiac Bracelet", sku: "AquariusKumbh", title: "Aquarius Zodiac Sign Kumbh Rashi Bracelet", description: "Description13", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Rashi/Zodiac Bracelet", sku: "AriesMesh", title: "Aries Zodiac Sign Mesh Rashi Bracelet", description: "Description14", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Rashi/Zodiac Bracelet", sku: "CancerKark", title: "Cancer Zodiac Sign Kark Rashi Bracelet", description: "Description15", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Rashi/Zodiac Bracelet", sku: "CapricornMakar", title: "Capricorn Zodiac Sign Makar Rashi Bracelet", description: "Description16", stock: "In Stock", mrp: 999, price: 299, images: ["https://i.ibb.co/1GYzdsDC/rashicapricorn1.png", "https://i.ibb.co/Xr0y4NfG/rashicapricorn2.png", "https://i.ibb.co/xqPmGRMq/rashicapricorn3.png", "https://i.ibb.co/0jMTMT7X/rashicapricorn4.png", "https://i.ibb.co/nsB3Mnc7/rashicapricorn5.jpg", "https://i.ibb.co/gbT1cBDt/rashicapricorn6.jpg"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Rashi/Zodiac Bracelet", sku: "Gemini mithun", title: "Gemini Zodiac Sign mithun Rashi Bracelet", description: "Description17", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Rashi/Zodiac Bracelet", sku: "Libra Tula", title: "Libra Zodiac Sign Tula Rashi Bracelet", description: "Description18", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Rashi/Zodiac Bracelet", sku: "Pisces Meen", title: "Pisces Zodiac Sign Meen Rashi Bracelet", description: "Description19", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Rashi/Zodiac Bracelet", sku: "Sagittarius Dhan", title: "Sagittarius Zodiac Sign Dhan Rashi Bracelet", description: "Description20", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Rashi/Zodiac Bracelet", sku: "Scorpio Vrushik", title: "Scorpio Zodiac Sign Vrushik Rashi Bracelet", description: "Description21", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Rashi/Zodiac Bracelet", sku: "Singh Leo", title: "Singh Zodiac Sign Leo Rashi Bracelet", description: "Description22", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Rashi/Zodiac Bracelet", sku: "Taurus Vrusabh", title: "Taurus Zodiac Sign Vrusabh Rashi Bracelet", description: "Description23", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Rashi/Zodiac Bracelet", sku: "Virgo Kanya", title: "Virgo Zodiac Sign Kanya Rashi Bracelet", description: "Description24", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Mala & Pendant", sku: "MalaKarungaliSimple", title: "Karungali Mala 8 mm", description: "Description25", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Mala & Pendant", sku: "MalaKarungaliSilver", title: "Karungali Mala Silver Clasp", description: "Description26", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Mala & Pendant", sku: "MalaKarungaliRudrakshaSilver", title: "Karungali Rudraksha Mala Silver Clasp", description: "Description27", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Mala & Pendant", sku: "PenMachhmaniBrown", title: "Machhmani Pendant (Brown/Orange)", description: "Description28", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Mala & Pendant", sku: "PenMachhmaniWhite", title: "Machhmani Pendant (White)", description: "Description29", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Anklets", sku: "AnkDhayog", title: "Dhanyog Anklet", description: "Description30", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Anklets", sku: "AnkPyrite", title: "Pyrite Anklet", description: "Description31", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Vastu & Prosperity", sku: "TortoisePyrite", title: "Pyrite Tortoise", description: "Description32", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Vastu & Prosperity", sku: "TortoiseDhanyog", title: "Dhanyog Tortoise", description: "Description33", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Vastu & Prosperity", sku: "7HorseFramePyrite", title: "Pyrite 7 Horse Frame", description: "Description34", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Jewellery", sku: "SqrDiamondPendant", title: "Square Opal shape pendant", description: "Description35", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Jewellery", sku: "SqrDiamondPendantChain", title: "Square Opal shape pendant with Chain", description: "Description36", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Jewellery", sku: "HeartEvilEyePendant", title: "Heart shape Evil Eye Pendant", description: "Description37", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
-            { category: "Jewellery", sku: "HeartEvilEyePendantChain", title: "Heart shape Evil Eye Pendant with Chain", description: "Description38", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" }
+            { category: "Crystal Bracelets", sku: "BracHemGold", title: "Pyrite Hematite Bracelet (Golden)", description: "Attracts wealth, abundance, and positive energy. Handcrafted original citrine and pyrite beads for daily wear.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Crystal Bracelets", sku: "BracHemSilver", title: "Pyrite Hematite Bracelet (Silver)", description: "Stylish silver tone stone bracelet designed for everyday minimal wear and positive aura protection.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "" },
+            { category: "Crystal Bracelets", sku: "BracBlackObsidian", title: "Black Obsidian Bracelet", description: "Powerful grounding stone that forms a shield against negativity, emotional blockages, and psychic attack.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Crystal Bracelets", sku: "BracCarlenian", title: "Carnelian Bracelet", description: "Energizing stone that boosts motivation, vitality, and courage.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Crystal Bracelets", sku: "BracDhanyog", title: "Dhanyog Bracelet", description: "Special prosperity combination bracelet to attract financial abundance.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Crystal Bracelets", sku: "BracTigerEye", title: "Tiger Eye Bracelet", description: "Enhances focus, inner strength, willpower, and protects the wearer from evil eye.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Crystal Bracelets", sku: "BracTripleProtection", title: "Triple Protection Bracelet", description: "Combination of Tiger Eye, Black Obsidian, and Hematite for ultimate protection and grounding.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Crystal Bracelets", sku: "BracAmethyst", title: "Amethyst Bracelet", description: "Natural tranquilizer that relieves stress, balances mood swings, and spiritual awareness.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Crystal Bracelets", sku: "BracCitrine", title: "Citrine Bracelet", description: "Merchant's stone that carries the power of sun, inspiring positivity and financial success.", stock: "In Stock", mrp: 1199, price: 349, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Crystal Bracelets", sku: "BracClearQtz", title: "Clear Quartz Bracelet", description: "Master healer stone that amplifies energy and thought.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Crystal Bracelets", sku: "BracGreenAven", title: "Green Aventurine Bracelet", description: "The stone of opportunity that attracts financial luck and business growth.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Crystal Bracelets", sku: "BracGreenJade", title: "Green Jade Bracelet", description: "Attracts good luck, wealth, and harmonious relationships.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Rashi/Zodiac Bracelet", sku: "AquariusKumbh", title: "Aquarius Zodiac Sign Kumbh Rashi Bracelet", description: "Astrological gemstone combination tailored for Aquarius individuals.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Rashi/Zodiac Bracelet", sku: "AriesMesh", title: "Aries Zodiac Sign Mesh Rashi Bracelet", description: "Astrological gemstone combination tailored for Aries individuals.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Rashi/Zodiac Bracelet", sku: "CancerKark", title: "Cancer Zodiac Sign Kark Rashi Bracelet", description: "Astrological gemstone combination tailored for Cancer individuals.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Rashi/Zodiac Bracelet", sku: "CapricornMakar", title: "Capricorn Zodiac Sign Makar Rashi Bracelet", description: "Discipline and prosperity crystal combination for Capricorn (Makar Rashi).", stock: "In Stock", mrp: 999, price: 299, images: ["https://i.ibb.co/1GYzdsDC/rashicapricorn1.png", "https://i.ibb.co/Xr0y4NfG/rashicapricorn2.png", "https://i.ibb.co/xqPmGRMq/rashicapricorn3.png", "https://i.ibb.co/0jMTMT7X/rashicapricorn4.png", "https://i.ibb.co/nsB3Mnc7/rashicapricorn5.jpg", "https://i.ibb.co/gbT1cBDt/rashicapricorn6.jpg"], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Rashi/Zodiac Bracelet", sku: "Gemini mithun", title: "Gemini Zodiac Sign mithun Rashi Bracelet", description: "Astrological crystal bracelet designed to enhance communication and luck for Gemini.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Rashi/Zodiac Bracelet", sku: "Libra Tula", title: "Libra Zodiac Sign Tula Rashi Bracelet", description: "Balance and harmony crystals curated specifically for Libra.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Rashi/Zodiac Bracelet", sku: "Pisces Meen", title: "Pisces Zodiac Sign Meen Rashi Bracelet", description: "Spiritual intuition and peace crystals for Pisces.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Rashi/Zodiac Bracelet", sku: "Sagittarius Dhan", title: "Sagittarius Zodiac Sign Dhan Rashi Bracelet", description: "Abundance and luck bracelet tailored for Sagittarius.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Rashi/Zodiac Bracelet", sku: "Scorpio Vrushik", title: "Scorpio Zodiac Sign Vrushik Rashi Bracelet", description: "Transformational gemstone beads for Scorpio intensity and power.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Rashi/Zodiac Bracelet", sku: "Singh Leo", title: "Singh Zodiac Sign Leo Rashi Bracelet", description: "Empowering zodiac bracelet designed for Leo leadership and vitality.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Rashi/Zodiac Bracelet", sku: "Taurus Vrusabh", title: "Taurus Zodiac Sign Vrusabh Rashi Bracelet", description: "Harmonizing crystal beads specially aligned for Taurus individuals.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Rashi/Zodiac Bracelet", sku: "Virgo Kanya", title: "Virgo Zodiac Sign Kanya Rashi Bracelet", description: "Astrological alignment beads crafted for Virgo focus and well-being.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Mala & Pendant", sku: "MalaKarungaliSimple", title: "Karungali Mala 8 mm", description: "Authentic ebony wood mala that absorbs negative energy and strengthens willpower.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Mala & Pendant", sku: "MalaKarungaliSilver", title: "Karungali Mala Silver Clasp", description: "Ebony wood mala featuring premium silver clasp.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Mala & Pendant", sku: "MalaKarungaliRudrakshaSilver", title: "Karungali Rudraksha Mala Silver Clasp", description: "Powerful combination of Karungali and Rudraksha with silver clasp.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Mala & Pendant", sku: "PenMachhmaniBrown", title: "Machhmani Pendant (Brown/Orange)", description: "Authentic spiritual fish stone pendant for wealth and removing obstacles.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Mala & Pendant", sku: "PenMachhmaniWhite", title: "Machhmani Pendant (White)", description: "Pure white machhmani spiritual pendant for divine grace.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Anklets", sku: "AnkDhayog", title: "Dhanyog Anklet", description: "Prosperity anklet designed to open up financial channels.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Anklets", sku: "AnkPyrite", title: "Pyrite Anklet", description: "Handcrafted pyrite gemstone anklet providing continuous aura shielding.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Vastu & Prosperity", sku: "TortoisePyrite", title: "Pyrite Tortoise", description: "Original pyrite tortoise for Vastu correction and career stability.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Vastu & Prosperity", sku: "TortoiseDhanyog", title: "Dhanyog Tortoise", description: "Vastu artifact designed to eliminate money blockages.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Vastu & Prosperity", sku: "7HorseFramePyrite", title: "Pyrite 7 Horse Frame", description: "Vastu energized 7 running horses wall frame embellished with pyrite.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Jewellery", sku: "SqrDiamondPendant", title: "Square Opal shape pendant", description: "Elegant square opal shape pendant for daily wear.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Jewellery", sku: "SqrDiamondPendantChain", title: "Square Opal shape pendant with Chain", description: "Square opal shape pendant with matching chain.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Jewellery", sku: "HeartEvilEyePendant", title: "Heart shape Evil Eye Pendant", description: "Stylish heart shape evil eye pendant for protection.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" },
+            { category: "Jewellery", sku: "HeartEvilEyePendantChain", title: "Heart shape Evil Eye Pendant with Chain", description: "Heart shape evil eye pendant with matching chain.", stock: "In Stock", mrp: 999, price: 299, images: [], amazon: "https://www.amazon.in/", meesho: "https://www.meesho.com/", discount: "10%" }
         ];
 
         const CATEGORY_IMAGES = {
@@ -435,19 +509,101 @@
             "Jewellery": DEFAULT_IMAGE
         };
 
-        function buildWhatsAppText(type, product) {
-            const base = [
-                `${product.title}`,
-                `SKU: ${product.sku}`,
-                `Category: ${product.category}`,
-                `Price: ₹${product.price ?? '—'}`
-            ].join('\n');
+        let currentCheckoutProduct = null;
 
-            if (type === 'order') {
-                return encodeURIComponent(`Hi Uroo Enterprise,\n\nI want to place a PREPAID UPI order for the following item:\n\n${base}\n\nPlease share payment link and dispatch details.\n\nThanks.`);
-            }
+        function openCheckoutModal(sku) {
+            currentCheckoutProduct = PRODUCTS.find(p => p.sku === sku);
+            if (!currentCheckoutProduct) return;
 
-            return encodeURIComponent(`Hi Uroo Enterprise,\n\nI have a question about the following product:\n\n${base}\n\nPlease provide more details about stock, shipping and variations.\n\nThanks.`);
+            const modalBody = document.getElementById('checkoutModalBody');
+            const price = currentCheckoutProduct.price || 299;
+
+            modalBody.innerHTML = `
+                <div style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">
+                    <strong>Item:</strong> ${escapeHtml(currentCheckoutProduct.title)}<br>
+                    <strong>Amount to Pay:</strong> <span style="color:var(--app-primary); font-weight:700; font-size:15px;">₹${price}</span>
+                </div>
+                <form id="checkoutForm" onsubmit="submitCheckout(event)">
+                    <div class="form-group">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" id="custName" class="form-input" required placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">WhatsApp Number *</label>
+                        <input type="tel" id="custPhone" class="form-input" required placeholder="10-digit mobile number">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Delivery Address *</label>
+                        <textarea id="custAddress" class="form-input" rows="2" required placeholder="House No, Street, Landmark, City"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Pincode *</label>
+                        <input type="text" id="custPincode" class="form-input" required placeholder="6-digit pincode">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">UPI Reference ID (UTR) after payment *</label>
+                        <input type="text" id="custUtr" class="form-input" required placeholder="e.g. 4276XXXXXXXX">
+                    </div>
+
+                    <div class="upi-qr-box">
+                        <div style="font-size:12px; font-weight:700; color:var(--app-primary); margin-bottom:4px;">Scan & Pay via any UPI App</div>
+                        <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">UPI ID: <strong>${BUSINESS_UPI_ID}</strong></div>
+                        <div id="qrcode"></div>
+                        <div class="upi-apps-row">
+                            <a href="upi://pay?pa=${BUSINESS_UPI_ID}&pn=UrooEnterprise&am=${price}&cu=INR&tn=Order_${currentCheckoutProduct.sku}" class="app-btn" style="background:#2563eb; color:#fff; font-size:11px; padding:8px;">Google Pay</a>
+                            <a href="upi://pay?pa=${BUSINESS_UPI_ID}&pn=UrooEnterprise&am=${price}&cu=INR&tn=Order_${currentCheckoutProduct.sku}" class="app-btn" style="background:#7c3aed; color:#fff; font-size:11px; padding:8px;">PhonePe</a>
+                            <a href="upi://pay?pa=${BUSINESS_UPI_ID}&pn=UrooEnterprise&am=${price}&cu=INR&tn=Order_${currentCheckoutProduct.sku}" class="app-btn" style="background:#0284c7; color:#fff; font-size:11px; padding:8px;">Paytm App</a>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="app-btn whatsapp-order" style="margin-top:10px;">
+                        🚀 Complete Order & Send via WhatsApp
+                    </button>
+                </form>
+            `;
+
+            // Generate QR Code
+            document.getElementById('qrcode').innerHTML = "";
+            const upiString = `upi://pay?pa=${BUSINESS_UPI_ID}&pn=UrooEnterprise&am=${price}&cu=INR&tn=Order_${currentCheckoutProduct.sku}`;
+            new QRCode(document.getElementById("qrcode"), {
+                text: upiString,
+                width: 150,
+                height: 150
+            });
+
+            document.getElementById('checkoutModal').classList.add('active');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.remove('active');
+        }
+
+        function submitCheckout(e) {
+            e.preventDefault();
+            if (!currentCheckoutProduct) return;
+
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+            const pincode = document.getElementById('custPincode').value.trim();
+            const utr = document.getElementById('custUtr').value.trim();
+            const price = currentCheckoutProduct.price || 299;
+
+            const message = encodeURIComponent(
+                `*NEW PREPAID UPI ORDER - Uroo Enterprise*\n\n` +
+                `*Product:* ${currentCheckoutProduct.title}\n` +
+                `*SKU:* ${currentCheckoutProduct.sku}\n` +
+                `*Price:* ₹${price}\n\n` +
+                `*Customer Details:*\n` +
+                `• Name: ${name}\n` +
+                `• Phone: ${phone}\n` +
+                `• Address: ${address} - ${pincode}\n\n` +
+                `*Payment UTR / Ref ID:* ${utr}\n\n` +
+                `Please verify payment and dispatch my order!`
+            );
+
+            closeCheckoutModal();
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank', 'noopener,noreferrer');
         }
 
         function safePrice(val) {
@@ -591,8 +747,7 @@
             const discount = (mrp && price && mrp > price) ? Math.round(((mrp - price) / mrp) * 100) : 0;
             const imgList = (product.images && product.images.length) ? product.images : [DEFAULT_IMAGE];
 
-            const orderMessage = buildWhatsAppText('order', product);
-            const inquiryMessage = buildWhatsAppText('inquiry', product);
+            const inquiryMessage = encodeURIComponent(`Hi Uroo Enterprise,\n\nI have a question about this product:\n*${product.title}* (SKU: ${product.sku})\nPrice: ₹${price}\n\nPlease provide more details.`);
 
             const pdpCard = document.getElementById('pdpCardContent');
             pdpCard.innerHTML = `
@@ -615,10 +770,10 @@
                     <div class="pdp-description">${escapeHtml(product.description || '')}</div>
 
                     <div class="pdp-action-stack">
-                        <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${orderMessage}" target="_blank" rel="noopener noreferrer" class="app-btn whatsapp-order">
-                            💬 Order on WhatsApp (Prepaid UPI Only)
-                        </a>
-                        <div style="font-size:10px; color:var(--success-green); font-weight:700; text-align:center;">✓ Fast Dispatch on Prepaid UPI Orders</div>
+                        <button onclick="openCheckoutModal('${product.sku}')" class="app-btn whatsapp-order">
+                            💬 Order on WhatsApp & Pay via UPI
+                        </button>
+                        <div style="font-size:10px; color:var(--success-green); font-weight:700; text-align:center;">✓ Scan QR or Open UPI App & Send Details to WhatsApp</div>
 
                         <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${inquiryMessage}" target="_blank" rel="noopener noreferrer" class="app-btn whatsapp-inquiry">
                             ❓ Product Inquiry via WhatsApp
