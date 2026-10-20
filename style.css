@@ -42,11 +42,15 @@ body { background-color: var(--bg-app); color: var(--text-main); padding-bottom:
     display: none;
 }
 
-/* Brand Name Entrance & Shimmer Animation */
-@keyframes brandEntrance {
+/* Premium Brand Entrance & Callout Pulse Animation */
+@keyframes brandAttentionPulse {
     0% {
         opacity: 0;
-        transform: translateY(-10px) scale(0.95);
+        transform: translateY(-15px) scale(0.9);
+    }
+    60% {
+        opacity: 1;
+        transform: translateY(3px) scale(1.02);
     }
     100% {
         opacity: 1;
@@ -54,17 +58,21 @@ body { background-color: var(--bg-app); color: var(--text-main); padding-bottom:
     }
 }
 
-@keyframes brandShimmer {
-    0% { filter: brightness(1); }
-    50% { filter: brightness(1.25); text-shadow: 0 0 12px rgba(217, 119, 6, 0.4); }
-    100% { filter: brightness(1); }
+@keyframes brandGlowHighlight {
+    0%, 100% {
+        color: var(--app-primary);
+        text-shadow: none;
+    }
+    50% {
+        color: #b45309;
+        text-shadow: 0 0 16px rgba(217, 119, 6, 0.6), 0 0 6px rgba(217, 119, 6, 0.4);
+    }
 }
 
 .app-title {
     font-size: 17px;
     font-weight: 700;
-    color: var(--app-primary);
-    animation: brandEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards, brandShimmer 3s ease-in-out infinite 1s;
+    animation: brandAttentionPulse 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, brandGlowHighlight 2.5s ease-in-out infinite 1.2s;
     display: inline-block;
 }
 
@@ -374,7 +382,7 @@ body { background-color: var(--bg-app); color: var(--text-main); padding-bottom:
 .footer-tagline { font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 16px; }
 .footer-links-row { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; }
 .footer-link-btn { background: #f1f5f9; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--text-main); cursor: pointer; }
-.social-icons-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+.social-icons-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
 .social-icon-badge {
     padding: 6px 12px;
     border-radius: 6px;
@@ -382,9 +390,6 @@ body { background-color: var(--bg-app); color: var(--text-main); padding-bottom:
     font-weight: 600;
     text-decoration: none;
     color: #fff;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
 }
 .social-icon-badge.ig { background: #e1306c; }
 .social-icon-badge.fb { background: #1877f2; }
