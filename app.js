@@ -408,7 +408,7 @@ function ensureLightboxDOM() {
         lb.id = 'imageLightboxModal';
         lb.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 9999; display: none; align-items: center; justify-content: center;';
         lb.innerHTML = `
-            <button onclick="closeLightbox()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #fff; font-size: 32px; cursor: pointer; z-index: 10000;">✕</button>
+            <button onclick="closeLightbox()" style="position: absolute; top: 20px; right: 20px; background: #dc2626; color: #fff; border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 24px; font-weight: 700; cursor: pointer; z-index: 10000; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">✕</button>
             <button onclick="lightboxChange(-1)" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); color: #fff; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center;">❮</button>
             <button onclick="lightboxChange(1)" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); color: #fff; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center;">❯</button>
             <img id="lightboxImg" src="" style="max-width: 90%; max-height: 85vh; object-fit: contain; border-radius: 6px;">
