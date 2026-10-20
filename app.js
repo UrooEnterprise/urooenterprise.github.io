@@ -185,6 +185,10 @@ function navigateTo(state, push = true) {
         url += `?view=category&category=${encodeURIComponent(state.category)}`;
     } else if (state.view === 'searchView') {
         url += '?view=search';
+    } else if (state.view === 'aboutView') {
+        url += '?view=about';
+    } else if (state.view === 'contactView') {
+        url += '?view=contact';
     } else if (state.view === 'payView') {
         url += `?view=pay&sku=${encodeURIComponent(state.sku || '')}&price=${state.price || '299'}&name=${encodeURIComponent(state.name || '')}`;
     }
@@ -219,6 +223,12 @@ function navigateTo(state, push = true) {
     } else if (state.view === 'searchView') {
         document.getElementById('appTopbarTitle').textContent = 'Search Catalog';
         document.getElementById('appTopbarSubtitle').textContent = 'Find items';
+    } else if (state.view === 'aboutView') {
+        document.getElementById('appTopbarTitle').textContent = 'About Us';
+        document.getElementById('appTopbarSubtitle').textContent = 'Uroo Enterprise';
+    } else if (state.view === 'contactView') {
+        document.getElementById('appTopbarTitle').textContent = 'Contact & Socials';
+        document.getElementById('appTopbarSubtitle').textContent = 'Uroo Enterprise';
     } else if (state.view === 'payView') {
         const params = new URLSearchParams(location.search);
         renderPayView(params);
@@ -295,6 +305,7 @@ function renderPDP(sku) {
     currentImageIndex = 0;
 
     const inquiryMessage = encodeURIComponent(`Hi Uroo Enterprise,\n\nI have a question about this product:\n*${product.title}* (SKU: ${product.sku})\nPrice: ₹${price}\n\nPlease provide more details.`);
+    const shareText = encodeURIComponent(`Check out ${product.title} on Uroo Enterprise for just ₹${price}! View product: ${location.href}`);
 
     const pdpCard = document.getElementById('pdpCardContent');
     pdpCard.innerHTML = `
@@ -336,13 +347,21 @@ function renderPDP(sku) {
                     <a href="${product.meesho || '#'}" target="_blank" rel="noopener noreferrer" class="app-btn meesho-action" ${product.meesho ? '' : 'aria-disabled="true"'}>🛍️ Meesho</a>
                     <a href="${product.amazon || '#'}" target="_blank" rel="noopener noreferrer" class="app-btn amazon-action" ${product.amazon ? '' : 'aria-disabled="true"'}>📦 Amazon</a>
                 </div>
+
+                <!-- Share Product Buttons -->
+                <div class="share-section">
+                    <div class="share-title">📤 Share this product with friends:</div>
+                    <div class="share-btns-row">
+                        <a href="https://api.whatsapp.com/send?text=${shareText}" target="_blank" rel="noopener noreferrer" class="share-btn share-wa">💬 WhatsApp</a>
+                        <button onclick="navigator.clipboard.writeText(location.href); alert('Product link copied to clipboard!');" class="share-btn share-copy">🔗 Copy Link</button>
+                    </div>
+                </div>
             </div>
         </div>
     `;
 
     ensureLightboxDOM();
 
-    // Render Recommendations (Robust category matching fallback to trending if category has few items)
     const recGrid = document.getElementById('pdpRecommendedGrid');
     recGrid.innerHTML = '';
     
@@ -350,7 +369,6 @@ function renderPDP(sku) {
         p.category.toLowerCase().trim() === product.category.toLowerCase().trim() && p.sku !== product.sku
     );
 
-    // If fewer than 4 items in the same category, pad with other products so recommendations are always visible
     if (recommendations.length < 4) {
         const others = PRODUCTS.filter(p => p.sku !== product.sku && !recommendations.includes(p));
         recommendations = [...recommendations, ...others];
@@ -455,6 +473,10 @@ function handleInitialRoute() {
     } else if (view === 'category' && params.get('category')) {
         history.replaceState({ view: 'categoryView', category: params.get('category') }, '', location.href);
         navigateTo({ view: 'categoryView', category: params.get('category') }, false);
+    } else if (view === 'about') {
+        navigateTo({ view: 'aboutView' }, false);
+    } else if (view === 'contact') {
+        navigateTo({ view: 'contactView' }, false);
     } else {
         history.replaceState({ view: 'homeView' }, '', '');
     }
