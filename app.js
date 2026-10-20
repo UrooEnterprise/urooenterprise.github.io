@@ -1,4 +1,3 @@
-
 const DEFAULT_IMAGE = "/Images/capricorn01.webp";
 const WHATSAPP_NUMBER = "919016406623";
 const BUSINESS_UPI_ID = "9016406623@ptaxis";
