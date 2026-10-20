@@ -4,6 +4,8 @@ const BUSINESS_UPI_ID = "9016406623@ptaxis";
 
 let PRODUCTS = [];
 let currentCheckoutProduct = null;
+let currentImageIndex = 0;
+let currentProductImages = [];
 
 async function loadProducts() {
     try {
@@ -288,19 +290,26 @@ function renderPDP(sku) {
     const price = safePrice(product.price);
     const mrp = safePrice(product.mrp);
     const discount = (mrp && price && mrp > price) ? Math.round(((mrp - price) / mrp) * 100) : 0;
-    const imgList = (product.images && product.images.length) ? product.images : [DEFAULT_IMAGE];
+    currentProductImages = (product.images && product.images.length) ? product.images : [DEFAULT_IMAGE];
+    currentImageIndex = 0;
 
     const inquiryMessage = encodeURIComponent(`Hi Uroo Enterprise,\n\nI have a question about this product:\n*${product.title}* (SKU: ${product.sku})\nPrice: ₹${price}\n\nPlease provide more details.`);
 
     const pdpCard = document.getElementById('pdpCardContent');
     pdpCard.innerHTML = `
-        <div class="pdp-img-container">
-            <img id="mainPdpImg" src="${imgList[0]}" alt="${escapeHtml(product.title)}">
+        <div class="pdp-img-container" style="position: relative; cursor: pointer; height: 320px; background: #ffffff; display: flex; align-items: center; justify-content: center;" onclick="openLightbox(currentImageIndex)">
+            <img id="mainPdpImg" src="${currentProductImages[0]}" alt="${escapeHtml(product.title)}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+            ${currentProductImages.length > 1 ? `
+                <button onclick="event.stopPropagation(); changeImage(-1)" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;">❮</button>
+                <button onclick="event.stopPropagation(); changeImage(1)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;">❯</button>
+                <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; padding: 3px 8px; font-size: 11px; border-radius: 12px;" id="imgCounter">1 / ${currentProductImages.length}</div>
+            ` : ''}
+            <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; padding: 4px 8px; font-size: 11px; border-radius: 6px;">🔍 Fullscreen</div>
         </div>
-        ${imgList.length > 1 ? `
+        ${currentProductImages.length > 1 ? `
         <div style="display:flex; gap:8px; padding:10px 16px; overflow-x:auto; background:#f8fafc; border-bottom:1px solid var(--border-color);">
-            ${imgList.map((imgUrl, index) => `
-                <img src="${imgUrl}" alt="Thumbnail ${index + 1}" onclick="document.getElementById('mainPdpImg').src='${imgUrl}'" style="width:55px; height:55px; object-fit:cover; border-radius:6px; cursor:pointer; border:2px solid ${index === 0 ? 'var(--app-primary)' : 'var(--border-color)'};" loading="lazy" />
+            ${currentProductImages.map((imgUrl, index) => `
+                <img src="${imgUrl}" alt="Thumbnail ${index + 1}" onclick="setMainImage(${index})" id="thumb-${index}" style="width:55px; height:55px; object-fit:cover; border-radius:6px; cursor:pointer; border:2px solid ${index === 0 ? 'var(--app-primary)' : 'var(--border-color)'};" loading="lazy" />
             `).join('')}
         </div>` : ''}
         <div class="pdp-content">
@@ -330,53 +339,89 @@ function renderPDP(sku) {
         </div>
     `;
 
-    const jsonLd = {
-        '@context': 'https://schema.org/',
-        '@type': 'Product',
-        name: product.title,
-        sku: product.sku,
-        description: product.description || '',
-        image: imgList,
-        offers: {
-            '@type': 'Offer',
-            priceCurrency: 'INR',
-            price: price ? String(price) : undefined,
-            availability: product.stock && product.stock.toLowerCase().includes('in stock') ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-            url: location.href
+    ensureLightboxDOM();
+}
+
+function setMainImage(index) {
+    if (index < 0 || index >= currentProductImages.length) return;
+    currentImageIndex = index;
+    document.getElementById('mainPdpImg').src = currentProductImages[index];
+    
+    const counter = document.getElementById('imgCounter');
+    if (counter) counter.textContent = `${index + 1} / ${currentProductImages.length}`;
+
+    currentProductImages.forEach((_, i) => {
+        const thumb = document.getElementById(`thumb-${i}`);
+        if (thumb) {
+            thumb.style.borderColor = i === index ? 'var(--app-primary)' : 'var(--border-color)';
         }
-    };
-
-    const existingScript = document.getElementById('product-json-ld');
-    if (existingScript) existingScript.remove();
-
-    const ld = document.createElement('script');
-    ld.type = 'application/ld+json';
-    ld.id = 'product-json-ld';
-    ld.text = JSON.stringify(jsonLd);
-    document.head.appendChild(ld);
-
-    const recGrid = document.getElementById('pdpRecommendedGrid');
-    recGrid.innerHTML = '';
-    PRODUCTS.filter(p => p.category === product.category && p.sku !== product.sku).slice(0, 4).forEach(rec => {
-        recGrid.appendChild(createProductCard(rec));
     });
 }
 
-function handleAppSearch() {
-    const query = document.getElementById('appSearchInput').value.toLowerCase().trim();
-    const grid = document.getElementById('searchProductGrid');
-    grid.innerHTML = '';
+function changeImage(direction) {
+    let newIndex = currentImageIndex + direction;
+    if (newIndex < 0) newIndex = currentProductImages.length - 1;
+    if (newIndex >= currentProductImages.length) newIndex = 0;
+    setMainImage(newIndex);
+}
 
-    if (query.length === 0) return;
+function ensureLightboxDOM() {
+    let lb = document.getElementById('imageLightboxModal');
+    if (!lb) {
+        lb = document.createElement('div');
+        lb.id = 'imageLightboxModal';
+        lb.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 9999; display: none; align-items: center; justify-content: center;';
+        lb.innerHTML = `
+            <button onclick="closeLightbox()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #fff; font-size: 32px; cursor: pointer; z-index: 10000;">✕</button>
+            <button onclick="lightboxChange(-1)" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); color: #fff; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center;">❮</button>
+            <button onclick="lightboxChange(1)" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); color: #fff; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center;">❯</button>
+            <img id="lightboxImg" src="" style="max-width: 90%; max-height: 85vh; object-fit: contain; border-radius: 6px;">
+            <div id="lightboxCounter" style="position: absolute; bottom: 25px; color: #fff; font-size: 14px; background: rgba(0,0,0,0.6); padding: 5px 14px; border-radius: 15px;">1 / 1</div>
+        `;
+        document.body.appendChild(lb);
 
-    const filtered = PRODUCTS.filter(p => {
-        const t = (p.title || '').toLowerCase();
-        const s = (p.sku || '').toLowerCase();
-        const d = (p.description || '').toLowerCase();
-        return t.includes(query) || s.includes(query) || d.includes(query);
-    });
+        let touchstartX = 0;
+        let touchendX = 0;
+        lb.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; });
+        lb.addEventListener('touchend', e => {
+            touchendX = e.changedTouches[0].screenX;
+            if (touchendX < touchstartX - 50) lightboxChange(1);
+            if (touchendX > touchstartX + 50) lightboxChange(-1);
+        });
+    }
+}
 
-    filtered.forEach(product => grid.appendChild(createProductCard(product)));
+function openLightbox(index) {
+    const lb = document.getElementById('imageLightboxModal');
+    if (!lb) return;
+    currentImageIndex = index;
+    updateLightboxContent();
+    lb.style.display = 'flex';
+}
+
+function closeLightbox() {
+    const lb = document.getElementById('imageLightboxModal');
+    if (lb) lb.style.display = 'none';
+}
+
+function lightboxChange(direction) {
+    let newIndex = currentImageIndex + direction;
+    if (newIndex < 0) newIndex = currentProductImages.length - 1;
+    if (newIndex >= currentProductImages.length) newIndex = 0;
+    currentImageIndex = newIndex;
+    updateLightboxContent();
+    setMainImage(currentImageIndex);
+}
+
+function updateLightboxContent() {
+    const imgEl = document.getElementById('lightboxImg');
+    const counterEl = document.getElementById('lightboxCounter');
+    if (imgEl && currentProductImages.length > 0) {
+        imgEl.src = currentProductImages[currentImageIndex];
+    }
+    if (counterEl) {
+        counterEl.textContent = `${currentImageIndex + 1} / ${currentProductImages.length}`;
+    }
 }
 
 function handleInitialRoute() {
