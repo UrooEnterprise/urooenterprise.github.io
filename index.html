@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Uroo Enterprise - Secure UPI Checkout</title>
-    <meta name="description" content="Uroo Enterprise - Secure UPI Payment Gateway">
+    <title>Uroo Enterprise - Certified Natural Crystals & Spiritual Store</title>
+    <meta name="description" content="Uroo Enterprise - Certified Natural Crystals, Rashi Zodiac Bracelets, Vastu Decor & Sacred Malas.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
@@ -34,6 +34,24 @@
 
             <div class="section-header">Trending Collections</div>
             <div class="app-product-grid" id="homeTrendingGrid"></div>
+
+            <!-- Professional Store Footer Section -->
+            <div class="store-footer">
+                <div class="footer-brand">Uroo Enterprise</div>
+                <p class="footer-tagline">Your trusted destination for certified natural crystals, zodiac gemstone bracelets, and sacred vastu artifacts.</p>
+                
+                <div class="footer-links-row">
+                    <button onclick="navigateTo({view: 'aboutView'})" class="footer-link-btn">ℹ️ About Us</button>
+                    <button onclick="navigateTo({view: 'contactView'})" class="footer-link-btn">📞 Contact & Socials</button>
+                </div>
+
+                <div class="social-icons-row">
+                    <a href="https://www.instagram.com/urooenterprise" target="_blank" rel="noopener noreferrer" class="social-icon-badge ig">📷 Instagram</a>
+                    <a href="https://www.facebook.com/share/18UGzyEyVY/" target="_blank" rel="noopener noreferrer" class="social-icon-badge fb">📘 Facebook</a>
+                    <a href="mailto:urooenterprise@gmail.com" class="social-icon-badge email">✉️ Email Us</a>
+                </div>
+                <div class="footer-copyright">© 2026 Uroo Enterprise. All rights reserved. Express Worldwide & Pan-India Shipping.</div>
+            </div>
         </div>
 
         <!-- Category View -->
@@ -55,6 +73,45 @@
             <div class="pdp-view-card" id="pdpCardContent"></div>
             <div class="section-header" style="margin-top: 24px;">Similar Recommendations</div>
             <div class="app-product-grid" id="pdpRecommendedGrid"></div>
+        </div>
+
+        <!-- About Us View -->
+        <div id="aboutView" class="app-view">
+            <div class="pdp-view-card" style="padding: 24px;">
+                <h2 style="font-size: 20px; font-weight: 700; color: var(--app-primary); margin-bottom: 12px;">About Uroo Enterprise</h2>
+                <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px;">
+                    Welcome to <strong>Uroo Enterprise</strong>, your premier destination for authentic, high-quality natural crystal gemstone jewelry, spiritual decor, and astrological Rashi bracelets. 
+                </p>
+                <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px;">
+                    Founded with a passion for positive energy and holistic well-being, we handcraft and curate sacred items—including Pyrite tortoises, zodiac bead combinations, and natural healing stones—designed to align your aura and attract prosperity.
+                </p>
+                <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+                    We pride ourselves on direct transparency, fast Pan-India & international dispatch, and personalized customer support via WhatsApp.
+                </p>
+            </div>
+        </div>
+
+        <!-- Contact & Socials View -->
+        <div id="contactView" class="app-view">
+            <div class="pdp-view-card" style="padding: 24px; text-align: center;">
+                <h2 style="font-size: 20px; font-weight: 700; color: var(--app-primary); margin-bottom: 8px;">Connect With Uroo Enterprise</h2>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">We would love to hear from you! Reach out or follow us below.</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 12px; text-align: left;">
+                    <a href="https://www.instagram.com/urooenterprise" target="_blank" rel="noopener noreferrer" class="app-btn" style="background: #e1306c; color: #fff;">
+                        📷 Follow on Instagram (@urooenterprise)
+                    </a>
+                    <a href="https://www.facebook.com/share/18UGzyEyVY/" target="_blank" rel="noopener noreferrer" class="app-btn" style="background: #1877f2; color: #fff;">
+                        📘 Connect on Facebook
+                    </a>
+                    <a href="mailto:urooenterprise@gmail.com" class="app-btn" style="background: #334155; color: #fff;">
+                        ✉️ Email Us (urooenterprise@gmail.com)
+                    </a>
+                    <a href="https://wa.me/919016406623?text=Hi%20Uroo%20Enterprise,%20I%20have%20an%20inquiry." target="_blank" rel="noopener noreferrer" class="app-btn whatsapp-order">
+                        💬 WhatsApp Support (+91 90164 06623)
+                    </a>
+                </div>
+            </div>
         </div>
 
         <!-- Dedicated Secure Payment View -->
@@ -96,8 +153,8 @@
         <button class="nav-item" id="navSearch" onclick="navigateTo({view: 'searchView'})">
             <span class="icon">🔍</span> Search
         </button>
-        <button class="nav-item" onclick="window.open('https://wa.me/919016406623?text=Hi%20Uroo%20Enterprise,%20I%20have%20an%20inquiry.', '_blank', 'noopener,noreferrer')">
-            <span class="icon">💬</span> Support
+        <button class="nav-item" onclick="navigateTo({view: 'contactView'})">
+            <span class="icon">📞</span> Contact
         </button>
     </nav>
 </body>
