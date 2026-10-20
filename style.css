@@ -42,10 +42,30 @@ body { background-color: var(--bg-app); color: var(--text-main); padding-bottom:
     display: none;
 }
 
+/* Brand Name Entrance & Shimmer Animation */
+@keyframes brandEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes brandShimmer {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.25); text-shadow: 0 0 12px rgba(217, 119, 6, 0.4); }
+    100% { filter: brightness(1); }
+}
+
 .app-title {
     font-size: 17px;
     font-weight: 700;
     color: var(--app-primary);
+    animation: brandEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards, brandShimmer 3s ease-in-out infinite 1s;
+    display: inline-block;
 }
 
 .app-subtitle {
