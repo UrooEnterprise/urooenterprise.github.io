@@ -1,3 +1,4 @@
+
 const DEFAULT_IMAGE = "/Images/capricorn01.webp";
 const WHATSAPP_NUMBER = "919016406623";
 const BUSINESS_UPI_ID = "9016406623@ptaxis";
@@ -274,7 +275,7 @@ const CATEGORY_IMAGES = {
 function renderCategoryProducts(catName) {
     const grid = document.getElementById('categoryProductGrid');
     grid.innerHTML = '';
-    const filtered = PRODUCTS.filter(p => p.category === catName);
+    const filtered = PRODUCTS.filter(p => p.category.toLowerCase().trim() === catName.toLowerCase().trim());
     filtered.forEach(product => grid.appendChild(createProductCard(product)));
 }
 
@@ -340,6 +341,24 @@ function renderPDP(sku) {
     `;
 
     ensureLightboxDOM();
+
+    // Render Recommendations (Robust category matching fallback to trending if category has few items)
+    const recGrid = document.getElementById('pdpRecommendedGrid');
+    recGrid.innerHTML = '';
+    
+    let recommendations = PRODUCTS.filter(p => 
+        p.category.toLowerCase().trim() === product.category.toLowerCase().trim() && p.sku !== product.sku
+    );
+
+    // If fewer than 4 items in the same category, pad with other products so recommendations are always visible
+    if (recommendations.length < 4) {
+        const others = PRODUCTS.filter(p => p.sku !== product.sku && !recommendations.includes(p));
+        recommendations = [...recommendations, ...others];
+    }
+
+    recommendations.slice(0, 4).forEach(rec => {
+        recGrid.appendChild(createProductCard(rec));
+    });
 }
 
 function setMainImage(index) {
