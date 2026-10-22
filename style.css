@@ -34,46 +34,29 @@ body { background-color: var(--bg-app); color: var(--text-main); padding-bottom:
 }
 
 .back-btn {
-    background: none;
-    border: none;
-    font-size: 20px;
+    background: #f1f5f9;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    font-weight: 700;
     cursor: pointer;
-    color: var(--text-main);
+    color: var(--app-primary);
     display: none;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, transform 0.1s ease;
 }
-
-/* Premium Brand Entrance & Callout Pulse Animation */
-@keyframes brandAttentionPulse {
-    0% {
-        opacity: 0;
-        transform: translateY(-15px) scale(0.9);
-    }
-    60% {
-        opacity: 1;
-        transform: translateY(3px) scale(1.02);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-@keyframes brandGlowHighlight {
-    0%, 100% {
-        color: var(--app-primary);
-        text-shadow: none;
-    }
-    50% {
-        color: #b45309;
-        text-shadow: 0 0 16px rgba(217, 119, 6, 0.6), 0 0 6px rgba(217, 119, 6, 0.4);
-    }
+.back-btn:active {
+    background: #e2e8f0;
+    transform: scale(0.95);
 }
 
 .app-title {
     font-size: 17px;
     font-weight: 700;
-    animation: brandAttentionPulse 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, brandGlowHighlight 2.5s ease-in-out infinite 1.2s;
-    display: inline-block;
+    color: var(--app-primary);
 }
 
 .app-subtitle {
@@ -443,3 +426,60 @@ body { background-color: var(--bg-app); color: var(--text-main); padding-bottom:
     outline: none;
 }
 .form-input:focus { border-color: var(--app-primary); }
+
+
+/* Brand Name Entrance & Shimmer Animation */
+@keyframes brandEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes brandShimmer {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.25); text-shadow: 0 0 12px rgba(217, 119, 6, 0.4); }
+    100% { filter: brightness(1); }
+}
+
+.app-title {
+    animation: brandEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards, brandShimmer 3s ease-in-out infinite 1s;
+    display: inline-block;
+}
+
+
+/* Premium Brand Entrance & Callout Pulse Animation */
+@keyframes brandAttentionPulse {
+    0% {
+        opacity: 0;
+        transform: translateY(-15px) scale(0.9);
+    }
+    60% {
+        opacity: 1;
+        transform: translateY(3px) scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes brandGlowHighlight {
+    0%, 100% {
+        color: var(--app-primary);
+        text-shadow: none;
+    }
+    50% {
+        color: #b45309;
+        text-shadow: 0 0 16px rgba(217, 119, 6, 0.6), 0 0 6px rgba(217, 119, 6, 0.4);
+    }
+}
+
+.app-title {
+    animation: brandAttentionPulse 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, brandGlowHighlight 2.5s ease-in-out infinite 1.2s;
+    display: inline-block;
+}
