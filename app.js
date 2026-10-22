@@ -342,13 +342,17 @@ function renderPDP(sku) {
                     ❓ Product Inquiry via WhatsApp
                 </a>
 
-                <div class="market-row" style="display: flex; gap: 10px; margin-top: 4px;">
-                    <a href="${product.meesho || '#'}" target="_blank" rel="noopener noreferrer" style="flex: 1; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,0.02); ${product.meesho ? '' : 'opacity:0.5; pointer-events:none;'}" title="View on Meesho">
-                        <img src="images/meeshoicon.png" alt="Meesho" style="height: 32px; object-fit: contain;">
-                    </a>
-                    <a href="${product.amazon || '#'}" target="_blank" rel="noopener noreferrer" style="flex: 1; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,0.02); ${product.amazon ? '' : 'opacity:0.5; pointer-events:none;'}" title="View on Amazon">
-                        <img src="images/amazonicon.png" alt="Amazon" style="height: 32px; object-fit: contain;">
-                    </a>
+                <!-- Buy from marketplaces section with header text -->
+                <div style="margin-top: 12px;">
+                    <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-align: center;">🛒 Or buy from:</div>
+                    <div class="market-row" style="display: flex; gap: 10px;">
+                        <a href="${product.meesho || '#'}" target="_blank" rel="noopener noreferrer" style="flex: 1; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,0.02); ${product.meesho ? '' : 'opacity:0.5; pointer-events:none;'}" title="View on Meesho">
+                            <img src="images/meeshoicon.png" alt="Meesho" style="height: 38px; object-fit: contain;">
+                        </a>
+                        <a href="${product.amazon || '#'}" target="_blank" rel="noopener noreferrer" style="flex: 1; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,0.02); ${product.amazon ? '' : 'opacity:0.5; pointer-events:none;'}" title="View on Amazon">
+                            <img src="images/amazonicon.png" alt="Amazon" style="height: 32px; object-fit: contain;">
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Share Product Buttons -->
