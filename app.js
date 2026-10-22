@@ -342,9 +342,13 @@ function renderPDP(sku) {
                     ❓ Product Inquiry via WhatsApp
                 </a>
 
-                <div class="market-row">
-                    <a href="${product.meesho || '#'}" target="_blank" rel="noopener noreferrer" class="app-btn meesho-action" ${product.meesho ? '' : 'aria-disabled="true"'}>🛍️ Meesho</a>
-                    <a href="${product.amazon || '#'}" target="_blank" rel="noopener noreferrer" class="app-btn amazon-action" ${product.amazon ? '' : 'aria-disabled="true"'}>📦 Amazon</a>
+                <div class="market-row" style="display: flex; gap: 10px; margin-top: 4px;">
+                    <a href="${product.meesho || '#'}" target="_blank" rel="noopener noreferrer" style="flex: 1; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,0.02); ${product.meesho ? '' : 'opacity:0.5; pointer-events:none;'}" title="View on Meesho">
+                        <img src="images/meeshoicon.png" alt="Meesho" style="height: 32px; object-fit: contain;">
+                    </a>
+                    <a href="${product.amazon || '#'}" target="_blank" rel="noopener noreferrer" style="flex: 1; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,0.02); ${product.amazon ? '' : 'opacity:0.5; pointer-events:none;'}" title="View on Amazon">
+                        <img src="images/amazonicon.png" alt="Amazon" style="height: 32px; object-fit: contain;">
+                    </a>
                 </div>
 
                 <!-- Share Product Buttons -->
@@ -427,29 +431,29 @@ function ensureLightboxDOM() {
     }
 }
 
-function openLightbox(index) {
+openLightbox = function(index) {
     const lb = document.getElementById('imageLightboxModal');
     if (!lb) return;
     currentImageIndex = index;
     updateLightboxContent();
     lb.style.display = 'flex';
-}
+};
 
-function closeLightbox() {
+closeLightbox = function() {
     const lb = document.getElementById('imageLightboxModal');
     if (lb) lb.style.display = 'none';
-}
+};
 
-function lightboxChange(direction) {
+lightboxChange = function(direction) {
     let newIndex = currentImageIndex + direction;
     if (newIndex < 0) newIndex = currentProductImages.length - 1;
     if (newIndex >= currentProductImages.length) newIndex = 0;
     currentImageIndex = newIndex;
     updateLightboxContent();
     setMainImage(currentImageIndex);
-}
+};
 
-function updateLightboxContent() {
+updateLightboxContent = function() {
     const imgEl = document.getElementById('lightboxImg');
     const counterEl = document.getElementById('lightboxCounter');
     if (imgEl && currentProductImages.length > 0) {
@@ -458,7 +462,7 @@ function updateLightboxContent() {
     if (counterEl) {
         counterEl.textContent = `${currentImageIndex + 1} / ${currentProductImages.length}`;
     }
-}
+};
 
 function handleInitialRoute() {
     const params = new URLSearchParams(location.search);
