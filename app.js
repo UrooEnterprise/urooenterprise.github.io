@@ -3,6 +3,7 @@ const WHATSAPP_NUMBER = "919016406623";
 const BUSINESS_UPI_ID = "9016406623@ptaxis";
 
 let PRODUCTS = [];
+let CART = []; 
 let currentCheckoutProduct = null;
 let currentImageIndex = 0;
 let currentProductImages = [];
@@ -15,8 +16,219 @@ async function loadProducts() {
         console.error("Failed to load uroo_products.json, using fallback data.");
         PRODUCTS = [];
     }
+    loadCartFromStorage();
     initHome();
     handleInitialRoute();
+}
+
+function loadCartFromStorage() {
+    try {
+        const saved = localStorage.getItem('uroo_cart');
+        if (saved) CART = JSON.parse(saved);
+    } catch(e) { CART = []; }
+    updateCartBadge();
+}
+
+function saveCartToStorage() {
+    try {
+        localStorage.setItem('uroo_cart', JSON.stringify(CART));
+    } catch(e) {}
+    updateCartBadge();
+}
+
+function addToCart(sku) {
+    const product = PRODUCTS.find(p => p.sku === sku);
+    if (!product) return;
+    const price = product.price || 299;
+    const mainImg = (product.images && product.images.length) ? product.images[0] : DEFAULT_IMAGE;
+
+    const existing = CART.find(item => item.sku === sku);
+    if (existing) {
+        existing.quantity += 1;
+    } else {
+        CART.push({
+            sku: product.sku,
+            title: product.title,
+            price: price,
+            quantity: 1,
+            image: mainImg
+        });
+    }
+    saveCartToStorage();
+    showToast(`✓ Added "${product.title}" to Cart!`);
+}
+
+function updateQuantity(sku, delta) {
+    const item = CART.find(i => i.sku === sku);
+    if (!item) return;
+    item.quantity += delta;
+    if (item.quantity <= 0) {
+        CART = CART.filter(i => i.sku !== sku);
+    }
+    saveCartToStorage();
+    renderCartModalItems();
+}
+
+function updateCartBadge() {
+    const totalItems = CART.reduce((sum, i) => sum + i.quantity, 0);
+    const badge = document.getElementById('cartBadgeCount');
+    if (badge) {
+        if (totalItems > 0) {
+            badge.textContent = totalItems;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+function showToast(msg) {
+    let toast = document.getElementById('appToastNotification');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'appToastNotification';
+        toast.style.cssText = 'position: fixed; bottom: 75px; left: 50%; transform: translateX(-50%); background: #1e1b4b; color: #fff; padding: 10px 20px; border-radius: 25px; font-size: 12px; font-weight: 600; z-index: 99999; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.3s ease;';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.opacity = '1';
+    setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+}
+
+function openCartModal() {
+    renderCartModalItems();
+    document.getElementById('cartModal').classList.add('active');
+}
+
+function closeCartModal() {
+    document.getElementById('cartModal').classList.remove('active');
+}
+
+function renderCartModalItems() {
+    const container = document.getElementById('cartModalItemsList');
+    const footer = document.getElementById('cartModalFooter');
+    if (!container) return;
+
+    if (CART.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                <div style="font-size: 40px; margin-bottom: 10px;">🛒</div>
+                <div style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">Your Cart is Empty</div>
+                <div style="font-size: 12px;">Explore our crystal bracelets & spiritual collection to add items.</div>
+            </div>
+        `;
+        if (footer) footer.style.display = 'none';
+        return;
+    }
+
+    if (footer) footer.style.display = 'block';
+
+    let subtotal = 0;
+    container.innerHTML = CART.map(item => {
+        subtotal += (item.price * item.quantity);
+        return `
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                <img src="${item.image}" alt="${escapeHtml(item.title)}" style="width: 50px; height: 50px; object-fit: contain; background: #f8fafc; border-radius: 6px; border: 1px solid var(--border-color);">
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 12px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(item.title)}</div>
+                    <div style="font-size: 13px; font-weight: 700; color: var(--app-primary); margin-top: 2px;">₹${item.price}</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button onclick="updateQuantity('${item.sku}', -1)" style="width: 26px; height: 26px; background: #f1f5f9; border: 1px solid var(--border-color); border-radius: 4px; font-weight: 700; cursor: pointer;">-</button>
+                    <span style="font-size: 13px; font-weight: 600; min-width: 16px; text-align: center;">${item.quantity}</span>
+                    <button onclick="updateQuantity('${item.sku}', 1)" style="width: 26px; height: 26px; background: #f1f5f9; border: 1px solid var(--border-color); border-radius: 4px; font-weight: 700; cursor: pointer;">+</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    const subtotalEl = document.getElementById('cartSubtotalAmount');
+    if (subtotalEl) subtotalEl.textContent = `₹${subtotal}`;
+}
+
+function proceedToCartCheckout() {
+    if (CART.length === 0) return;
+    closeCartModal();
+    openCartCheckoutModal();
+}
+
+function openCartCheckoutModal() {
+    const modalBody = document.getElementById('checkoutModalBody');
+    let subtotal = CART.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+
+    modalBody.innerHTML = `
+        <div style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">
+            <strong>Cart Summary:</strong> ${CART.reduce((s, i) => s + i.quantity, 0)} items<br>
+            <strong>Total Amount:</strong> <span style="color:var(--app-primary); font-weight:700; font-size:15px;">₹${subtotal}</span>
+        </div>
+        <form id="cartCheckoutForm" onsubmit="submitCartCheckout(event)">
+            <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" id="cartCustName" class="form-input" required placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">WhatsApp Number *</label>
+                <input type="tel" id="cartCustPhone" class="form-input" required placeholder="10-digit mobile number">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Delivery Address *</label>
+                <textarea id="cartCustAddress" class="form-input" rows="2" required placeholder="House No, Street, Landmark, City"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Pincode *</label>
+                <input type="text" id="cartCustPincode" class="form-input" required placeholder="6-digit pincode">
+            </div>
+
+            <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:12px; margin:14px 0; font-size:12px; color:var(--text-muted); line-height:1.4;">
+                ✨ <strong>Easy Process / आसान प्रक्रिया / எளிதான முறை:</strong><br>
+                1️⃣ Click below to send combined order on WhatsApp.<br>
+                2️⃣ Tap the secure payment link received in WhatsApp.<br>
+                3️⃣ Pay ₹${subtotal} instantly via GPay/PhonePe/Paytm!
+            </div>
+
+            <button type="submit" class="app-btn whatsapp-order" style="margin-top:10px;">
+                💬 Send Cart Order & Pay via WhatsApp
+            </button>
+        </form>
+    `;
+
+    document.getElementById('checkoutModal').classList.add('active');
+}
+
+function submitCartCheckout(e) {
+    e.preventDefault();
+    if (CART.length === 0) return;
+
+    const name = document.getElementById('cartCustName').value.trim();
+    const phone = document.getElementById('cartCustPhone').value.trim();
+    const address = document.getElementById('cartCustAddress').value.trim();
+    const pincode = document.getElementById('cartCustPincode').value.trim();
+    const subtotal = CART.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+
+    const personalizedPayLink = `${window.location.origin}${window.location.pathname}?view=pay&sku=CART_COMBINED&price=${subtotal}&name=${encodeURIComponent(name)}`;
+
+    let itemsText = CART.map((i, idx) => `${idx + 1}. *${i.title}* (SKU: ${i.sku}) x ${i.quantity} = ₹${i.price * i.quantity}`).join('\n');
+
+    const message = encodeURIComponent(
+        `*MULTIPLE ITEMS ORDER - Uroo Enterprise*\n\n` +
+        `*Items Ordered:*\n${itemsText}\n\n` +
+        `*Total Cart Amount:* ₹${subtotal}\n\n` +
+        `*Customer Details:*\n` +
+        `• Name: ${name}\n` +
+        `• Phone: ${phone}\n` +
+        `• Address: ${address} - ${pincode}\n\n` +
+        `✨ *Easy Process / आसान प्रक्रिया / எளிதான முறை:*\n` +
+        `1️⃣ Click below to send order on WhatsApp / व्हाट्सएप पर आर्डर भेजें\n` +
+        `2️⃣ Tap the secure payment link received in WhatsApp / भुगतान लिंक पर टैप करें\n` +
+        `3️⃣ Pay ₹${subtotal} instantly via GPay/PhonePe/Paytm / भुगतान करें\n\n` +
+        `👆 *Click above to pay securely / सुरक्षित भुगतान के लिए ऊपर क्लिक करें / பாதுகாப்பாக பணம் செலுத்த மேலே கிளிக் செய்யவும்:*\n` +
+        `${personalizedPayLink}`
+    );
+
+    closeCheckoutModal();
+    CART = [];
+    saveCartToStorage();
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank', 'noopener,noreferrer');
 }
 
 function openCheckoutModal(sku) {
@@ -122,7 +334,7 @@ function renderPayView(params) {
     `;
 
     document.getElementById('qrcode').innerHTML = "";
-    const upiString = `upi://pay?pa=${BUSINESS_UPI_ID}&pn=UrooEnterprise&am=${price}&cu=INR&tn=Order_${product.sku}`;
+    const upiString = `upi://pay?pa=${BUSINESS_UPI_ID}&pn=UrooEnterprise&am=${price}&cu=INR&tn=Order_${sku}`;
     new QRCode(document.getElementById("qrcode"), {
         text: upiString,
         width: 160,
@@ -170,6 +382,9 @@ function createProductCard(product) {
                 <span class="app-price">${price ? '₹' + price : 'Price on request'}</span>
                 ${mrp ? `<span class="app-mrp">₹${mrp}</span>` : ''}
                 ${discount > 0 ? `<span class="app-disc">${discount}%off</span>` : ''}
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 8px;">
+                <button onclick="event.stopPropagation(); addToCart('${product.sku}')" class="app-btn" style="background: #f1f5f9; color: var(--app-primary); border: 1px solid var(--border-color); font-size: 11px; padding: 6px; border-radius: 6px; flex: 1;">🛒 Add to Cart</button>
             </div>
         </div>
     `;
@@ -270,10 +485,48 @@ function initHome() {
     PRODUCTS.slice(0, 6).forEach(product => {
         trendGrid.appendChild(createProductCard(product));
     });
+
+    renderTestimonialsSection();
+}
+
+function renderTestimonialsSection() {
+    let testContainer = document.getElementById('homeTestimonialsSection');
+    if (!testContainer) {
+        testContainer = document.createElement('div');
+        testContainer.id = 'homeTestimonialsSection';
+        testContainer.style.cssText = 'margin-top: 30px;';
+        
+        const homeView = document.getElementById('homeView');
+        if (homeView) {
+            const footer = homeView.querySelector('.store-footer');
+            homeView.insertBefore(testContainer, footer);
+        }
+    }
+
+    const reviews = [
+        { name: "Pooja Mehta", location: "Mumbai", rating: 5, text: "Bought the Pyrite Hematite bracelet. The quality is exceptional and original natural stones. Received it quickly via WhatsApp order!" },
+        { name: "Rajesh Patel", location: "Ahmedabad", rating: 5, text: "Authentic spiritual products! The Pyrite Tortoise brought wonderful positive energy to my office desk. Highly recommended." },
+        { name: "Sneha Sharma", location: "Surat", rating: 5, text: "Gorgeous packaging and certified natural crystal beads. Customer support on WhatsApp was extremely helpful." }
+    ];
+
+    testContainer.innerHTML = `
+        <div class="section-header">⭐ Customer Testimonials</div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            ${reviews.map(r => `
+                <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <div style="font-size: 13px; font-weight: 700; color: var(--text-main);">${escapeHtml(r.name)} <span style="font-size: 11px; font-weight: 400; color: var(--text-muted);">(${r.location})</span></div>
+                        <div style="color: #f59e0b; font-size: 13px;">${'★'.repeat(r.rating)}</div>
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">"${escapeHtml(r.text)}"</p>
+                </div>
+            `).join('')}
+        </div>
+    `;
 }
 
 const CATEGORY_IMAGES = {
-    "Crystal Bracelets": "images/cat_crystal_bracelets.webp",
+    "Crystal Bracelets": DEFAULT_IMAGE,
     "Rashi/Zodiac Bracelet": DEFAULT_IMAGE,
     "Mala & Pendant": DEFAULT_IMAGE,
     "Anklets": DEFAULT_IMAGE,
@@ -306,7 +559,6 @@ function renderPDP(sku) {
     const inquiryMessage = encodeURIComponent(`Hi Uroo Enterprise,\n\nI have a question about this product:\n*${product.title}* (SKU: ${product.sku})\nPrice: ₹${price}\n\nPlease provide more details.`);
     const shareText = encodeURIComponent(`Check out ${product.title} on Uroo Enterprise for just ₹${price}! View product: ${location.href}`);
 
-    // Check if meesho and amazon links are provided and non-empty
     const hasMeesho = product.meesho && product.meesho.trim() !== '' && product.meesho !== '#';
     const hasAmazon = product.amazon && product.amazon.trim() !== '' && product.amazon !== '#';
 
@@ -363,6 +615,10 @@ function renderPDP(sku) {
             <div class="pdp-action-stack">
                 <button onclick="openCheckoutModal('${product.sku}')" class="app-btn whatsapp-order">
                     💬 Order on WhatsApp & Pay via UPI
+                </button>
+
+                <button onclick="addToCart('${product.sku}')" class="app-btn" style="background: #f8fafc; color: var(--app-primary); border: 1px solid var(--border-color); font-weight: 600;">
+                    🛒 Add to Shopping Cart
                 </button>
 
                 ${marketSectionHTML}
