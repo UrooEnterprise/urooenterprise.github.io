@@ -99,8 +99,8 @@
         "mrp": 999,
         "price": 299,
         "images": [],
-        "amazon": "https://www.amazon.in/",
-        "meesho": "https://www.meesho.com/",
+        "amazon": "",
+        "meesho": "",
         "discount": "10%"
     },
     {
@@ -113,7 +113,7 @@
         "price": 349,
         "images": [],
         "amazon": "https://www.amazon.in/",
-        "meesho": "https://www.meesho.com/",
+        "meesho": "",
         "discount": "10%"
     },
     {
