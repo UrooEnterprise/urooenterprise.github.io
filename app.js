@@ -306,6 +306,34 @@ function renderPDP(sku) {
     const inquiryMessage = encodeURIComponent(`Hi Uroo Enterprise,\n\nI have a question about this product:\n*${product.title}* (SKU: ${product.sku})\nPrice: ₹${price}\n\nPlease provide more details.`);
     const shareText = encodeURIComponent(`Check out ${product.title} on Uroo Enterprise for just ₹${price}! View product: ${location.href}`);
 
+    // Check if meesho and amazon links are provided and non-empty
+    const hasMeesho = product.meesho && product.meesho.trim() !== '' && product.meesho !== '#';
+    const hasAmazon = product.amazon && product.amazon.trim() !== '' && product.amazon !== '#';
+
+    let marketSectionHTML = '';
+    if (hasMeesho || hasAmazon) {
+        marketSectionHTML = `
+            <div style="margin-top: 10px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 10px; padding: 12px;">
+                <div style="font-size: 12px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; text-align: center;">🛍️ Buy From:</div>
+                <div class="market-row" style="display: flex; gap: 10px; margin-bottom: 8px; justify-content: center;">
+                    ${hasMeesho ? `
+                        <a href="${product.meesho}" target="_blank" rel="noopener noreferrer" style="flex: 1; max-width: 140px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,0.02);" title="View on Meesho">
+                            <img src="images/meeshoicon.png" alt="Meesho" style="height: 44px; object-fit: contain;">
+                        </a>
+                    ` : ''}
+                    ${hasAmazon ? `
+                        <a href="${product.amazon}" target="_blank" rel="noopener noreferrer" style="flex: 1; max-width: 140px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,0.02);" title="View on Amazon">
+                            <img src="images/amazonicon.png" alt="Amazon" style="height: 32px; object-fit: contain;">
+                        </a>
+                    ` : ''}
+                </div>
+                <div style="font-size: 10px; color: var(--text-muted); text-align: center; line-height: 1.4;">
+                    💡 Note: Prices and discounts may vary on Amazon or Meesho based on active platform promotions.
+                </div>
+            </div>
+        `;
+    }
+
     const pdpCard = document.getElementById('pdpCardContent');
     pdpCard.innerHTML = `
         <div class="pdp-img-container" style="position: relative; cursor: pointer; height: 320px; background: #ffffff; display: flex; align-items: center; justify-content: center;" onclick="openLightbox(currentImageIndex)">
@@ -337,21 +365,7 @@ function renderPDP(sku) {
                     💬 Order on WhatsApp & Pay via UPI
                 </button>
 
-                <!-- Buy from marketplaces section placed directly below WhatsApp order button -->
-                <div style="margin-top: 10px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 10px; padding: 12px;">
-                    <div style="font-size: 12px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; text-align: center;">🛍️ Buy From:</div>
-                    <div class="market-row" style="display: flex; gap: 10px; margin-bottom: 8px;">
-                        <a href="${product.meesho || '#'}" target="_blank" rel="noopener noreferrer" style="flex: 1; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,0.02); ${product.meesho ? '' : 'opacity:0.5; pointer-events:none;'}" title="View on Meesho">
-                            <img src="images/meeshoicon.png" alt="Meesho" style="height: 44px; object-fit: contain;">
-                        </a>
-                        <a href="${product.amazon || '#'}" target="_blank" rel="noopener noreferrer" style="flex: 1; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,0.02); ${product.amazon ? '' : 'opacity:0.5; pointer-events:none;'}" title="View on Amazon">
-                            <img src="images/amazonicon.png" alt="Amazon" style="height: 32px; object-fit: contain;">
-                        </a>
-                    </div>
-                    <div style="font-size: 10px; color: var(--text-muted); text-align: center; line-height: 1.4;">
-                        💡 Note: Prices and discounts may vary on Amazon or Meesho based on active platform promotions.
-                    </div>
-                </div>
+                ${marketSectionHTML}
 
                 <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${inquiryMessage}" target="_blank" rel="noopener noreferrer" class="app-btn whatsapp-inquiry" style="margin-top: 4px;">
                     ❓ Product Inquiry via WhatsApp
