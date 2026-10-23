@@ -19,7 +19,13 @@
                 <div class="app-subtitle" id="appTopbarSubtitle">Spiritual & Gemstone Store</div>
             </div>
         </div>
-        <div class="topbar-search-icon" onclick="navigateTo({view: 'searchView'})">🔍</div>
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="position: relative; cursor: pointer; font-size: 20px;" onclick="openCartModal()" title="Shopping Cart">
+                🛒
+                <span id="cartBadgeCount" style="position: absolute; top: -5px; right: -8px; background: var(--app-accent); color: #fff; font-size: 9px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: none; align-items: center; justify-content: center;">0</span>
+            </div>
+            <div class="topbar-search-icon" onclick="navigateTo({view: 'searchView'})">🔍</div>
+        </div>
     </div>
 
     <div class="app-container">
@@ -163,5 +169,24 @@
             <span class="icon">📞</span> Contact
         </button>
     </nav>
+    <!-- Cart Modal Drawer -->
+    <div class="modal-overlay" id="cartModal">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <div class="modal-title">🛒 Your Shopping Cart</div>
+                <button class="modal-close" onclick="closeCartModal()">✕</button>
+            </div>
+            <div id="cartModalItemsList" style="max-height: 50vh; overflow-y: auto;"></div>
+            <div id="cartModalFooter" style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 16px; display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 15px; font-weight: 700;">
+                    <span>Subtotal:</span>
+                    <span id="cartSubtotalAmount" style="color: var(--app-primary);">₹0</span>
+                </div>
+                <button onclick="proceedToCartCheckout()" class="app-btn whatsapp-order">
+                    💬 Proceed to WhatsApp Checkout
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
