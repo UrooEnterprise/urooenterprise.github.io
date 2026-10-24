@@ -631,7 +631,7 @@ function renderTestimonialsSection() {
 const CATEGORY_IMAGES = {
     "Crystal Bracelets": "images/cat_crystal_bracelets.webp",
     "Rashi/Zodiac Bracelet": "images/cat_rashi_bracelets",
-    "Mala & Pendant": DEFAULT_IMAGE,
+    "Mala & Pendant": "images/cat_mala_machhmani.webp",
     "Anklets": DEFAULT_IMAGE,
     "Vastu & Prosperity": DEFAULT_IMAGE,
     "Jewellery": DEFAULT_IMAGE
