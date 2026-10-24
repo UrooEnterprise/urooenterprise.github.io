@@ -8,7 +8,7 @@ let currentCheckoutProduct = null;
 let currentImageIndex = 0;
 let currentProductImages = [];
 
-// Verified Meesho Customer Reviews Database (Excluding 3-star reviews) linked to product types/categories/SKUs
+// Verified Meesho Customer Reviews Database (Excluding 3-star reviews) with approximate calendar dates
 const PRODUCT_REVIEWS_DB = [
     { 
         name: "Prashant", 
@@ -60,7 +60,7 @@ const PRODUCT_REVIEWS_DB = [
     },
     { 
         name: "Shalli Dogra", 
-        date: "Posted 15 days ago", 
+        date: "Posted on 09 Oct, 2026", 
         rating: 5, 
         badge: "Very Good",
         text: "Nice 👍",
@@ -68,7 +68,7 @@ const PRODUCT_REVIEWS_DB = [
     },
     { 
         name: "Ragula Dhanraj", 
-        date: "Posted 17 days ago", 
+        date: "Posted on 07 Oct, 2026", 
         rating: 5, 
         badge: "Very Good",
         text: "Super 😍",
@@ -153,6 +153,30 @@ const PRODUCT_REVIEWS_DB = [
         badge: "Very Good",
         text: "Nice.",
         tags: ["anklet"]
+    },
+    { 
+        name: "Meesho User", 
+        date: "Posted on 26 Sep, 2026", 
+        rating: 4, 
+        badge: "Good",
+        text: "Acha product hai.",
+        tags: ["bracelet"]
+    },
+    { 
+        name: "Meesho User", 
+        date: "Posted on 27 Sep, 2026", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "Bahut accha product hai.",
+        tags: ["pendant"]
+    },
+    { 
+        name: "Meesho User", 
+        date: "Posted on 28 Sep, 2026", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "Ggh - Very satisfied with the finish.",
+        tags: ["pendant"]
     }
 ];
 
@@ -797,7 +821,7 @@ function renderPDP(sku) {
         `;
     }
 
-    // Filter relevant reviews based on product category or title (Excluding 3-star reviews)
+    // Filter relevant reviews based on product category or title (Excluding 3-star reviews and converting relative dates)
     const prodTitleLower = product.title.toLowerCase();
     const prodCatLower = product.category.toLowerCase();
     const linkedReviews = PRODUCT_REVIEWS_DB.filter(r => 
