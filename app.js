@@ -26,14 +26,37 @@ function loadCartFromStorage() {
         const saved = localStorage.getItem('uroo_cart');
         if (saved) CART = JSON.parse(saved);
     } catch(e) { CART = []; }
-    updateCartBadge();
+    updateCartUI();
 }
 
 function saveCartToStorage() {
     try {
         localStorage.setItem('uroo_cart', JSON.stringify(CART));
     } catch(e) {}
-    updateCartBadge();
+    updateCartUI();
+}
+
+function generateUniqueOrderId() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    const orderId = `UROO-${year}${month}${day}-${hours}${minutes}-${randomNum}`;
+    
+    try {
+        let existingOrders = JSON.parse(localStorage.getItem('uroo_orders_history') || '[]');
+        if (existingOrders.includes(orderId)) {
+            return generateUniqueOrderId();
+        }
+        existingOrders.push(orderId);
+        if (existingOrders.length > 100) existingOrders.shift();
+        localStorage.setItem('uroo_orders_history', JSON.stringify(existingOrders));
+    } catch(e) {}
+
+    return orderId;
 }
 
 function addToCart(sku) {
@@ -69,8 +92,11 @@ function updateQuantity(sku, delta) {
     renderCartModalItems();
 }
 
-function updateCartBadge() {
+function updateCartUI() {
     const totalItems = CART.reduce((sum, i) => sum + i.quantity, 0);
+    const subtotal = CART.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+    
+    // Topbar badge
     const badge = document.getElementById('cartBadgeCount');
     if (badge) {
         if (totalItems > 0) {
@@ -79,6 +105,34 @@ function updateCartBadge() {
         } else {
             badge.style.display = 'none';
         }
+    }
+
+    // Frozen bottom floating bar
+    let floatBar = document.getElementById('frozenCartBar');
+    if (!floatBar) {
+        floatBar = document.createElement('div');
+        floatBar.id = 'frozenCartBar';
+        document.body.appendChild(floatBar);
+    }
+
+    if (totalItems > 0) {
+        floatBar.style.cssText = 'position: fixed; bottom: 60px; left: 0; right: 0; background: #1e1b4b; color: #fff; padding: 12px 16px; z-index: 999; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 -4px 16px rgba(0,0,0,0.15); animation: slideUpBar 0.2s ease-out;';
+        floatBar.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 20px;">🛒</span>
+                <div>
+                    <div style="font-size: 11px; color: #cbd5e1; font-weight: 500;">${totalItems} Items in Cart</div>
+                    <div style="font-size: 14px; font-weight: 700; color: #fff;">₹${subtotal}</div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="openCartModal()" style="background: var(--app-accent); color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;">Go to Cart ➔</button>
+            </div>
+        `;
+        document.body.style.paddingBottom = '120px';
+    } else {
+        floatBar.style.display = 'none';
+        document.body.style.paddingBottom = '70px';
     }
 }
 
@@ -118,6 +172,7 @@ function renderCartModalItems() {
             </div>
         `;
         if (footer) footer.style.display = 'none';
+        updateCartUI();
         return;
     }
 
@@ -199,20 +254,22 @@ function submitCartCheckout(e) {
     e.preventDefault();
     if (CART.length === 0) return;
 
+    const orderId = generateUniqueOrderId();
     const name = document.getElementById('cartCustName').value.trim();
     const phone = document.getElementById('cartCustPhone').value.trim();
     const address = document.getElementById('cartCustAddress').value.trim();
     const pincode = document.getElementById('cartCustPincode').value.trim();
     const subtotal = CART.reduce((sum, i) => sum + (i.price * i.quantity), 0);
 
-    const personalizedPayLink = `${window.location.origin}${window.location.pathname}?view=pay&sku=CART_COMBINED&price=${subtotal}&name=${encodeURIComponent(name)}`;
+    const personalizedPayLink = `${window.location.origin}${window.location.pathname}?view=pay&orderId=${orderId}&price=${subtotal}&name=${encodeURIComponent(name)}`;
 
     let itemsText = CART.map((i, idx) => `${idx + 1}. *${i.title}* (SKU: ${i.sku}) x ${i.quantity} = ₹${i.price * i.quantity}`).join('\n');
 
     const message = encodeURIComponent(
-        `*MULTIPLE ITEMS ORDER - Uroo Enterprise*\n\n` +
+        `*MULTIPLE ITEMS ORDER - Uroo Enterprise*\n` +
+        `*Order ID:* ${orderId}\n\n` +
         `*Items Ordered:*\n${itemsText}\n\n` +
-        `*Total Cart Amount:* ₹${subtotal}\n\n` +
+        `*Total Amount:* ₹${subtotal}\n\n` +
         `*Customer Details:*\n` +
         `• Name: ${name}\n` +
         `• Phone: ${phone}\n` +
@@ -285,16 +342,18 @@ function submitCheckout(e) {
     e.preventDefault();
     if (!currentCheckoutProduct) return;
 
+    const orderId = generateUniqueOrderId();
     const name = document.getElementById('custName').value.trim();
     const phone = document.getElementById('custPhone').value.trim();
     const address = document.getElementById('custAddress').value.trim();
     const pincode = document.getElementById('custPincode').value.trim();
     const price = currentCheckoutProduct.price || 299;
 
-    const personalizedPayLink = `${window.location.origin}${window.location.pathname}?view=pay&sku=${encodeURIComponent(currentCheckoutProduct.sku)}&price=${price}&name=${encodeURIComponent(name)}`;
+    const personalizedPayLink = `${window.location.origin}${window.location.pathname}?view=pay&orderId=${orderId}&price=${price}&name=${encodeURIComponent(name)}`;
 
     const message = encodeURIComponent(
-        `*NEW ORDER - Uroo Enterprise*\n\n` +
+        `*NEW ORDER - Uroo Enterprise*\n` +
+        `*Order ID:* ${orderId}\n\n` +
         `*Product:* ${currentCheckoutProduct.title}\n` +
         `*SKU:* ${currentCheckoutProduct.sku}\n` +
         `*Total Price:* ₹${price}\n\n` +
@@ -315,10 +374,9 @@ function submitCheckout(e) {
 }
 
 function renderPayView(params) {
-    const sku = params.get('sku');
+    const orderId = params.get('orderId') || generateUniqueOrderId();
     const price = params.get('price') || '299';
     const name = params.get('name') || 'Customer';
-    const product = PRODUCTS.find(p => p.sku === sku) || PRODUCTS[0] || { title: 'Gemstone Item', sku: sku };
 
     document.getElementById('appTopbarTitle').textContent = 'Secure UPI Payment';
     document.getElementById('appTopbarSubtitle').textContent = 'Uroo Enterprise';
@@ -327,14 +385,13 @@ function renderPayView(params) {
     detailsBox.innerHTML = `
         <div style="font-size: 13px; color: var(--text-main); line-height: 1.6;">
             <strong>Hello ${escapeHtml(name)},</strong><br>
-            <strong>Item:</strong> ${escapeHtml(product.title)}<br>
-            <strong>SKU:</strong> ${escapeHtml(product.sku)}<br>
+            <strong>Order ID:</strong> <span style="color: var(--app-accent); font-weight: 700;">${escapeHtml(orderId)}</span><br>
             <strong>Amount to Pay:</strong> <span style="color: var(--app-primary); font-weight: 700; font-size: 16px;">₹${price}</span>
         </div>
     `;
 
     document.getElementById('qrcode').innerHTML = "";
-    const upiString = `upi://pay?pa=${BUSINESS_UPI_ID}&pn=UrooEnterprise&am=${price}&cu=INR&tn=Order_${sku}`;
+    const upiString = `upi://pay?pa=${BUSINESS_UPI_ID}&pn=UrooEnterprise&am=${price}&cu=INR&tn=Order_${orderId}`;
     new QRCode(document.getElementById("qrcode"), {
         text: upiString,
         width: 160,
@@ -344,7 +401,7 @@ function renderPayView(params) {
     const buttonsContainer = document.getElementById('upiButtonsContainer');
     buttonsContainer.innerHTML = `
         <a href="${upiString}" class="app-btn" style="background: #2563eb; color: #fff; font-size: 14px; padding: 12px;">📱 Pay ₹${price} via Google Pay / PhonePe / Paytm</a>
-        <div style="font-size: 11px; color: var(--success-green); font-weight: 700; text-align: center; margin-top: 4px;">✓ Instant Direct UPI Transfer to Uroo Enterprise</div>
+        <div style="font-size: 11px; color: var(--success-green); font-weight: 700; text-align: center; margin-top: 4px;">✓ Instant Direct UPI Transfer for Order #${escapeHtml(orderId)}</div>
     `;
 }
 
@@ -383,9 +440,6 @@ function createProductCard(product) {
                 ${mrp ? `<span class="app-mrp">₹${mrp}</span>` : ''}
                 ${discount > 0 ? `<span class="app-disc">${discount}%off</span>` : ''}
             </div>
-            <div style="display: flex; gap: 6px; margin-top: 8px;">
-                <button onclick="event.stopPropagation(); addToCart('${product.sku}')" class="app-btn" style="background: #f1f5f9; color: var(--app-primary); border: 1px solid var(--border-color); font-size: 11px; padding: 6px; border-radius: 6px; flex: 1;">🛒 Add to Cart</button>
-            </div>
         </div>
     `;
     return card;
@@ -404,7 +458,7 @@ function navigateTo(state, push = true) {
     } else if (state.view === 'contactView') {
         url += '?view=contact';
     } else if (state.view === 'payView') {
-        url += `?view=pay&sku=${encodeURIComponent(state.sku || '')}&price=${state.price || '299'}&name=${encodeURIComponent(state.name || '')}`;
+        url += `?view=pay&orderId=${encodeURIComponent(state.orderId || '')}&price=${state.price || '299'}&name=${encodeURIComponent(state.name || '')}`;
     }
 
     if (push) history.pushState(state, "", url);
@@ -744,7 +798,7 @@ function handleInitialRoute() {
     const params = new URLSearchParams(location.search);
     const view = params.get('view');
     if (view === 'pay') {
-        navigateTo({ view: 'payView', sku: params.get('sku'), price: params.get('price'), name: params.get('name') }, false);
+        navigateTo({ view: 'payView', orderId: params.get('orderId'), price: params.get('price'), name: params.get('name') }, false);
     } else if (view === 'pdp' && params.get('sku')) {
         history.replaceState({ view: 'pdpView', sku: params.get('sku') }, '', location.href);
         renderPDP(params.get('sku'));
