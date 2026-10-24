@@ -138,7 +138,7 @@
         "stock": "In Stock",
         "mrp": 999,
         "price": 299,
-        "images": [],
+        "images": ["https://m.media-amazon.com/images/I/61e1VGIAGHL._SY695_.jpg", "https://m.media-amazon.com/images/I/61yQ+kH7kTL._SY695_.jpg", "https://m.media-amazon.com/images/I/611zwxatxZL._SY695_.jpg", "https://m.media-amazon.com/images/I/61sKEouLssL._SY695_.jpg", "https://m.media-amazon.com/images/I/61aPAghnuCL._SY695_.jpg"],
         "amazon": "https://www.amazon.in/",
         "meesho": "https://www.meesho.com/",
         "discount": "10%"
@@ -151,7 +151,7 @@
         "stock": "In Stock",
         "mrp": 999,
         "price": 299,
-        "images": [],
+        "images": ["https://images-r.meesho.com/images/products/610700392/imp2v_512.avif?width=512", "https://images-r.meesho.com/images/products/610700392/3sw6c_512.avif?width=512", "https://images-r.meesho.com/images/products/610700392/eysd2_512.avif?width=512", "https://images-r.meesho.com/images/products/610700392/cbole_512.avif?width=512"],
         "amazon": "https://www.amazon.in/",
         "meesho": "https://www.meesho.com/",
         "discount": "10%"
