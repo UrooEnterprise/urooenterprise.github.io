@@ -566,7 +566,6 @@ function initHome() {
     catGrid.innerHTML = '';
 
     categories.forEach(cat => {
-        const count = PRODUCTS.filter(p => p.category === cat).length;
         const coverImg = CATEGORY_IMAGES[cat] || DEFAULT_IMAGE;
 
         const tile = document.createElement('div');
@@ -576,7 +575,6 @@ function initHome() {
             <div class="app-cat-overlay"></div>
             <div class="app-cat-content">
                 <h4>${escapeHtml(cat)}</h4>
-                <span>${count} Items ➔</span>
             </div>
         `;
         tile.onclick = () => navigateTo({ view: 'categoryView', category: cat });
