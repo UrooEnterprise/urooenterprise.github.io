@@ -634,7 +634,7 @@ const CATEGORY_IMAGES = {
     "Mala & Pendant": "images/cat_mala_machhmani.webp",
     "Anklets": "images/cat_anklet.webp",
     "Vastu & Prosperity": "images/cat_vastu.webp",
-    "Jewellery": DEFAULT_IMAGE
+    "Jewellery": "images/cat_jewellery.webp"
 };
 
 function renderCategoryProducts(catName) {
