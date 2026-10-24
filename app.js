@@ -78,7 +78,58 @@ function addToCart(sku) {
         });
     }
     saveCartToStorage();
+    triggerFlyToCartAnimation(mainImg);
     showToast(`✓ Added "${product.title}" to Cart!`);
+
+    const currentView = document.getElementById('pdpView');
+    if (currentView && currentView.classList.contains('active')) {
+        renderPDP(sku);
+    }
+}
+
+function triggerFlyToCartAnimation(imgSrc) {
+    const imgEl = document.getElementById('mainPdpImg');
+    const cartIcon = document.querySelector('.app-topbar [title="Shopping Cart"]') || document.querySelector('.app-topbar');
+    if (!imgEl || !cartIcon) return;
+
+    const startRect = imgEl.getBoundingClientRect();
+    const targetRect = cartIcon.getBoundingClientRect();
+
+    const flyer = document.createElement('img');
+    flyer.src = imgSrc;
+    flyer.style.cssText = `
+        position: fixed;
+        top: ${startRect.top}px;
+        left: ${startRect.left}px;
+        width: ${startRect.width}px;
+        height: ${startRect.height}px;
+        object-fit: contain;
+        border-radius: 8px;
+        z-index: 999999;
+        pointer-events: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    `;
+    document.body.appendChild(flyer);
+    flyer.getBoundingClientRect();
+
+    setTimeout(() => {
+        flyer.style.top = `${targetRect.top + 5}px`;
+        flyer.style.left = `${targetRect.left + 5}px`;
+        flyer.style.width = '30px';
+        flyer.style.height = '30px';
+        flyer.style.opacity = '0.3';
+        flyer.style.borderRadius = '50%';
+    }, 20);
+
+    setTimeout(() => {
+        flyer.remove();
+        const badge = document.getElementById('cartBadgeCount');
+        if (badge) {
+            badge.classList.add('cart-badge-bounce');
+            setTimeout(() => badge.classList.remove('cart-badge-bounce'), 400);
+        }
+    }, 820);
 }
 
 function updateQuantity(sku, delta) {
@@ -96,7 +147,6 @@ function updateCartUI() {
     const totalItems = CART.reduce((sum, i) => sum + i.quantity, 0);
     const subtotal = CART.reduce((sum, i) => sum + (i.price * i.quantity), 0);
     
-    // Topbar badge
     const badge = document.getElementById('cartBadgeCount');
     if (badge) {
         if (totalItems > 0) {
@@ -107,7 +157,6 @@ function updateCartUI() {
         }
     }
 
-    // Frozen bottom floating bar
     let floatBar = document.getElementById('frozenCartBar');
     if (!floatBar) {
         floatBar = document.createElement('div');
@@ -671,9 +720,19 @@ function renderPDP(sku) {
                     💬 Order on WhatsApp & Pay via UPI
                 </button>
 
-                <button onclick="addToCart('${product.sku}')" class="app-btn" style="background: #f8fafc; color: var(--app-primary); border: 1px solid var(--border-color); font-weight: 600;">
-                    🛒 Add to Shopping Cart
-                </button>
+                ${(() => {
+                    const inCart = CART.find(i => i.sku === product.sku);
+                    const qty = inCart ? inCart.quantity : 0;
+                    if (qty > 0) {
+                        return `<button onclick="addToCart('${product.sku}')" class="app-btn" style="background: #ecfdf5; color: #047857; border: 1px solid #10b981; font-weight: 600;">
+                            ✓ Added in Cart (${qty} in cart) - Add More 🛒
+                        </button>`;
+                    } else {
+                        return `<button onclick="addToCart('${product.sku}')" class="app-btn" style="background: #f8fafc; color: var(--app-primary); border: 1px solid var(--border-color); font-weight: 600;">
+                            🛒 Add to Shopping Cart
+                        </button>`;
+                    }
+                })()}
 
                 ${marketSectionHTML}
 
