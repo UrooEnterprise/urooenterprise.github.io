@@ -8,6 +8,154 @@ let currentCheckoutProduct = null;
 let currentImageIndex = 0;
 let currentProductImages = [];
 
+// Verified Meesho Customer Reviews Database (Excluding 3-star reviews) linked to product types/categories/SKUs
+const PRODUCT_REVIEWS_DB = [
+    { 
+        name: "Prashant", 
+        date: "Posted on 28 May, 2026", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "Honestly didn't expect the quality to be this good at this price Bracelet looks really nice and feels premium.",
+        tags: ["bracelet", "crystal"]
+    },
+    { 
+        name: "Prashant", 
+        date: "Posted on 28 May, 2026", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "Mala feels original and well made. Beads are smooth, lightweight and comfortable for regular use.",
+        tags: ["mala", "pendant"]
+    },
+    { 
+        name: "Meesho User", 
+        date: "Posted on 15 Aug, 2025", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "Bahut accha bracelet hain sundar rang aur perfect fit daily roz pehne layak aur dekhne me classyy.",
+        tags: ["bracelet", "zodiac", "rashi"]
+    },
+    { 
+        name: "Rathod Pravinaben", 
+        date: "Posted on 03 Aug, 2026", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "Price ke hisaab se bahut accha product hai. Comfortable hai aur dekhne mein bhi classy lagta hai.",
+        tags: ["bracelet", "crystal"]
+    },
+    { 
+        name: "Sumit Lubana", 
+        date: "Posted on 09 May, 2026", 
+        rating: 4, 
+        badge: "Good",
+        text: "Good product quality.",
+        tags: ["anklet"]
+    },
+    { 
+        name: "G Mahalakshmi", 
+        date: "Posted on 05 Jul, 2026", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "Surprise gift 🎁 🙏🙏🙏 thank you pendant superb and gift also thank you.",
+        tags: ["pendant", "vastu"]
+    },
+    { 
+        name: "Shalli Dogra", 
+        date: "Posted 15 days ago", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "Nice 👍",
+        tags: ["pendant", "vastu"]
+    },
+    { 
+        name: "Ragula Dhanraj", 
+        date: "Posted 17 days ago", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "Super 😍",
+        tags: ["pendant", "vastu"]
+    },
+    { 
+        name: "Darshana Mehta", 
+        date: "Posted on 28 May, 2026", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "Nice product",
+        tags: ["anklet"]
+    },
+    { 
+        name: "Dipti Panchal", 
+        date: "Posted on 19 May, 2026", 
+        rating: 4, 
+        badge: "Good",
+        text: "Good",
+        tags: ["anklet"]
+    },
+    { 
+        name: "Dhwani Vora", 
+        date: "Posted on 11 Sep, 2026", 
+        rating: 4, 
+        badge: "Good",
+        text: "Nice",
+        tags: ["bracelet"]
+    },
+    { 
+        name: "Hardik Gediya", 
+        date: "Posted on 22 Jul, 2026", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "Product is good, comfortable for regular wear.",
+        tags: ["anklet"]
+    },
+    { 
+        name: "Arabinda Kumar Mazumdar", 
+        date: "Posted on 04 Sep, 2026", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "All materials are very good.",
+        tags: ["bracelet"]
+    },
+    { 
+        name: "Sweet Angel", 
+        date: "Posted on 02 Jul, 2026", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "Good looking.",
+        tags: ["anklet"]
+    },
+    { 
+        name: "Gurjinder Kaur", 
+        date: "Posted on 25 Jun, 2026", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "Nice Product.",
+        tags: ["anklet"]
+    },
+    { 
+        name: "Hitesh Kumar Saini", 
+        date: "Posted on 16 Jun, 2026", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "Size thora chota he bs.",
+        tags: ["vastu", "frame"]
+    },
+    { 
+        name: "Kainath Khan", 
+        date: "Posted on 14 Aug, 2026", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "Good.",
+        tags: ["anklet"]
+    },
+    { 
+        name: "Shipra Sarkar", 
+        date: "Posted on 01 Sep, 2026", 
+        rating: 5, 
+        badge: "Very Good",
+        text: "Nice.",
+        tags: ["anklet"]
+    }
+];
+
 async function loadProducts() {
     try {
         const response = await fetch('uroo_products.json');
@@ -586,44 +734,6 @@ function initHome() {
     PRODUCTS.slice(0, 6).forEach(product => {
         trendGrid.appendChild(createProductCard(product));
     });
-
-    renderTestimonialsSection();
-}
-
-function renderTestimonialsSection() {
-    let testContainer = document.getElementById('homeTestimonialsSection');
-    if (!testContainer) {
-        testContainer = document.createElement('div');
-        testContainer.id = 'homeTestimonialsSection';
-        testContainer.style.cssText = 'margin-top: 30px;';
-        
-        const homeView = document.getElementById('homeView');
-        if (homeView) {
-            const footer = homeView.querySelector('.store-footer');
-            homeView.insertBefore(testContainer, footer);
-        }
-    }
-
-    const reviews = [
-        { name: "Pooja Mehta", location: "Mumbai", rating: 5, text: "Bought the Pyrite Hematite bracelet. The quality is exceptional and original natural stones. Received it quickly via WhatsApp order!" },
-        { name: "Rajesh Patel", location: "Ahmedabad", rating: 5, text: "Authentic spiritual products! The Pyrite Tortoise brought wonderful positive energy to my office desk. Highly recommended." },
-        { name: "Sneha Sharma", location: "Surat", rating: 5, text: "Gorgeous packaging and certified natural crystal beads. Customer support on WhatsApp was extremely helpful." }
-    ];
-
-    testContainer.innerHTML = `
-        <div class="section-header">⭐ Customer Testimonials</div>
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-            ${reviews.map(r => `
-                <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <div style="font-size: 13px; font-weight: 700; color: var(--text-main);">${escapeHtml(r.name)} <span style="font-size: 11px; font-weight: 400; color: var(--text-muted);">(${r.location})</span></div>
-                        <div style="color: #f59e0b; font-size: 13px;">${'★'.repeat(r.rating)}</div>
-                    </div>
-                    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">"${escapeHtml(r.text)}"</p>
-                </div>
-            `).join('')}
-        </div>
-    `;
 }
 
 const CATEGORY_IMAGES = {
@@ -687,6 +797,35 @@ function renderPDP(sku) {
         `;
     }
 
+    // Filter relevant reviews based on product category or title (Excluding 3-star reviews)
+    const prodTitleLower = product.title.toLowerCase();
+    const prodCatLower = product.category.toLowerCase();
+    const linkedReviews = PRODUCT_REVIEWS_DB.filter(r => 
+        r.tags.some(tag => prodTitleLower.includes(tag) || prodCatLower.includes(tag))
+    );
+    const reviewsToShow = linkedReviews.length > 0 ? linkedReviews : PRODUCT_REVIEWS_DB;
+
+    const reviewsHtml = `
+        <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+            <div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 12px;">⭐ Verified Customer Reviews (${reviewsToShow.length})</div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                ${reviewsToShow.map(r => `
+                    <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <div style="font-size: 12px; font-weight: 700; color: var(--text-main);">${escapeHtml(r.name)}</div>
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <span style="background: #16a34a; color:#fff; font-size:10px; font-weight:700; padding:1px 6px; border-radius:4px;">${r.rating} ★</span>
+                                <span style="font-size:11px; font-weight:600; color:#16a34a;">${r.badge}</span>
+                            </div>
+                        </div>
+                        <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 6px;">${r.date}</div>
+                        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">"${escapeHtml(r.text)}"</p>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
     const pdpCard = document.getElementById('pdpCardContent');
     pdpCard.innerHTML = `
         <div class="pdp-img-container" style="position: relative; cursor: pointer; height: 320px; background: #ffffff; display: flex; align-items: center; justify-content: center;" onclick="openLightbox(currentImageIndex)">
@@ -746,6 +885,8 @@ function renderPDP(sku) {
                         <button onclick="navigator.clipboard.writeText(location.href); alert('Product link copied to clipboard!');" class="share-btn share-copy">🔗 Copy Link</button>
                     </div>
                 </div>
+
+                ${reviewsHtml}
             </div>
         </div>
     `;
