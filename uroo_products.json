@@ -92,19 +92,6 @@
     },
     {
         "category": "Crystal Bracelets",
-        "sku": "BracAmethyst",
-        "title": "Amethyst Bracelet",
-        "description": "Natural tranquilizer that relieves stress and balances mood.",
-        "stock": "In Stock",
-        "mrp": 999,
-        "price": 299,
-        "images": [],
-        "amazon": "",
-        "meesho": "",
-        "discount": "10%"
-    },
-    {
-        "category": "Crystal Bracelets",
         "sku": "BracCitrine",
         "title": "Citrine Bracelet",
         "description": "Merchant's stone that carries power of sun and success.",
