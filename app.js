@@ -633,7 +633,7 @@ const CATEGORY_IMAGES = {
     "Rashi/Zodiac Bracelet": "images/cat_rashi_bracelets.webp",
     "Mala & Pendant": "images/cat_mala_machhmani.webp",
     "Anklets": "images/cat_anklet.webp",
-    "Vastu & Prosperity": DEFAULT_IMAGE,
+    "Vastu & Prosperity": "images/cat_vastu.webp",
     "Jewellery": DEFAULT_IMAGE
 };
 
