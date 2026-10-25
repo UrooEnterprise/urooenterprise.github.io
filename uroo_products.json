@@ -223,7 +223,7 @@
         "stock": "In Stock",
         "mrp": 999,
         "price": 299,
-        "images": [],
+        "images": ["https://images.meesho.com/images/products/1102331036/vnfjm_512.avif?width=512", "https://images.meesho.com/images/products/1102331036/kpnej_512.avif?width=512", "https://images.meesho.com/images/products/1102331036/zb1kf_512.avif?width=512", "https://images-r.meesho.com/images/products/1102331036/qtemq_512.avif?width=512"],
         "amazon": "https://www.amazon.in/",
         "meesho": "https://www.meesho.com/",
         "discount": "10%"
