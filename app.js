@@ -1,14 +1,42 @@
-const DEFAULT_IMAGE = "/Images/capricorn01.webp";
+"use strict";
+
+/* =========================================================
+   Uroo Enterprise storefront
+   ========================================================= */
+
 const WHATSAPP_NUMBER = "919016406623";
 const BUSINESS_UPI_ID = "9016406623@ptaxis";
+const MAX_QTY = 99;
+const MAX_PAY_AMOUNT = 100000;
+
+// Inline placeholder: no file needed, works on any host (fixes the broken /Images/capricorn01.webp path)
+const DEFAULT_IMAGE = "data:image/svg+xml;utf8," + encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>" +
+    "<rect width='200' height='200' fill='#f1f5f9'/>" +
+    "<g fill='none' stroke='#94a3b8' stroke-width='6' stroke-linejoin='round'>" +
+    "<path d='M100 45l38 32-38 72-38-72z'/><path d='M62 77h76'/></g>" +
+    "<text x='100' y='178' font-family='sans-serif' font-size='14' text-anchor='middle' fill='#94a3b8'>Image coming soon</text>" +
+    "</svg>"
+);
+
+const CATEGORY_IMAGES = {
+    "Crystal Bracelets": "images/cat_crystal_bracelets.webp",
+    "Rashi/Zodiac Bracelet": "images/cat_rashi_bracelets.webp",
+    "Mala & Pendant": "images/cat_mala_machhmani.webp",
+    "Anklets": "images/cat_anklet.webp",
+    "Vastu & Prosperity": "images/cat_vastu.webp",
+    "Jewellery": "images/cat_jewellery.webp"
+};
 
 let PRODUCTS = [];
-let CART = []; 
-let currentCheckoutProduct = null;
+let CART = [];
+let checkoutContext = null;   // { items: [{sku,title,price,quantity}], fromCart: bool }
 let currentImageIndex = 0;
 let currentProductImages = [];
+let searchTimer = null;
+let toastTimer = null;
 
-// Verified Meesho Customer Reviews Database (Excluding 3-star reviews) with approximate calendar dates
+// Meesho customer reviews (3-star reviews excluded). Shown only on products whose title/category matches a review's tags.
 const PRODUCT_REVIEWS_DB = [
     { 
         name: "Prashant", 
@@ -180,108 +208,173 @@ const PRODUCT_REVIEWS_DB = [
     }
 ];
 
+/* ---------------------------------------------------------
+   Small helpers
+   --------------------------------------------------------- */
+const $ = (id) => document.getElementById(id);
+
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function safePrice(val) {
+    const n = (typeof val === 'string' && val.trim() !== '') ? Number(val) : val;
+    return (typeof n === 'number' && isFinite(n) && n > 0) ? n : null;
+}
+
+function formatINR(n) {
+    return '₹' + Number(n).toLocaleString('en-IN');
+}
+
+function isInStock(p) {
+    return !p.stock || /^in\s*stock$/i.test(String(p.stock).trim());
+}
+
+// A product can be ordered only with a real price and in stock (removes the silent "|| 299" fallback)
+function canOrder(p) {
+    return safePrice(p.price) !== null && isInStock(p);
+}
+
+function productImages(p) {
+    return (Array.isArray(p.images) && p.images.length) ? p.images : [DEFAULT_IMAGE];
+}
+
+// Marketplace links must be real product URLs, not just a homepage
+function isRealLink(u) {
+    if (!u || typeof u !== 'string') return false;
+    try {
+        const x = new URL(u.trim());
+        return /^https?:$/.test(x.protocol) && (x.pathname.length > 1 || x.search.length > 1);
+    } catch (e) { return false; }
+}
+
+function imgFallback(img) {
+    img.onerror = null;
+    img.src = DEFAULT_IMAGE;
+}
+
+function discountPercent(price, mrp) {
+    return (mrp && price && mrp > price) ? Math.round(((mrp - price) / mrp) * 100) : 0;
+}
+
+function showToast(msg) {
+    let toast = $('appToastNotification');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'appToastNotification';
+        toast.className = 'app-toast';
+        toast.setAttribute('role', 'status');
+        document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+/* ---------------------------------------------------------
+   Data loading
+   --------------------------------------------------------- */
 async function loadProducts() {
+    let loaded = true;
     try {
         const response = await fetch('uroo_products.json');
-        PRODUCTS = await response.json();
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const data = await response.json();
+        PRODUCTS = Array.isArray(data) ? data.filter(p => p && p.sku && p.title) : [];
+        PRODUCTS.forEach(p => { p.category = p.category || 'Other'; });
     } catch (e) {
-        console.error("Failed to load uroo_products.json, using fallback data.");
+        console.error('Failed to load uroo_products.json', e);
         PRODUCTS = [];
+        loaded = false;
     }
     loadCartFromStorage();
-    initHome();
+    initHome(loaded);
     handleInitialRoute();
 }
 
 function loadCartFromStorage() {
+    CART = [];
     try {
-        const saved = localStorage.getItem('uroo_cart');
-        if (saved) CART = JSON.parse(saved);
-    } catch(e) { CART = []; }
+        const saved = JSON.parse(localStorage.getItem('uroo_cart') || '[]');
+        if (Array.isArray(saved) && PRODUCTS.length) {
+            // Re-validate against the live catalogue so stale prices / removed items never reach checkout
+            CART = saved.map(item => {
+                const p = PRODUCTS.find(x => x.sku === item.sku);
+                if (!p || !canOrder(p)) return null;
+                const qty = Math.max(1, Math.min(MAX_QTY, parseInt(item.quantity, 10) || 1));
+                return { sku: p.sku, title: p.title, price: safePrice(p.price), quantity: qty, image: productImages(p)[0] };
+            }).filter(Boolean);
+        }
+    } catch (e) { CART = []; }
     updateCartUI();
 }
 
 function saveCartToStorage() {
-    try {
-        localStorage.setItem('uroo_cart', JSON.stringify(CART));
-    } catch(e) {}
+    try { localStorage.setItem('uroo_cart', JSON.stringify(CART)); } catch (e) {}
     updateCartUI();
 }
 
 function generateUniqueOrderId() {
     const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const pad = (n) => String(n).padStart(2, '0');
     const randomNum = Math.floor(1000 + Math.random() * 9000);
-    const orderId = `UROO-${year}${month}${day}-${hours}${minutes}-${randomNum}`;
-    
-    try {
-        let existingOrders = JSON.parse(localStorage.getItem('uroo_orders_history') || '[]');
-        if (existingOrders.includes(orderId)) {
-            return generateUniqueOrderId();
-        }
-        existingOrders.push(orderId);
-        if (existingOrders.length > 100) existingOrders.shift();
-        localStorage.setItem('uroo_orders_history', JSON.stringify(existingOrders));
-    } catch(e) {}
+    const orderId = `UROO-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}-${randomNum}`;
 
+    try {
+        const existing = JSON.parse(localStorage.getItem('uroo_orders_history') || '[]');
+        if (existing.includes(orderId)) return generateUniqueOrderId();
+        existing.push(orderId);
+        if (existing.length > 100) existing.shift();
+        localStorage.setItem('uroo_orders_history', JSON.stringify(existing));
+    } catch (e) {}
     return orderId;
 }
 
+/* ---------------------------------------------------------
+   Cart
+   --------------------------------------------------------- */
 function addToCart(sku) {
     const product = PRODUCTS.find(p => p.sku === sku);
     if (!product) return;
-    const price = product.price || 299;
-    const mainImg = (product.images && product.images.length) ? product.images[0] : DEFAULT_IMAGE;
-
+    if (!canOrder(product)) {
+        showToast('Sorry, this item is currently unavailable');
+        return;
+    }
+    const mainImg = productImages(product)[0];
     const existing = CART.find(item => item.sku === sku);
     if (existing) {
-        existing.quantity += 1;
+        existing.quantity = Math.min(MAX_QTY, existing.quantity + 1);
     } else {
-        CART.push({
-            sku: product.sku,
-            title: product.title,
-            price: price,
-            quantity: 1,
-            image: mainImg
-        });
+        CART.push({ sku: product.sku, title: product.title, price: safePrice(product.price), quantity: 1, image: mainImg });
     }
+
+    triggerFlyToCartAnimation(mainImg);   // run before the PDP re-renders
     saveCartToStorage();
-    triggerFlyToCartAnimation(mainImg);
     showToast(`✓ Added "${product.title}" to Cart!`);
 
-    const currentView = document.getElementById('pdpView');
-    if (currentView && currentView.classList.contains('active')) {
-        renderPDP(sku);
-    }
+    const pdp = $('pdpView');
+    if (pdp && pdp.classList.contains('active')) renderPDP(sku, { keepImage: true });
 }
 
 function triggerFlyToCartAnimation(imgSrc) {
-    const imgEl = document.getElementById('mainPdpImg');
-    const cartIcon = document.querySelector('.app-topbar [title="Shopping Cart"]') || document.querySelector('.app-topbar');
-    if (!imgEl || !cartIcon) return;
+    const imgEl = $('mainPdpImg');
+    const cartIcon = document.querySelector('.app-topbar [data-role="cart-btn"]');
+    if (!imgEl || !cartIcon || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const startRect = imgEl.getBoundingClientRect();
     const targetRect = cartIcon.getBoundingClientRect();
 
     const flyer = document.createElement('img');
     flyer.src = imgSrc;
-    flyer.style.cssText = `
-        position: fixed;
-        top: ${startRect.top}px;
-        left: ${startRect.left}px;
-        width: ${startRect.width}px;
-        height: ${startRect.height}px;
-        object-fit: contain;
-        border-radius: 8px;
-        z-index: 999999;
-        pointer-events: none;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-    `;
+    flyer.alt = '';
+    flyer.style.cssText = `position:fixed;top:${startRect.top}px;left:${startRect.left}px;width:${startRect.width}px;height:${startRect.height}px;object-fit:contain;border-radius:8px;z-index:999999;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,0.3);transition:all .8s cubic-bezier(.2,.8,.2,1);`;
     document.body.appendChild(flyer);
     flyer.getBoundingClientRect();
 
@@ -296,7 +389,7 @@ function triggerFlyToCartAnimation(imgSrc) {
 
     setTimeout(() => {
         flyer.remove();
-        const badge = document.getElementById('cartBadgeCount');
+        const badge = $('cartBadgeCount');
         if (badge) {
             badge.classList.add('cart-badge-bounce');
             setTimeout(() => badge.classList.remove('cart-badge-bounce'), 400);
@@ -307,119 +400,102 @@ function triggerFlyToCartAnimation(imgSrc) {
 function updateQuantity(sku, delta) {
     const item = CART.find(i => i.sku === sku);
     if (!item) return;
-    item.quantity += delta;
-    if (item.quantity <= 0) {
-        CART = CART.filter(i => i.sku !== sku);
-    }
+    item.quantity = Math.min(MAX_QTY, item.quantity + delta);
+    if (item.quantity <= 0) CART = CART.filter(i => i.sku !== sku);
     saveCartToStorage();
     renderCartModalItems();
+    const pdp = $('pdpView');
+    if (pdp && pdp.classList.contains('active') && history.state && history.state.sku) {
+        renderPDP(history.state.sku, { keepImage: true });
+    }
+}
+
+function cartTotals() {
+    return {
+        items: CART.reduce((s, i) => s + i.quantity, 0),
+        subtotal: CART.reduce((s, i) => s + i.price * i.quantity, 0)
+    };
 }
 
 function updateCartUI() {
-    const totalItems = CART.reduce((sum, i) => sum + i.quantity, 0);
-    const subtotal = CART.reduce((sum, i) => sum + (i.price * i.quantity), 0);
-    
-    const badge = document.getElementById('cartBadgeCount');
+    const { items: totalItems, subtotal } = cartTotals();
+
+    const badge = $('cartBadgeCount');
     if (badge) {
-        if (totalItems > 0) {
-            badge.textContent = totalItems;
-            badge.style.display = 'flex';
-        } else {
-            badge.style.display = 'none';
-        }
+        badge.textContent = totalItems;
+        badge.style.display = totalItems > 0 ? 'flex' : 'none';
     }
 
-    let floatBar = document.getElementById('frozenCartBar');
-    if (!floatBar) {
-        floatBar = document.createElement('div');
-        floatBar.id = 'frozenCartBar';
-        document.body.appendChild(floatBar);
+    let bar = $('frozenCartBar');
+    if (!bar) {
+        bar = document.createElement('div');
+        bar.id = 'frozenCartBar';
+        bar.className = 'cart-float-bar';
+        document.body.appendChild(bar);
     }
 
     if (totalItems > 0) {
-        floatBar.style.cssText = 'position: fixed; bottom: 60px; left: 0; right: 0; background: #1e1b4b; color: #fff; padding: 12px 16px; z-index: 999; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 -4px 16px rgba(0,0,0,0.15); animation: slideUpBar 0.2s ease-out;';
-        floatBar.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 20px;">🛒</span>
+        bar.style.display = 'flex';
+        bar.innerHTML = `
+            <div class="cart-float-info">
+                <span class="cart-float-icon">🛒</span>
                 <div>
-                    <div style="font-size: 11px; color: #cbd5e1; font-weight: 500;">${totalItems} Items in Cart</div>
-                    <div style="font-size: 14px; font-weight: 700; color: #fff;">₹${subtotal}</div>
+                    <div class="cart-float-count">${totalItems} ${totalItems === 1 ? 'Item' : 'Items'} in Cart</div>
+                    <div class="cart-float-total">${formatINR(subtotal)}</div>
                 </div>
             </div>
-            <div style="display: flex; gap: 8px;">
-                <button onclick="openCartModal()" style="background: var(--app-accent); color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;">Go to Cart ➔</button>
-            </div>
+            <button type="button" class="cart-float-btn" onclick="openCartModal()">Go to Cart ➔</button>
         `;
-        document.body.style.paddingBottom = '120px';
+        document.body.classList.add('has-cart-bar');
     } else {
-        floatBar.style.display = 'none';
-        document.body.style.paddingBottom = '70px';
+        bar.style.display = 'none';
+        document.body.classList.remove('has-cart-bar');
     }
-}
-
-function showToast(msg) {
-    let toast = document.getElementById('appToastNotification');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'appToastNotification';
-        toast.style.cssText = 'position: fixed; bottom: 75px; left: 50%; transform: translateX(-50%); background: #1e1b4b; color: #fff; padding: 10px 20px; border-radius: 25px; font-size: 12px; font-weight: 600; z-index: 99999; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.3s ease;';
-        document.body.appendChild(toast);
-    }
-    toast.textContent = msg;
-    toast.style.opacity = '1';
-    setTimeout(() => { toast.style.opacity = '0'; }, 2500);
 }
 
 function openCartModal() {
     renderCartModalItems();
-    document.getElementById('cartModal').classList.add('active');
+    $('cartModal').classList.add('active');
 }
 
 function closeCartModal() {
-    document.getElementById('cartModal').classList.remove('active');
+    $('cartModal').classList.remove('active');
 }
 
 function renderCartModalItems() {
-    const container = document.getElementById('cartModalItemsList');
-    const footer = document.getElementById('cartModalFooter');
+    const container = $('cartModalItemsList');
+    const footer = $('cartModalFooter');
     if (!container) return;
 
     if (CART.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
-                <div style="font-size: 40px; margin-bottom: 10px;">🛒</div>
-                <div style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">Your Cart is Empty</div>
-                <div style="font-size: 12px;">Explore our crystal bracelets & spiritual collection to add items.</div>
-            </div>
-        `;
+            <div class="empty-state">
+                <div style="font-size:40px;margin-bottom:10px;">🛒</div>
+                <div style="font-size:15px;font-weight:600;margin-bottom:4px;">Your Cart is Empty</div>
+                <div style="font-size:12px;">Explore our crystal bracelets &amp; spiritual collection to add items.</div>
+            </div>`;
         if (footer) footer.style.display = 'none';
-        updateCartUI();
         return;
     }
 
     if (footer) footer.style.display = 'block';
 
-    let subtotal = 0;
-    container.innerHTML = CART.map(item => {
-        subtotal += (item.price * item.quantity);
-        return `
-            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
-                <img src="${item.image}" alt="${escapeHtml(item.title)}" style="width: 50px; height: 50px; object-fit: contain; background: #f8fafc; border-radius: 6px; border: 1px solid var(--border-color);">
-                <div style="flex: 1; min-width: 0;">
-                    <div style="font-size: 12px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(item.title)}</div>
-                    <div style="font-size: 13px; font-weight: 700; color: var(--app-primary); margin-top: 2px;">₹${item.price}</div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <button onclick="updateQuantity('${item.sku}', -1)" style="width: 26px; height: 26px; background: #f1f5f9; border: 1px solid var(--border-color); border-radius: 4px; font-weight: 700; cursor: pointer;">-</button>
-                    <span style="font-size: 13px; font-weight: 600; min-width: 16px; text-align: center;">${item.quantity}</span>
-                    <button onclick="updateQuantity('${item.sku}', 1)" style="width: 26px; height: 26px; background: #f1f5f9; border: 1px solid var(--border-color); border-radius: 4px; font-weight: 700; cursor: pointer;">+</button>
-                </div>
+    container.innerHTML = CART.map(item => `
+        <div class="cart-item">
+            <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="cart-item-img" onerror="imgFallback(this)">
+            <div class="cart-item-info">
+                <div class="cart-item-title">${escapeHtml(item.title)}</div>
+                <div class="cart-item-price">${formatINR(item.price)}</div>
             </div>
-        `;
-    }).join('');
+            <div class="cart-item-qty">
+                <button type="button" class="qty-btn" data-action="qty-dec" data-sku="${escapeHtml(item.sku)}" aria-label="Decrease quantity">−</button>
+                <span class="qty-num">${item.quantity}</span>
+                <button type="button" class="qty-btn" data-action="qty-inc" data-sku="${escapeHtml(item.sku)}" aria-label="Increase quantity">+</button>
+            </div>
+        </div>`).join('');
 
-    const subtotalEl = document.getElementById('cartSubtotalAmount');
-    if (subtotalEl) subtotalEl.textContent = `₹${subtotal}`;
+    const el = $('cartSubtotalAmount');
+    if (el) el.textContent = formatINR(cartTotals().subtotal);
 }
 
 function proceedToCartCheckout() {
@@ -428,156 +504,116 @@ function proceedToCartCheckout() {
     openCartCheckoutModal();
 }
 
-function openCartCheckoutModal() {
-    const modalBody = document.getElementById('checkoutModalBody');
-    let subtotal = CART.reduce((sum, i) => sum + (i.price * i.quantity), 0);
-
-    modalBody.innerHTML = `
-        <div style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">
-            <strong>Cart Summary:</strong> ${CART.reduce((s, i) => s + i.quantity, 0)} items<br>
-            <strong>Total Amount:</strong> <span style="color:var(--app-primary); font-weight:700; font-size:15px;">₹${subtotal}</span>
-        </div>
-        <form id="cartCheckoutForm" onsubmit="submitCartCheckout(event)">
-            <div class="form-group">
-                <label class="form-label">Full Name *</label>
-                <input type="text" id="cartCustName" class="form-input" required placeholder="Enter your full name">
-            </div>
-            <div class="form-group">
-                <label class="form-label">WhatsApp Number *</label>
-                <input type="tel" id="cartCustPhone" class="form-input" required placeholder="10-digit mobile number">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Delivery Address *</label>
-                <textarea id="cartCustAddress" class="form-input" rows="2" required placeholder="House No, Street, Landmark, City"></textarea>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Pincode *</label>
-                <input type="text" id="cartCustPincode" class="form-input" required placeholder="6-digit pincode">
-            </div>
-
-            <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:12px; margin:14px 0; font-size:12px; color:var(--text-muted); line-height:1.4;">
-                ✨ <strong>Easy Process / आसान प्रक्रिया / எளிதான முறை:</strong><br>
-                1️⃣ Click below to send combined order on WhatsApp.<br>
-                2️⃣ Tap the secure payment link received in WhatsApp.<br>
-                3️⃣ Pay ₹${subtotal} instantly via GPay/PhonePe/Paytm!
-            </div>
-
-            <button type="submit" class="app-btn whatsapp-order" style="margin-top:10px;">
-                💬 Send Cart Order & Pay via WhatsApp
-            </button>
-        </form>
-    `;
-
-    document.getElementById('checkoutModal').classList.add('active');
-}
-
-function submitCartCheckout(e) {
-    e.preventDefault();
-    if (CART.length === 0) return;
-
-    const orderId = generateUniqueOrderId();
-    const name = document.getElementById('cartCustName').value.trim();
-    const phone = document.getElementById('cartCustPhone').value.trim();
-    const address = document.getElementById('cartCustAddress').value.trim();
-    const pincode = document.getElementById('cartCustPincode').value.trim();
-    const subtotal = CART.reduce((sum, i) => sum + (i.price * i.quantity), 0);
-
-    const personalizedPayLink = `${window.location.origin}${window.location.pathname}?view=pay&orderId=${orderId}&price=${subtotal}&name=${encodeURIComponent(name)}`;
-
-    let itemsText = CART.map((i, idx) => `${idx + 1}. *${i.title}* (SKU: ${i.sku}) x ${i.quantity} = ₹${i.price * i.quantity}`).join('\n');
-
-    const message = encodeURIComponent(
-        `*MULTIPLE ITEMS ORDER - Uroo Enterprise*\n` +
-        `*Order ID:* ${orderId}\n\n` +
-        `*Items Ordered:*\n${itemsText}\n\n` +
-        `*Total Amount:* ₹${subtotal}\n\n` +
-        `*Customer Details:*\n` +
-        `• Name: ${name}\n` +
-        `• Phone: ${phone}\n` +
-        `• Address: ${address} - ${pincode}\n\n` +
-        `✨ *Easy Process / आसान प्रक्रिया / எளிதான முறை:*\n` +
-        `1️⃣ Click below to send order on WhatsApp / व्हाट्सएप पर आर्डर भेजें\n` +
-        `2️⃣ Tap the secure payment link received in WhatsApp / भुगतान लिंक पर टैप करें\n` +
-        `3️⃣ Pay ₹${subtotal} instantly via GPay/PhonePe/Paytm / भुगतान करें\n\n` +
-        `👆 *Click above to pay securely / सुरक्षित भुगतान के लिए ऊपर क्लिक करें / பாதுகாப்பாக பணம் செலுத்த மேலே கிளிக் செய்யவும்:*\n` +
-        `${personalizedPayLink}`
-    );
-
-    closeCheckoutModal();
-    CART = [];
-    saveCartToStorage();
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank', 'noopener,noreferrer');
-}
-
+/* ---------------------------------------------------------
+   Checkout (single product + cart share one form / one sender)
+   --------------------------------------------------------- */
 function openCheckoutModal(sku) {
-    currentCheckoutProduct = PRODUCTS.find(p => p.sku === sku);
-    if (!currentCheckoutProduct) return;
+    const p = PRODUCTS.find(x => x.sku === sku);
+    if (!p) return;
+    if (!canOrder(p)) {
+        showToast('Sorry, this item is currently unavailable');
+        return;
+    }
+    checkoutContext = { items: [{ sku: p.sku, title: p.title, price: safePrice(p.price), quantity: 1 }], fromCart: false };
+    renderCheckoutForm();
+}
 
-    const modalBody = document.getElementById('checkoutModalBody');
-    const price = currentCheckoutProduct.price || 299;
+function openCartCheckoutModal() {
+    if (!CART.length) return;
+    checkoutContext = { items: CART.map(i => ({ sku: i.sku, title: i.title, price: i.price, quantity: i.quantity })), fromCart: true };
+    renderCheckoutForm();
+}
 
-    modalBody.innerHTML = `
-        <div style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">
-            <strong>Item:</strong> ${escapeHtml(currentCheckoutProduct.title)}<br>
-            <strong>Total Price:</strong> <span style="color:var(--app-primary); font-weight:700; font-size:15px;">₹${price}</span>
-        </div>
-        <form id="checkoutForm" onsubmit="submitCheckout(event)">
-            <div class="form-group">
-                <label class="form-label">Full Name *</label>
-                <input type="text" id="custName" class="form-input" required placeholder="Enter your full name">
-            </div>
-            <div class="form-group">
-                <label class="form-label">WhatsApp Number *</label>
-                <input type="tel" id="custPhone" class="form-input" required placeholder="10-digit mobile number">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Delivery Address *</label>
-                <textarea id="custAddress" class="form-input" rows="2" required placeholder="House No, Street, Landmark, City"></textarea>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Pincode *</label>
-                <input type="text" id="custPincode" class="form-input" required placeholder="6-digit pincode">
-            </div>
+function renderCheckoutForm() {
+    const ctx = checkoutContext;
+    if (!ctx) return;
+    const total = ctx.items.reduce((s, i) => s + i.price * i.quantity, 0);
+    const count = ctx.items.reduce((s, i) => s + i.quantity, 0);
 
-            <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:12px; margin:14px 0; font-size:12px; color:var(--text-muted); line-height:1.4;">
+    const summary = ctx.items.length === 1 && ctx.items[0].quantity === 1
+        ? `<strong>Item:</strong> ${escapeHtml(ctx.items[0].title)}<br><strong>Total Price:</strong> `
+        : `<strong>Cart Summary:</strong> ${count} items<br><strong>Total Amount:</strong> `;
+
+    $('checkoutModalTitle').textContent = 'Enter Delivery Details';
+    $('checkoutModalBody').innerHTML = `
+        <div class="checkout-summary">${summary}<span class="checkout-total">${formatINR(total)}</span></div>
+        <form id="checkoutForm" onsubmit="submitCheckout(event)" autocomplete="on">
+            <div class="form-group">
+                <label class="form-label" for="custName">Full Name *</label>
+                <input type="text" id="custName" class="form-input" required minlength="2" maxlength="60" autocomplete="name" placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="custPhone">WhatsApp Number *</label>
+                <input type="tel" id="custPhone" class="form-input" required inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}" title="Enter a valid 10-digit mobile number" autocomplete="tel-national" placeholder="10-digit mobile number">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="custAddress">Delivery Address *</label>
+                <textarea id="custAddress" class="form-input" rows="2" required minlength="8" maxlength="250" autocomplete="street-address" placeholder="House No, Street, Landmark, City"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="custPincode">Pincode *</label>
+                <input type="text" id="custPincode" class="form-input" required inputmode="numeric" maxlength="6" pattern="[1-9][0-9]{5}" title="Enter a valid 6-digit pincode" autocomplete="postal-code" placeholder="6-digit pincode">
+            </div>
+            <div class="process-box">
                 ✨ <strong>Easy Process / आसान प्रक्रिया / எளிதான முறை:</strong><br>
                 1️⃣ Click below to send order on WhatsApp.<br>
                 2️⃣ Tap the secure payment link received in WhatsApp.<br>
-                3️⃣ Pay ₹${price} instantly via GPay/PhonePe/Paytm!
+                3️⃣ Pay ${formatINR(total)} instantly via GPay/PhonePe/Paytm!
             </div>
-
             <button type="submit" class="app-btn whatsapp-order" style="margin-top:10px;">
-                💬 Send Order & Pay via WhatsApp
+                💬 ${ctx.fromCart ? 'Send Cart Order' : 'Send Order'} &amp; Pay via WhatsApp
             </button>
-        </form>
-    `;
-
-    document.getElementById('checkoutModal').classList.add('active');
+        </form>`;
+    $('checkoutModal').classList.add('active');
 }
 
 function closeCheckoutModal() {
-    document.getElementById('checkoutModal').classList.remove('active');
+    $('checkoutModal').classList.remove('active');
+}
+
+function openWhatsApp(text) {
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+    const w = window.open(url, '_blank');
+    if (w) {
+        try { w.opener = null; } catch (e) {}
+    } else {
+        location.href = url;   // popup blocked: fall back to same-tab navigation
+    }
 }
 
 function submitCheckout(e) {
     e.preventDefault();
-    if (!currentCheckoutProduct) return;
+    const ctx = checkoutContext;
+    if (!ctx || !ctx.items.length) return;
 
+    // Re-check against the live catalogue so the price in the message can't be stale
+    const items = [];
+    for (const it of ctx.items) {
+        const p = PRODUCTS.find(x => x.sku === it.sku);
+        if (!p || !canOrder(p)) {
+            showToast(`"${it.title}" is no longer available`);
+            return;
+        }
+        items.push({ sku: p.sku, title: p.title, price: safePrice(p.price), quantity: it.quantity });
+    }
+
+    const name = $('custName').value.trim();
+    const phone = $('custPhone').value.trim();
+    const address = $('custAddress').value.trim();
+    const pincode = $('custPincode').value.trim();
+    const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
     const orderId = generateUniqueOrderId();
-    const name = document.getElementById('custName').value.trim();
-    const phone = document.getElementById('custPhone').value.trim();
-    const address = document.getElementById('custAddress').value.trim();
-    const pincode = document.getElementById('custPincode').value.trim();
-    const price = currentCheckoutProduct.price || 299;
 
-    const personalizedPayLink = `${window.location.origin}${window.location.pathname}?view=pay&orderId=${orderId}&price=${price}&name=${encodeURIComponent(name)}`;
+    const payLink = `${location.origin}${location.pathname}?view=pay&orderId=${encodeURIComponent(orderId)}&price=${total}&name=${encodeURIComponent(name)}`;
+    const multi = items.length > 1 || items[0].quantity > 1;
 
-    const message = encodeURIComponent(
-        `*NEW ORDER - Uroo Enterprise*\n` +
+    const itemsText = items.map((i, idx) => `${idx + 1}. *${i.title}* (SKU: ${i.sku}) x ${i.quantity} = ${formatINR(i.price * i.quantity)}`).join('\n');
+
+    const message =
+        `*${multi ? 'MULTIPLE ITEMS ORDER' : 'NEW ORDER'} - Uroo Enterprise*\n` +
         `*Order ID:* ${orderId}\n\n` +
-        `*Product:* ${currentCheckoutProduct.title}\n` +
-        `*SKU:* ${currentCheckoutProduct.sku}\n` +
-        `*Total Price:* ₹${price}\n\n` +
+        `*Items Ordered:*\n${itemsText}\n\n` +
+        `*Total Amount:* ${formatINR(total)}\n\n` +
         `*Customer Details:*\n` +
         `• Name: ${name}\n` +
         `• Phone: ${phone}\n` +
@@ -585,88 +621,461 @@ function submitCheckout(e) {
         `✨ *Easy Process / आसान प्रक्रिया / எளிதான முறை:*\n` +
         `1️⃣ Click below to send order on WhatsApp / व्हाट्सएप पर आर्डर भेजें\n` +
         `2️⃣ Tap the secure payment link received in WhatsApp / भुगतान लिंक पर टैप करें\n` +
-        `3️⃣ Pay ₹${price} instantly via GPay/PhonePe/Paytm / भुगतान करें\n\n` +
+        `3️⃣ Pay ${formatINR(total)} instantly via GPay/PhonePe/Paytm / भुगतान करें\n\n` +
         `👆 *Click above to pay securely / सुरक्षित भुगतान के लिए ऊपर क्लिक करें / பாதுகாப்பாக பணம் செலுத்த மேலே கிளிக் செய்யவும்:*\n` +
-        `${personalizedPayLink}`
-    );
+        `${payLink}`;
 
     closeCheckoutModal();
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank', 'noopener,noreferrer');
+    openWhatsApp(message);
+
+    // Clear the cart only after WhatsApp has been opened (not before)
+    if (ctx.fromCart) {
+        CART = [];
+        saveCartToStorage();
+    }
+    checkoutContext = null;
 }
 
+/* ---------------------------------------------------------
+   Payment page
+   --------------------------------------------------------- */
 function renderPayView(params) {
-    const orderId = params.get('orderId') || generateUniqueOrderId();
-    const price = params.get('price') || '299';
-    const name = params.get('name') || 'Customer';
+    const orderId = (params.get('orderId') || '').trim();
+    const amount = safePrice(params.get('price'));
+    const name = (params.get('name') || 'Customer').trim().slice(0, 60) || 'Customer';
 
-    document.getElementById('appTopbarTitle').textContent = 'Secure UPI Payment';
-    document.getElementById('appTopbarSubtitle').textContent = 'Uroo Enterprise';
+    $('appTopbarTitle').textContent = 'Secure UPI Payment';
+    $('appTopbarSubtitle').textContent = 'Uroo Enterprise';
 
-    const detailsBox = document.getElementById('payDetailsBox');
+    const detailsBox = $('payDetailsBox');
+    const qrBox = $('qrcode');
+    const btnBox = $('upiButtonsContainer');
+    qrBox.innerHTML = '';
+    btnBox.innerHTML = '';
+
+    // Validate everything coming from the URL: never trust it, never inject it raw
+    const validId = /^[A-Za-z0-9_-]{6,40}$/.test(orderId);
+    const validAmount = amount !== null && amount <= MAX_PAY_AMOUNT;
+    if (!validId || !validAmount) {
+        detailsBox.innerHTML = `<div class="notice notice-warn">This payment link looks invalid or incomplete. Please message us on WhatsApp and we'll send you a fresh link.</div>`;
+        btnBox.innerHTML = `<a href="https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hi Uroo Enterprise, my payment link is not working.')}" target="_blank" rel="noopener noreferrer" class="app-btn whatsapp-order">💬 Contact us on WhatsApp</a>`;
+        return;
+    }
+
     detailsBox.innerHTML = `
-        <div style="font-size: 13px; color: var(--text-main); line-height: 1.6;">
+        <div style="font-size:13px;color:var(--text-main);line-height:1.6;">
             <strong>Hello ${escapeHtml(name)},</strong><br>
-            <strong>Order ID:</strong> <span style="color: var(--app-accent); font-weight: 700;">${escapeHtml(orderId)}</span><br>
-            <strong>Amount to Pay:</strong> <span style="color: var(--app-primary); font-weight: 700; font-size: 16px;">₹${price}</span>
+            <strong>Order ID:</strong> <span style="color:var(--app-accent);font-weight:700;">${escapeHtml(orderId)}</span><br>
+            <strong>Amount to Pay:</strong> <span style="color:var(--app-primary);font-weight:700;font-size:16px;">${formatINR(amount)}</span>
         </div>
-    `;
+        <div class="pay-note">Please pay exactly the amount shown. It is checked against your WhatsApp order before dispatch.</div>`;
 
-    document.getElementById('qrcode').innerHTML = "";
-    const upiString = `upi://pay?pa=${BUSINESS_UPI_ID}&pn=UrooEnterprise&am=${price}&cu=INR&tn=Order_${orderId}`;
-    new QRCode(document.getElementById("qrcode"), {
-        text: upiString,
-        width: 160,
-        height: 160
-    });
+    const upiString = `upi://pay?pa=${BUSINESS_UPI_ID}&pn=UrooEnterprise&am=${amount.toFixed(2)}&cu=INR&tn=Order_${orderId}`;
 
-    const buttonsContainer = document.getElementById('upiButtonsContainer');
-    buttonsContainer.innerHTML = `
-        <a href="${upiString}" class="app-btn" style="background: #2563eb; color: #fff; font-size: 14px; padding: 12px;">📱 Pay ₹${price} via Google Pay / PhonePe / Paytm</a>
-        <div style="font-size: 11px; color: var(--success-green); font-weight: 700; text-align: center; margin-top: 4px;">✓ Instant Direct UPI Transfer for Order #${escapeHtml(orderId)}</div>
-    `;
+    if (typeof QRCode !== 'undefined') {
+        new QRCode(qrBox, { text: upiString, width: 160, height: 160 });
+    } else {
+        qrBox.innerHTML = '<div style="font-size:12px;color:var(--text-muted);">QR unavailable. Use the button below.</div>';
+    }
+
+    btnBox.innerHTML = `
+        <a href="${escapeHtml(upiString)}" class="app-btn" style="background:#2563eb;color:#fff;font-size:14px;padding:12px;">📱 Pay ${formatINR(amount)} via Google Pay / PhonePe / Paytm</a>
+        <div style="font-size:11px;color:var(--success-green);font-weight:700;text-align:center;margin-top:4px;">✓ Instant Direct UPI Transfer for Order #${escapeHtml(orderId)}</div>`;
 }
 
-function safePrice(val) {
-    return (typeof val === 'number' && !isNaN(val)) ? val : null;
-}
-
-function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-
+/* ---------------------------------------------------------
+   Product cards, home, category, search
+   --------------------------------------------------------- */
 function createProductCard(product) {
     const price = safePrice(product.price);
     const mrp = safePrice(product.mrp);
-    const mainImg = (product.images && product.images.length) ? product.images[0] : DEFAULT_IMAGE;
-    const discount = (mrp && price && mrp > price) ? Math.round(((mrp - price) / mrp) * 100) : 0;
+    const mainImg = productImages(product)[0];
+    const discount = discountPercent(price, mrp);
+    const inStock = isInStock(product);
 
     const card = document.createElement('div');
     card.className = 'app-product-card';
-    card.onclick = () => navigateTo({ view: 'pdpView', sku: product.sku });
+    card.setAttribute('role', 'link');
+    card.tabIndex = 0;
+    card.setAttribute('aria-label', product.title);
+    const open = () => navigateTo({ view: 'pdpView', sku: product.sku });
+    card.addEventListener('click', open);
+    card.addEventListener('keydown', (e) => { if (e.key === 'Enter') open(); });
 
     card.innerHTML = `
         <div class="app-card-img">
-            <img src="${mainImg}" alt="${escapeHtml(product.title)}" loading="lazy">
+            <img src="${escapeHtml(mainImg)}" alt="${escapeHtml(product.title)}" loading="lazy" onerror="imgFallback(this)">
+            ${inStock ? '' : '<span class="oos-badge">Out of Stock</span>'}
         </div>
         <div class="app-card-body">
             <div class="app-card-title">${escapeHtml(product.title)}</div>
             <div class="app-card-price-row">
-                <span class="app-price">${price ? '₹' + price : 'Price on request'}</span>
-                ${mrp ? `<span class="app-mrp">₹${mrp}</span>` : ''}
-                ${discount > 0 ? `<span class="app-disc">${discount}%off</span>` : ''}
+                <span class="app-price">${price ? formatINR(price) : 'Price on request'}</span>
+                ${mrp && discount > 0 ? `<span class="app-mrp">${formatINR(mrp)}</span>` : ''}
+                ${discount > 0 ? `<span class="app-disc">${discount}% off</span>` : ''}
             </div>
-        </div>
-    `;
+        </div>`;
     return card;
 }
 
+function initHome(loaded = true) {
+    const catGrid = $('homeCatGrid');
+    const trendGrid = $('homeTrendingGrid');
+    catGrid.innerHTML = '';
+    trendGrid.innerHTML = '';
+
+    if (!PRODUCTS.length) {
+        const msg = loaded
+            ? 'Our catalogue is being updated. Please check back soon.'
+            : 'We could not load the products. Please check your connection and try again.';
+        catGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">${msg}<br><br><button type="button" class="app-btn" style="background:var(--app-primary);color:#fff;max-width:180px;margin:0 auto;" onclick="location.reload()">Retry</button></div>`;
+        return;
+    }
+
+    const categories = [...new Set(PRODUCTS.map(p => p.category))];
+    categories.forEach(cat => {
+        const count = PRODUCTS.filter(p => p.category === cat).length;
+        const tile = document.createElement('div');
+        tile.className = 'app-cat-tile';
+        tile.setAttribute('role', 'link');
+        tile.tabIndex = 0;
+        tile.setAttribute('aria-label', `${cat}, ${count} items`);
+        tile.innerHTML = `
+            <img src="${escapeHtml(CATEGORY_IMAGES[cat] || DEFAULT_IMAGE)}" alt="" loading="lazy" onerror="imgFallback(this)">
+            <div class="app-cat-overlay"></div>
+            <div class="app-cat-content">
+                <h4>${escapeHtml(cat)}</h4>
+                <span>${count} ${count === 1 ? 'item' : 'items'}</span>
+            </div>`;
+        const open = () => navigateTo({ view: 'categoryView', category: cat });
+        tile.addEventListener('click', open);
+        tile.addEventListener('keydown', (e) => { if (e.key === 'Enter') open(); });
+        catGrid.appendChild(tile);
+    });
+
+    PRODUCTS.slice(0, 6).forEach(p => trendGrid.appendChild(createProductCard(p)));
+}
+
+function renderCategoryProducts(catName) {
+    const grid = $('categoryProductGrid');
+    grid.innerHTML = '';
+    const wanted = String(catName || '').toLowerCase().trim();
+    const filtered = PRODUCTS.filter(p => p.category.toLowerCase().trim() === wanted);
+    if (!filtered.length) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">No products found in this category.</div>';
+        return;
+    }
+    filtered.forEach(p => grid.appendChild(createProductCard(p)));
+}
+
+// Search (this function was missing, so search never worked)
+function handleAppSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(runAppSearch, 150);
+}
+
+function runAppSearch() {
+    const input = $('appSearchInput');
+    const grid = $('searchProductGrid');
+    if (!input || !grid) return;
+
+    const q = input.value.trim().toLowerCase();
+    grid.innerHTML = '';
+
+    if (!q) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">Type a name, stone or category to search.</div>';
+        return;
+    }
+
+    const terms = q.split(/\s+/);
+    const results = PRODUCTS.filter(p => {
+        const hay = [p.title, p.description, p.category, p.sku].join(' ').toLowerCase();
+        return terms.every(t => hay.includes(t));
+    });
+
+    if (!results.length) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">No results for "${escapeHtml(input.value.trim())}".<br>Try another word, or ask us on WhatsApp.</div>`;
+        return;
+    }
+    results.forEach(p => grid.appendChild(createProductCard(p)));
+}
+
+/* ---------------------------------------------------------
+   Product detail page
+   --------------------------------------------------------- */
+function getReviewsFor(product) {
+    // Strict matching only: never fall back to showing every review on every product
+    const hay = `${product.title} ${product.category}`.toLowerCase();
+    return PRODUCT_REVIEWS_DB.filter(r => r.tags.some(tag => hay.includes(tag)));
+}
+
+function renderMarketSection(product) {
+    const hasMeesho = isRealLink(product.meesho);
+    const hasAmazon = isRealLink(product.amazon);
+    if (!hasMeesho && !hasAmazon) return '';
+
+    const link = (url, label, icon, h) => `
+        <a href="${escapeHtml(url.trim())}" target="_blank" rel="noopener noreferrer" class="market-link" title="View on ${label}">
+            <img src="images/${icon}" alt="${label}" style="height:${h}px;object-fit:contain;" onerror="this.replaceWith(document.createTextNode('${label}'))">
+        </a>`;
+
+    return `
+        <div class="market-box">
+            <div class="market-title">🛍️ Buy From:</div>
+            <div class="market-row">
+                ${hasMeesho ? link(product.meesho, 'Meesho', 'meeshoicon.png', 44) : ''}
+                ${hasAmazon ? link(product.amazon, 'Amazon', 'amazonicon.png', 32) : ''}
+            </div>
+            <div class="market-note">💡 Note: Prices and discounts may vary on Amazon or Meesho based on active platform promotions.</div>
+        </div>`;
+}
+
+function renderReviewsSection(product) {
+    const reviews = getReviewsFor(product);
+    if (!reviews.length) return '';
+    const avg = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1);
+
+    return `
+        <div class="reviews-section">
+            <div class="reviews-title">⭐ Customer Reviews (${reviews.length}) · ${avg} avg</div>
+            <div class="reviews-sub">Reviews from buyers of similar items on Meesho.</div>
+            <div class="reviews-list">
+                ${reviews.map(r => `
+                    <div class="review-card">
+                        <div class="review-top">
+                            <div class="review-name">${escapeHtml(r.name)}</div>
+                            <div class="review-rating">
+                                <span class="review-stars">${escapeHtml(r.rating)} ★</span>
+                                <span class="review-badge">${escapeHtml(r.badge)}</span>
+                            </div>
+                        </div>
+                        <div class="review-date">${escapeHtml(r.date)}</div>
+                        <p class="review-text">"${escapeHtml(r.text)}"</p>
+                    </div>`).join('')}
+            </div>
+        </div>`;
+}
+
+function renderPDP(sku, opts = {}) {
+    const product = PRODUCTS.find(p => p.sku === sku);
+    const card = $('pdpCardContent');
+    const recGrid = $('pdpRecommendedGrid');
+
+    if (!product) {
+        card.innerHTML = '<div class="empty-state">Product not found.</div>';
+        recGrid.innerHTML = '';
+        return;
+    }
+
+    document.title = `${product.title} | Uroo Enterprise`;
+    $('appTopbarSubtitle').textContent = product.category || '';
+
+    const price = safePrice(product.price);
+    const mrp = safePrice(product.mrp);
+    const discount = discountPercent(price, mrp);
+    const inStock = isInStock(product);
+
+    currentProductImages = productImages(product);
+    if (!opts.keepImage || currentImageIndex >= currentProductImages.length) currentImageIndex = 0;
+
+    const inquiryMessage = encodeURIComponent(
+        `Hi Uroo Enterprise,\n\nI have a question about this product:\n*${product.title}* (SKU: ${product.sku})\n` +
+        (price ? `Price: ${formatINR(price)}\n` : '') +
+        `\nPlease provide more details.`
+    );
+    const shareText = encodeURIComponent(
+        `Check out ${product.title} on Uroo Enterprise${price ? ` for just ${formatINR(price)}` : ''}! View product: ${location.href}`
+    );
+
+    let actionsHTML;
+    if (!price) {
+        actionsHTML = `<div class="notice">Price on request. Message us on WhatsApp to order this item.</div>`;
+    } else if (!inStock) {
+        actionsHTML = `<div class="notice notice-warn">Currently out of stock. Message us to know when it's back.</div>`;
+    } else {
+        const inCart = CART.find(i => i.sku === product.sku);
+        const qty = inCart ? inCart.quantity : 0;
+        actionsHTML = `
+            <button type="button" data-action="order-now" data-sku="${escapeHtml(product.sku)}" class="app-btn whatsapp-order">
+                💬 Order on WhatsApp &amp; Pay via UPI
+            </button>
+            ${qty > 0
+                ? `<button type="button" data-action="add-to-cart" data-sku="${escapeHtml(product.sku)}" class="app-btn cart-btn-added">✓ Added in Cart (${qty} in cart) - Add More 🛒</button>`
+                : `<button type="button" data-action="add-to-cart" data-sku="${escapeHtml(product.sku)}" class="app-btn cart-btn-add">🛒 Add to Shopping Cart</button>`}`;
+    }
+
+    const multi = currentProductImages.length > 1;
+
+    card.innerHTML = `
+        <div class="pdp-img-container pdp-hero" data-action="open-lightbox">
+            <img id="mainPdpImg" src="${escapeHtml(currentProductImages[currentImageIndex])}" alt="${escapeHtml(product.title)}" onerror="imgFallback(this)">
+            ${multi ? `
+                <button type="button" class="pdp-arrow pdp-arrow-left" data-action="img-prev" aria-label="Previous image">❮</button>
+                <button type="button" class="pdp-arrow pdp-arrow-right" data-action="img-next" aria-label="Next image">❯</button>
+                <div class="pdp-img-counter" id="imgCounter">${currentImageIndex + 1} / ${currentProductImages.length}</div>` : ''}
+            <div class="pdp-fs-hint">🔍 Fullscreen</div>
+            ${inStock ? '' : '<span class="oos-badge oos-badge-lg">Out of Stock</span>'}
+        </div>
+        ${multi ? `
+        <div class="pdp-thumbs">
+            ${currentProductImages.map((imgUrl, index) => `
+                <img src="${escapeHtml(imgUrl)}" alt="Thumbnail ${index + 1}" data-action="thumb" data-index="${index}" id="thumb-${index}" class="pdp-thumb${index === currentImageIndex ? ' active' : ''}" loading="lazy" onerror="imgFallback(this)">`).join('')}
+        </div>` : ''}
+        <div class="pdp-content">
+            <div class="pdp-title">${escapeHtml(product.title)}</div>
+            <div class="pdp-price-box">
+                <span class="pdp-cur-price">${price ? formatINR(price) : 'Price on request'}</span>
+                ${mrp && discount > 0 ? `<span class="pdp-old-price">${formatINR(mrp)}</span>` : ''}
+                ${discount > 0 ? `<span class="pdp-disc">${discount}% OFF</span>` : ''}
+            </div>
+            <div class="pdp-description">${escapeHtml(product.description || '')}</div>
+
+            <div class="pdp-action-stack">
+                ${actionsHTML}
+                ${renderMarketSection(product)}
+                <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${inquiryMessage}" target="_blank" rel="noopener noreferrer" class="app-btn whatsapp-inquiry" style="margin-top:4px;">
+                    ❓ Product Inquiry via WhatsApp
+                </a>
+
+                <div class="share-section">
+                    <div class="share-title">📤 Share this product with friends:</div>
+                    <div class="share-btns-row">
+                        <a href="https://api.whatsapp.com/send?text=${shareText}" target="_blank" rel="noopener noreferrer" class="share-btn share-wa">💬 WhatsApp</a>
+                        <button type="button" data-action="copy-link" class="share-btn share-copy">🔗 Copy Link</button>
+                    </div>
+                </div>
+
+                ${renderReviewsSection(product)}
+            </div>
+        </div>`;
+
+    ensureLightboxDOM();
+
+    recGrid.innerHTML = '';
+    const sameCat = PRODUCTS.filter(p => p.category.toLowerCase().trim() === product.category.toLowerCase().trim() && p.sku !== product.sku);
+    let recs = sameCat;
+    if (recs.length < 4) {
+        recs = [...sameCat, ...PRODUCTS.filter(p => p.sku !== product.sku && !sameCat.includes(p))];
+    }
+    recs.slice(0, 4).forEach(rec => recGrid.appendChild(createProductCard(rec)));
+}
+
+function copyProductLink() {
+    const url = location.href;
+    const done = () => showToast('✓ Product link copied');
+    const fallback = () => {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.cssText = 'position:fixed;opacity:0;';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) { showToast('Could not copy. Please copy the address bar link.'); }
+        ta.remove();
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done).catch(fallback);
+    } else {
+        fallback();
+    }
+}
+
+function setMainImage(index) {
+    if (index < 0 || index >= currentProductImages.length) return;
+    currentImageIndex = index;
+    const main = $('mainPdpImg');
+    if (main) main.src = currentProductImages[index];
+
+    const counter = $('imgCounter');
+    if (counter) counter.textContent = `${index + 1} / ${currentProductImages.length}`;
+
+    currentProductImages.forEach((_, i) => {
+        const thumb = $(`thumb-${i}`);
+        if (thumb) thumb.classList.toggle('active', i === index);
+    });
+}
+
+function changeImage(direction) {
+    const n = currentProductImages.length;
+    if (!n) return;
+    setMainImage((currentImageIndex + direction + n) % n);
+}
+
+/* ---------------------------------------------------------
+   Lightbox (all functions are now properly declared)
+   --------------------------------------------------------- */
+function ensureLightboxDOM() {
+    if ($('imageLightboxModal')) return;
+    const lb = document.createElement('div');
+    lb.id = 'imageLightboxModal';
+    lb.className = 'lightbox';
+    lb.innerHTML = `
+        <button type="button" class="lb-btn lb-close" data-action="lb-close" aria-label="Close">✕</button>
+        <button type="button" class="lb-btn lb-nav lb-prev" data-action="lb-prev" aria-label="Previous image">❮</button>
+        <button type="button" class="lb-btn lb-nav lb-next" data-action="lb-next" aria-label="Next image">❯</button>
+        <img id="lightboxImg" src="" alt="">
+        <div id="lightboxCounter" class="lb-counter">1 / 1</div>`;
+    document.body.appendChild(lb);
+
+    let startX = 0;
+    lb.addEventListener('touchstart', e => { startX = e.changedTouches[0].screenX; }, { passive: true });
+    lb.addEventListener('touchend', e => {
+        const endX = e.changedTouches[0].screenX;
+        if (endX < startX - 50) lightboxChange(1);
+        if (endX > startX + 50) lightboxChange(-1);
+    }, { passive: true });
+    lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
+}
+
+function updateLightboxContent() {
+    const imgEl = $('lightboxImg');
+    const counterEl = $('lightboxCounter');
+    if (imgEl && currentProductImages.length) {
+        imgEl.src = currentProductImages[currentImageIndex];
+        imgEl.onerror = () => imgFallback(imgEl);
+    }
+    if (counterEl) counterEl.textContent = `${currentImageIndex + 1} / ${currentProductImages.length}`;
+}
+
+function openLightbox(index) {
+    ensureLightboxDOM();
+    currentImageIndex = index;
+    updateLightboxContent();
+    $('imageLightboxModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    const lb = $('imageLightboxModal');
+    if (lb) lb.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function lightboxChange(direction) {
+    const n = currentProductImages.length;
+    if (!n) return;
+    currentImageIndex = (currentImageIndex + direction + n) % n;
+    updateLightboxContent();
+    setMainImage(currentImageIndex);
+}
+
+function isLightboxOpen() {
+    const lb = $('imageLightboxModal');
+    return !!lb && lb.style.display === 'flex';
+}
+
+/* ---------------------------------------------------------
+   Navigation / routing
+   --------------------------------------------------------- */
+function setActiveNav(id) {
+    document.querySelectorAll('.app-bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
+    const el = id ? $(id) : null;
+    if (el) el.classList.add('active');
+}
+
 function navigateTo(state, push = true) {
+    state = Object.assign({}, state);
+    const curIdx = (history.state && Number.isInteger(history.state.idx)) ? history.state.idx : 0;
+
     let url = location.pathname;
     if (state.view === 'pdpView' && state.sku) {
         url += `?view=pdp&sku=${encodeURIComponent(state.sku)}`;
@@ -679,365 +1088,127 @@ function navigateTo(state, push = true) {
     } else if (state.view === 'contactView') {
         url += '?view=contact';
     } else if (state.view === 'payView') {
-        url += `?view=pay&orderId=${encodeURIComponent(state.orderId || '')}&price=${state.price || '299'}&name=${encodeURIComponent(state.name || '')}`;
+        url += `?view=pay&orderId=${encodeURIComponent(state.orderId || '')}&price=${encodeURIComponent(state.price || '')}&name=${encodeURIComponent(state.name || '')}`;
     }
 
-    if (push) history.pushState(state, "", url);
+    if (push) {
+        if (url === location.pathname + location.search) {
+            // Same page: don't stack duplicate history entries
+            state.idx = curIdx;
+            history.replaceState(state, '', url);
+        } else {
+            state.idx = curIdx + 1;
+            history.pushState(state, '', url);
+        }
+    }
 
     document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
-    const viewEl = document.getElementById(state.view);
+    const viewEl = $(state.view);
     if (viewEl) viewEl.classList.add('active');
+    document.body.classList.toggle('on-pay', state.view === 'payView');
 
-    document.querySelectorAll('.app-bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
-    if (state.view === 'homeView') document.getElementById('navHome').classList.add('active');
-    if (state.view === 'searchView') document.getElementById('navSearch').classList.add('active');
+    const navMap = { homeView: 'navHome', searchView: 'navSearch', contactView: 'navContact' };
+    setActiveNav(navMap[state.view]);
 
-    const backBtn = document.getElementById('appBackBtn');
-    if (state.view === 'homeView') {
-        backBtn.style.display = 'none';
-        document.getElementById('appTopbarTitle').textContent = 'Uroo Enterprise';
-        document.getElementById('appTopbarSubtitle').textContent = 'Spiritual & Gemstone Store';
+    const backBtn = $('appBackBtn');
+    const title = $('appTopbarTitle');
+    const subtitle = $('appTopbarSubtitle');
+    backBtn.style.display = state.view === 'homeView' ? 'none' : 'flex';
+    document.title = 'Uroo Enterprise - Certified Natural Crystals & Spiritual Store';
+
+    switch (state.view) {
+        case 'homeView':
+            title.textContent = 'Uroo Enterprise';
+            subtitle.textContent = 'Spiritual & Gemstone Store';
+            break;
+        case 'categoryView':
+            title.textContent = state.category;
+            subtitle.textContent = 'Collection';
+            $('categoryViewTitle').textContent = state.category;
+            renderCategoryProducts(state.category);
+            break;
+        case 'pdpView':
+            title.textContent = 'Product Details';
+            renderPDP(state.sku);
+            break;
+        case 'searchView':
+            title.textContent = 'Search Catalog';
+            subtitle.textContent = 'Find items';
+            runAppSearch();
+            setTimeout(() => { const i = $('appSearchInput'); if (i) i.focus(); }, 50);
+            break;
+        case 'aboutView':
+            title.textContent = 'About Us';
+            subtitle.textContent = 'Uroo Enterprise';
+            break;
+        case 'contactView':
+            title.textContent = 'Contact & Socials';
+            subtitle.textContent = 'Uroo Enterprise';
+            break;
+        case 'payView':
+            renderPayView(new URLSearchParams(location.search));
+            break;
+    }
+
+    window.scrollTo(0, 0);
+}
+
+// Back: only use history.back() if the previous page is inside this app, otherwise go Home
+function goBack() {
+    const idx = history.state && history.state.idx;
+    if (idx > 0) {
+        history.back();
     } else {
-        backBtn.style.display = 'block';
+        const home = { view: 'homeView', idx: 0 };
+        history.replaceState(home, '', location.pathname);
+        navigateTo(home, false);
     }
-
-    if (state.view === 'categoryView') {
-        document.getElementById('appTopbarTitle').textContent = state.category;
-        document.getElementById('appTopbarSubtitle').textContent = 'Collection';
-        document.getElementById('categoryViewTitle').textContent = state.category;
-        renderCategoryProducts(state.category);
-    } else if (state.view === 'pdpView') {
-        document.getElementById('appTopbarTitle').textContent = 'Product Details';
-        renderPDP(state.sku);
-    } else if (state.view === 'searchView') {
-        document.getElementById('appTopbarTitle').textContent = 'Search Catalog';
-        document.getElementById('appTopbarSubtitle').textContent = 'Find items';
-    } else if (state.view === 'aboutView') {
-        document.getElementById('appTopbarTitle').textContent = 'About Us';
-        document.getElementById('appTopbarSubtitle').textContent = 'Uroo Enterprise';
-    } else if (state.view === 'contactView') {
-        document.getElementById('appTopbarTitle').textContent = 'Contact & Socials';
-        document.getElementById('appTopbarSubtitle').textContent = 'Uroo Enterprise';
-    } else if (state.view === 'payView') {
-        const params = new URLSearchParams(location.search);
-        renderPayView(params);
-    }
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function scrollToCats() {
-    const el = document.getElementById('homeCatGrid');
+    const el = $('homeCatGrid');
     if (el) el.scrollIntoView({ behavior: 'smooth' });
 }
 
-function initHome() {
-    if (!PRODUCTS.length) return;
-    const categories = [...new Set(PRODUCTS.map(p => p.category))];
-    const catGrid = document.getElementById('homeCatGrid');
-    catGrid.innerHTML = '';
-
-    categories.forEach(cat => {
-        const coverImg = CATEGORY_IMAGES[cat] || DEFAULT_IMAGE;
-
-        const tile = document.createElement('div');
-        tile.className = 'app-cat-tile';
-        tile.innerHTML = `
-            <img src="${coverImg}" alt="${escapeHtml(cat)}" loading="lazy">
-            <div class="app-cat-overlay"></div>
-            <div class="app-cat-content">
-                <h4>${escapeHtml(cat)}</h4>
-            </div>
-        `;
-        tile.onclick = () => navigateTo({ view: 'categoryView', category: cat });
-        catGrid.appendChild(tile);
-    });
-
-    const trendGrid = document.getElementById('homeTrendingGrid');
-    trendGrid.innerHTML = '';
-    PRODUCTS.slice(0, 6).forEach(product => {
-        trendGrid.appendChild(createProductCard(product));
-    });
+function goToCategories() {
+    navigateTo({ view: 'homeView' });
+    setActiveNav('navCategories');
+    requestAnimationFrame(scrollToCats);
 }
-
-const CATEGORY_IMAGES = {
-    "Crystal Bracelets": "images/cat_crystal_bracelets.webp",
-    "Rashi/Zodiac Bracelet": "images/cat_rashi_bracelets.webp",
-    "Mala & Pendant": "images/cat_mala_machhmani.webp",
-    "Anklets": "images/cat_anklet.webp",
-    "Vastu & Prosperity": "images/cat_vastu.webp",
-    "Jewellery": "images/cat_jewellery.webp"
-};
-
-function renderCategoryProducts(catName) {
-    const grid = document.getElementById('categoryProductGrid');
-    grid.innerHTML = '';
-    const filtered = PRODUCTS.filter(p => p.category.toLowerCase().trim() === catName.toLowerCase().trim());
-    filtered.forEach(product => grid.appendChild(createProductCard(product)));
-}
-
-function renderPDP(sku) {
-    const product = PRODUCTS.find(p => p.sku === sku);
-    if (!product) {
-        document.getElementById('pdpCardContent').innerHTML = '<div style="padding:16px">Product not found.</div>';
-        return;
-    }
-
-    document.getElementById('appTopbarSubtitle').textContent = product.category || '';
-
-    const price = safePrice(product.price);
-    const mrp = safePrice(product.mrp);
-    const discount = (mrp && price && mrp > price) ? Math.round(((mrp - price) / mrp) * 100) : 0;
-    currentProductImages = (product.images && product.images.length) ? product.images : [DEFAULT_IMAGE];
-    currentImageIndex = 0;
-
-    const inquiryMessage = encodeURIComponent(`Hi Uroo Enterprise,\n\nI have a question about this product:\n*${product.title}* (SKU: ${product.sku})\nPrice: ₹${price}\n\nPlease provide more details.`);
-    const shareText = encodeURIComponent(`Check out ${product.title} on Uroo Enterprise for just ₹${price}! View product: ${location.href}`);
-
-    const hasMeesho = product.meesho && product.meesho.trim() !== '' && product.meesho !== '#';
-    const hasAmazon = product.amazon && product.amazon.trim() !== '' && product.amazon !== '#';
-
-    let marketSectionHTML = '';
-    if (hasMeesho || hasAmazon) {
-        marketSectionHTML = `
-            <div style="margin-top: 10px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 10px; padding: 12px;">
-                <div style="font-size: 12px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; text-align: center;">🛍️ Buy From:</div>
-                <div class="market-row" style="display: flex; gap: 10px; margin-bottom: 8px; justify-content: center;">
-                    ${hasMeesho ? `
-                        <a href="${product.meesho}" target="_blank" rel="noopener noreferrer" style="flex: 1; max-width: 140px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,0.02);" title="View on Meesho">
-                            <img src="images/meeshoicon.png" alt="Meesho" style="height: 44px; object-fit: contain;">
-                        </a>
-                    ` : ''}
-                    ${hasAmazon ? `
-                        <a href="${product.amazon}" target="_blank" rel="noopener noreferrer" style="flex: 1; max-width: 140px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,0.02);" title="View on Amazon">
-                            <img src="images/amazonicon.png" alt="Amazon" style="height: 32px; object-fit: contain;">
-                        </a>
-                    ` : ''}
-                </div>
-                <div style="font-size: 10px; color: var(--text-muted); text-align: center; line-height: 1.4;">
-                    💡 Note: Prices and discounts may vary on Amazon or Meesho based on active platform promotions.
-                </div>
-            </div>
-        `;
-    }
-
-    // Filter relevant reviews based on product category or title (Excluding 3-star reviews and converting relative dates)
-    const prodTitleLower = product.title.toLowerCase();
-    const prodCatLower = product.category.toLowerCase();
-    const linkedReviews = PRODUCT_REVIEWS_DB.filter(r => 
-        r.tags.some(tag => prodTitleLower.includes(tag) || prodCatLower.includes(tag))
-    );
-    const reviewsToShow = linkedReviews.length > 0 ? linkedReviews : PRODUCT_REVIEWS_DB;
-
-    const reviewsHtml = `
-        <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 16px;">
-            <div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 12px;">⭐ Verified Customer Reviews (${reviewsToShow.length})</div>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                ${reviewsToShow.map(r => `
-                    <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                            <div style="font-size: 12px; font-weight: 700; color: var(--text-main);">${escapeHtml(r.name)}</div>
-                            <div style="display:flex; align-items:center; gap:6px;">
-                                <span style="background: #16a34a; color:#fff; font-size:10px; font-weight:700; padding:1px 6px; border-radius:4px;">${r.rating} ★</span>
-                                <span style="font-size:11px; font-weight:600; color:#16a34a;">${r.badge}</span>
-                            </div>
-                        </div>
-                        <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 6px;">${r.date}</div>
-                        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">"${escapeHtml(r.text)}"</p>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `;
-
-    const pdpCard = document.getElementById('pdpCardContent');
-    pdpCard.innerHTML = `
-        <div class="pdp-img-container" style="position: relative; cursor: pointer; height: 320px; background: #ffffff; display: flex; align-items: center; justify-content: center;" onclick="openLightbox(currentImageIndex)">
-            <img id="mainPdpImg" src="${currentProductImages[0]}" alt="${escapeHtml(product.title)}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-            ${currentProductImages.length > 1 ? `
-                <button onclick="event.stopPropagation(); changeImage(-1)" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;">❮</button>
-                <button onclick="event.stopPropagation(); changeImage(1)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;">❯</button>
-                <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; padding: 3px 8px; font-size: 11px; border-radius: 12px;" id="imgCounter">1 / ${currentProductImages.length}</div>
-            ` : ''}
-            <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; padding: 4px 8px; font-size: 11px; border-radius: 6px;">🔍 Fullscreen</div>
-        </div>
-        ${currentProductImages.length > 1 ? `
-        <div style="display:flex; gap:8px; padding:10px 16px; overflow-x:auto; background:#f8fafc; border-bottom:1px solid var(--border-color);">
-            ${currentProductImages.map((imgUrl, index) => `
-                <img src="${imgUrl}" alt="Thumbnail ${index + 1}" onclick="setMainImage(${index})" id="thumb-${index}" style="width:55px; height:55px; object-fit:cover; border-radius:6px; cursor:pointer; border:2px solid ${index === 0 ? 'var(--app-primary)' : 'var(--border-color)'};" loading="lazy" />
-            `).join('')}
-        </div>` : ''}
-        <div class="pdp-content">
-            <div class="pdp-title">${escapeHtml(product.title)}</div>
-            <div class="pdp-price-box">
-                <span class="pdp-cur-price">${price ? '₹' + price : 'Price on request'}</span>
-                ${mrp ? `<span class="pdp-old-price">₹${mrp}</span>` : ''}
-                ${discount > 0 ? `<span style="font-size:12px; font-weight:700; color:var(--success-green);">${discount}% OFF</span>` : ''}
-            </div>
-            <div class="pdp-description">${escapeHtml(product.description || '')}</div>
-
-            <div class="pdp-action-stack">
-                <button onclick="openCheckoutModal('${product.sku}')" class="app-btn whatsapp-order">
-                    💬 Order on WhatsApp & Pay via UPI
-                </button>
-
-                ${(() => {
-                    const inCart = CART.find(i => i.sku === product.sku);
-                    const qty = inCart ? inCart.quantity : 0;
-                    if (qty > 0) {
-                        return `<button onclick="addToCart('${product.sku}')" class="app-btn" style="background: #ecfdf5; color: #047857; border: 1px solid #10b981; font-weight: 600;">
-                            ✓ Added in Cart (${qty} in cart) - Add More 🛒
-                        </button>`;
-                    } else {
-                        return `<button onclick="addToCart('${product.sku}')" class="app-btn" style="background: #f8fafc; color: var(--app-primary); border: 1px solid var(--border-color); font-weight: 600;">
-                            🛒 Add to Shopping Cart
-                        </button>`;
-                    }
-                })()}
-
-                ${marketSectionHTML}
-
-                <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${inquiryMessage}" target="_blank" rel="noopener noreferrer" class="app-btn whatsapp-inquiry" style="margin-top: 4px;">
-                    ❓ Product Inquiry via WhatsApp
-                </a>
-
-                <!-- Share Product Buttons -->
-                <div class="share-section">
-                    <div class="share-title">📤 Share this product with friends:</div>
-                    <div class="share-btns-row">
-                        <a href="https://api.whatsapp.com/send?text=${shareText}" target="_blank" rel="noopener noreferrer" class="share-btn share-wa">💬 WhatsApp</a>
-                        <button onclick="navigator.clipboard.writeText(location.href); alert('Product link copied to clipboard!');" class="share-btn share-copy">🔗 Copy Link</button>
-                    </div>
-                </div>
-
-                ${reviewsHtml}
-            </div>
-        </div>
-    `;
-
-    ensureLightboxDOM();
-
-    const recGrid = document.getElementById('pdpRecommendedGrid');
-    recGrid.innerHTML = '';
-    
-    let recommendations = PRODUCTS.filter(p => 
-        p.category.toLowerCase().trim() === product.category.toLowerCase().trim() && p.sku !== product.sku
-    );
-
-    if (recommendations.length < 4) {
-        const others = PRODUCTS.filter(p => p.sku !== product.sku && !recommendations.includes(p));
-        recommendations = [...recommendations, ...others];
-    }
-
-    recommendations.slice(0, 4).forEach(rec => {
-        recGrid.appendChild(createProductCard(rec));
-    });
-}
-
-function setMainImage(index) {
-    if (index < 0 || index >= currentProductImages.length) return;
-    currentImageIndex = index;
-    document.getElementById('mainPdpImg').src = currentProductImages[index];
-    
-    const counter = document.getElementById('imgCounter');
-    if (counter) counter.textContent = `${index + 1} / ${currentProductImages.length}`;
-
-    currentProductImages.forEach((_, i) => {
-        const thumb = document.getElementById(`thumb-${i}`);
-        if (thumb) {
-            thumb.style.borderColor = i === index ? 'var(--app-primary)' : 'var(--border-color)';
-        }
-    });
-}
-
-function changeImage(direction) {
-    let newIndex = currentImageIndex + direction;
-    if (newIndex < 0) newIndex = currentProductImages.length - 1;
-    if (newIndex >= currentProductImages.length) newIndex = 0;
-    setMainImage(newIndex);
-}
-
-function ensureLightboxDOM() {
-    let lb = document.getElementById('imageLightboxModal');
-    if (!lb) {
-        lb = document.createElement('div');
-        lb.id = 'imageLightboxModal';
-        lb.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 9999; display: none; align-items: center; justify-content: center;';
-        lb.innerHTML = `
-            <button onclick="closeLightbox()" style="position: absolute; top: 20px; right: 20px; background: #dc2626; color: #fff; border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 24px; font-weight: 700; cursor: pointer; z-index: 10000; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">✕</button>
-            <button onclick="lightboxChange(-1)" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); color: #fff; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center;">❮</button>
-            <button onclick="lightboxChange(1)" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); color: #fff; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center;">❯</button>
-            <img id="lightboxImg" src="" style="max-width: 90%; max-height: 85vh; object-fit: contain; border-radius: 6px;">
-            <div id="lightboxCounter" style="position: absolute; bottom: 25px; color: #fff; font-size: 14px; background: rgba(0,0,0,0.6); padding: 5px 14px; border-radius: 15px;">1 / 1</div>
-        `;
-        document.body.appendChild(lb);
-
-        let touchstartX = 0;
-        let touchendX = 0;
-        lb.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; });
-        lb.addEventListener('touchend', e => {
-            touchendX = e.changedTouches[0].screenX;
-            if (touchendX < touchstartX - 50) lightboxChange(1);
-            if (touchendX > touchstartX + 50) lightboxChange(-1);
-        });
-    }
-}
-
-openLightbox = function(index) {
-    const lb = document.getElementById('imageLightboxModal');
-    if (!lb) return;
-    currentImageIndex = index;
-    updateLightboxContent();
-    lb.style.display = 'flex';
-};
-
-closeLightbox = function() {
-    const lb = document.getElementById('imageLightboxModal');
-    if (lb) lb.style.display = 'none';
-};
-
-lightboxChange = function(direction) {
-    let newIndex = currentImageIndex + direction;
-    if (newIndex < 0) newIndex = currentProductImages.length - 1;
-    if (newIndex >= currentProductImages.length) newIndex = 0;
-    currentImageIndex = newIndex;
-    updateLightboxContent();
-    setMainImage(currentImageIndex);
-};
-
-updateLightboxContent = function() {
-    const imgEl = document.getElementById('lightboxImg');
-    const counterEl = document.getElementById('lightboxCounter');
-    if (imgEl && currentProductImages.length > 0) {
-        imgEl.src = currentProductImages[currentImageIndex];
-    }
-    if (counterEl) {
-        counterEl.textContent = `${currentImageIndex + 1} / ${currentProductImages.length}`;
-    }
-};
 
 function handleInitialRoute() {
     const params = new URLSearchParams(location.search);
     const view = params.get('view');
+    let state;
+
     if (view === 'pay') {
-        navigateTo({ view: 'payView', orderId: params.get('orderId'), price: params.get('price'), name: params.get('name') }, false);
+        state = { view: 'payView', orderId: params.get('orderId'), price: params.get('price'), name: params.get('name') };
     } else if (view === 'pdp' && params.get('sku')) {
-        history.replaceState({ view: 'pdpView', sku: params.get('sku') }, '', location.href);
-        renderPDP(params.get('sku'));
-        navigateTo({ view: 'pdpView', sku: params.get('sku') }, false);
+        state = { view: 'pdpView', sku: params.get('sku') };
     } else if (view === 'category' && params.get('category')) {
-        history.replaceState({ view: 'categoryView', category: params.get('category') }, '', location.href);
-        navigateTo({ view: 'categoryView', category: params.get('category') }, false);
+        state = { view: 'categoryView', category: params.get('category') };
+    } else if (view === 'search') {
+        state = { view: 'searchView' };
     } else if (view === 'about') {
-        navigateTo({ view: 'aboutView' }, false);
+        state = { view: 'aboutView' };
     } else if (view === 'contact') {
-        navigateTo({ view: 'contactView' }, false);
+        state = { view: 'contactView' };
     } else {
-        history.replaceState({ view: 'homeView' }, '', '');
+        state = { view: 'homeView' };
     }
+
+    state.idx = 0;
+    history.replaceState(state, '', location.href);
+    navigateTo(state, false);
 }
 
+/* ---------------------------------------------------------
+   Global event wiring
+   --------------------------------------------------------- */
 window.addEventListener('popstate', (event) => {
+    closeLightbox();
+    closeCartModal();
+    closeCheckoutModal();
     if (event.state) {
         navigateTo(event.state, false);
     } else {
@@ -1045,6 +1216,44 @@ window.addEventListener('popstate', (event) => {
     }
 });
 
-window.addEventListener('DOMContentLoaded', () => {
-    loadProducts();
+// One delegated click handler for data-action buttons (no inline JS with SKUs inside attributes)
+document.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    const sku = el.dataset.sku;
+    switch (el.dataset.action) {
+        case 'add-to-cart':    addToCart(sku); break;
+        case 'order-now':      openCheckoutModal(sku); break;
+        case 'qty-inc':        updateQuantity(sku, 1); break;
+        case 'qty-dec':        updateQuantity(sku, -1); break;
+        case 'copy-link':      copyProductLink(); break;
+        case 'thumb':          setMainImage(Number(el.dataset.index)); break;
+        case 'img-prev':       e.stopPropagation(); changeImage(-1); break;
+        case 'img-next':       e.stopPropagation(); changeImage(1); break;
+        case 'open-lightbox':  openLightbox(currentImageIndex); break;
+        case 'lb-close':       closeLightbox(); break;
+        case 'lb-prev':        lightboxChange(-1); break;
+        case 'lb-next':        lightboxChange(1); break;
+    }
 });
+
+// Tap the dark backdrop to close sheets
+['cartModal', 'checkoutModal'].forEach(id => {
+    document.addEventListener('DOMContentLoaded', () => {
+        const overlay = $(id);
+        if (overlay) overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('active'); });
+    });
+});
+
+// Keyboard: Esc closes things, arrows move through the lightbox
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        if (isLightboxOpen()) closeLightbox();
+        else { closeCartModal(); closeCheckoutModal(); }
+    } else if (isLightboxOpen()) {
+        if (e.key === 'ArrowLeft') lightboxChange(-1);
+        if (e.key === 'ArrowRight') lightboxChange(1);
+    }
+});
+
+window.addEventListener('DOMContentLoaded', loadProducts);
