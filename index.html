@@ -2,9 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Uroo Enterprise - Certified Natural Crystals & Spiritual Store</title>
+    <meta name="theme-color" content="#1e1b4b">
     <meta name="description" content="Uroo Enterprise - Certified Natural Crystals, Rashi Zodiac Bracelets, Vastu Decor & Sacred Malas.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
@@ -13,18 +16,18 @@
 <body>
     <div class="app-topbar">
         <div class="topbar-left">
-            <button class="back-btn" id="appBackBtn" onclick="history.back()" title="Go Back">‹</button>
+            <button class="back-btn" id="appBackBtn" onclick="goBack()" title="Go Back" aria-label="Go back">‹</button>
             <div>
                 <div class="app-title" id="appTopbarTitle">Uroo Enterprise</div>
                 <div class="app-subtitle" id="appTopbarSubtitle">Spiritual & Gemstone Store</div>
             </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 14px;">
-            <div style="position: relative; cursor: pointer; font-size: 20px;" onclick="openCartModal()" title="Shopping Cart">
+        <div class="topbar-actions">
+            <button type="button" class="icon-btn" data-role="cart-btn" onclick="openCartModal()" title="Shopping Cart" aria-label="Open shopping cart">
                 🛒
-                <span id="cartBadgeCount" style="position: absolute; top: -5px; right: -8px; background: var(--app-accent); color: #fff; font-size: 9px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: none; align-items: center; justify-content: center;">0</span>
-            </div>
-            <div class="topbar-search-icon" onclick="navigateTo({view: 'searchView'})">🔍</div>
+                <span id="cartBadgeCount" class="cart-badge">0</span>
+            </button>
+            <button type="button" class="icon-btn topbar-search-icon" onclick="navigateTo({view: 'searchView'})" title="Search" aria-label="Search">🔍</button>
         </div>
     </div>
 
@@ -75,7 +78,7 @@
         <!-- Search View -->
         <div id="searchView" class="app-view">
             <div class="app-search-input-box">
-                <input type="text" id="appSearchInput" placeholder="Search crystals, bracelets, vastu items..." oninput="handleAppSearch()">
+                <input type="search" id="appSearchInput" placeholder="Search crystals, bracelets, vastu items..." aria-label="Search products" autocomplete="off" oninput="handleAppSearch()">
             </div>
             <div class="app-product-grid" id="searchProductGrid"></div>
         </div>
@@ -149,7 +152,7 @@
         <div class="modal-sheet">
             <div class="modal-header">
                 <div class="modal-title" id="checkoutModalTitle">Enter Delivery Details</div>
-                <button class="modal-close" onclick="closeCheckoutModal()">✕</button>
+                <button class="modal-close" onclick="closeCheckoutModal()" aria-label="Close">✕</button>
             </div>
             <div id="checkoutModalBody"></div>
         </div>
@@ -159,13 +162,13 @@
         <button class="nav-item active" id="navHome" onclick="navigateTo({view: 'homeView'})">
             <span class="icon">🏠</span> Home
         </button>
-        <button class="nav-item" id="navCategories" onclick="navigateTo({view: 'homeView'}); scrollToCats();">
+        <button class="nav-item" id="navCategories" onclick="goToCategories()">
             <span class="icon">📂</span> Categories
         </button>
         <button class="nav-item" id="navSearch" onclick="navigateTo({view: 'searchView'})">
             <span class="icon">🔍</span> Search
         </button>
-        <button class="nav-item" onclick="navigateTo({view: 'contactView'})">
+        <button class="nav-item" id="navContact" onclick="navigateTo({view: 'contactView'})">
             <span class="icon">📞</span> Contact
         </button>
     </nav>
@@ -174,13 +177,13 @@
         <div class="modal-sheet">
             <div class="modal-header">
                 <div class="modal-title">🛒 Your Shopping Cart</div>
-                <button class="modal-close" onclick="closeCartModal()">✕</button>
+                <button class="modal-close" onclick="closeCartModal()" aria-label="Close">✕</button>
             </div>
-            <div id="cartModalItemsList" style="max-height: 50vh; overflow-y: auto;"></div>
-            <div id="cartModalFooter" style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 16px; display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 15px; font-weight: 700;">
+            <div id="cartModalItemsList" class="cart-items-list"></div>
+            <div id="cartModalFooter" class="cart-footer">
+                <div class="cart-subtotal-row">
                     <span>Subtotal:</span>
-                    <span id="cartSubtotalAmount" style="color: var(--app-primary);">₹0</span>
+                    <span id="cartSubtotalAmount">₹0</span>
                 </div>
                 <button onclick="proceedToCartCheckout()" class="app-btn whatsapp-order">
                     💬 Proceed to WhatsApp Checkout
