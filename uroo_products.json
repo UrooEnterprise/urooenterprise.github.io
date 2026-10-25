@@ -177,7 +177,7 @@
         "stock": "In Stock",
         "mrp": 999,
         "price": 299,
-        "images": [],
+        "images": ["https://images.meesho.com/images/products/1122308556/8sptk_512.avif?width=512", "https://images.meesho.com/images/products/1122308556/llaex_512.avif?width=512", "https://images.meesho.com/images/products/1122308556/uy1c6_512.avif?width=512", "https://images-r.meesho.com/images/products/1122308556/oaq8y_512.avif?width=512", "https://images.meesho.com/images/products/1122308532/uyrqv_512.avif?width=512", "https://images.meesho.com/images/products/1122308549/ebsyz_512.avif?width=512"],
         "amazon": "https://www.amazon.in/",
         "meesho": "https://www.meesho.com/",
         "discount": "10%"
