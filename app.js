@@ -5,7 +5,7 @@
    ========================================================= */
 
 const WHATSAPP_NUMBER = "919016406623";
-const BUSINESS_UPI_ID = "9016406623@ptaxis";
+const BUSINESS_UPI_ID = "par.ar.orashant01@oksbi";
 const MAX_QTY = 99;
 const MAX_PAY_AMOUNT = 100000;
 
