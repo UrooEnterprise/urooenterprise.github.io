@@ -288,7 +288,7 @@
         "stock": "In Stock",
         "mrp": 999,
         "price": 299,
-        "images": [],
+        "images": ["https://images-r.meesho.com/images/products/1140234761/mklhl_512.avif?width=512", "https://images-r.meesho.com/images/products/1140234761/gyvoc_512.avif?width=512", "https://images.meesho.com/images/products/1140234773/bx8ad_512.avif?width=512", "https://images.meesho.com/images/products/1140234794/89igh_512.avif?width=512", "https://images-r.meesho.com/images/products/1140234761/kondo_512.avif?width=512", "https://images-r.meesho.com/images/products/1140234761/kr3v7_512.avif?width=512"],
         "amazon": "https://www.amazon.in/",
         "meesho": "https://www.meesho.com/",
         "discount": "10%"
