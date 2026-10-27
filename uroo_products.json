@@ -190,14 +190,7 @@
         "stock": "In Stock",
         "mrp": 999,
         "price": 299,
-        "images": [
-            "https://i.ibb.co/1GYzdsDC/rashicapricorn1.png",
-            "https://i.ibb.co/Xr0y4NfG/rashicapricorn2.png",
-            "https://i.ibb.co/xqPmGRMq/rashicapricorn3.png",
-            "https://i.ibb.co/0jMTMT7X/rashicapricorn4.png",
-            "https://i.ibb.co/nsB3Mnc7/rashicapricorn5.jpg",
-            "https://i.ibb.co/gbT1cBDt/rashicapricorn6.jpg"
-        ],
+        "images": ["https://images.meesho.com/images/products/1122385084/msz0n_512.avif?width=512", "https://images.meesho.com/images/products/1122385084/biigv_512.avif?width=512", "https://images.meesho.com/images/products/1118585499/ckjai_512.avif?width=512", "https://images.meesho.com/images/products/1122385077/1uqf1_512.avif?width=512", "https://images.meesho.com/images/products/1122385081/oosqp_512.avif?width=512", "https://images.meesho.com/images/products/1122385074/lklc4_512.avif?width=512", "https://images-r.meesho.com/images/products/1122385074/bybv9_512.avif?width=512"],
         "amazon": "https://www.amazon.in/",
         "meesho": "https://www.meesho.com/",
         "discount": "10%"
