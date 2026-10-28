@@ -3,16 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DT6CVG8C5H"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-DT6CVG8C5H');
+    </script>
+    <!-- End Google Analytics 4 -->
+
     <title>Uroo Enterprise - Certified Natural Crystals & Spiritual Store</title>
     <meta name="theme-color" content="#1e1b4b">
     <meta name="description" content="Uroo Enterprise - Certified Natural Crystals, Rashi Zodiac Bracelets, Vastu Decor & Sacred Malas.">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
     <script src="app.js" defer></script>
 </head>
+
 <body>
     <div class="app-topbar">
         <div class="topbar-left">
@@ -22,6 +36,7 @@
                 <div class="app-subtitle" id="appTopbarSubtitle">Spiritual & Gemstone Store</div>
             </div>
         </div>
+
         <div class="topbar-actions">
             <button type="button" class="icon-btn" data-role="cart-btn" onclick="openCartModal()" title="Shopping Cart" aria-label="Open shopping cart">
                 🛒
@@ -32,12 +47,14 @@
     </div>
 
     <div class="app-container">
+
         <!-- Home View -->
         <div id="homeView" class="app-view active">
             <div class="app-banner-card">
                 <h2>Certified Natural Crystals</h2>
                 <p>Explore exclusive Rashi bracelets, vastu decor, and sacred malas with direct WhatsApp UPI priority dispatch.</p>
             </div>
+
             <div class="section-header">Categories</div>
             <div class="app-cat-grid" id="homeCatGrid"></div>
 
@@ -48,7 +65,7 @@
             <div class="store-footer">
                 <div class="footer-brand">Uroo Enterprise</div>
                 <p class="footer-tagline">Your trusted destination for certified natural crystals, zodiac gemstone bracelets, and sacred vastu artifacts.</p>
-                
+
                 <div class="footer-links-row">
                     <button onclick="navigateTo({view: 'aboutView'})" class="footer-link-btn">ℹ️ About Us</button>
                     <button onclick="navigateTo({view: 'contactView'})" class="footer-link-btn">📞 Contact & Socials</button>
@@ -58,13 +75,16 @@
                     <a href="https://www.instagram.com/urooenterprise" target="_blank" rel="noopener noreferrer" title="Instagram" style="display: inline-block; transition: transform 0.2s ease;" class="social-app-icon">
                         <img src="images/instagramicon.png" alt="Instagram" style="width: 48px; height: 48px; object-fit: contain; display: block; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
                     </a>
+
                     <a href="https://www.facebook.com/share/18UGzyEyVY/" target="_blank" rel="noopener noreferrer" title="Facebook" style="display: inline-block; transition: transform 0.2s ease;" class="social-app-icon">
                         <img src="images/facebookicon.png" alt="Facebook" style="width: 48px; height: 48px; object-fit: contain; display: block; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
                     </a>
+
                     <a href="mailto:urooenterprise@gmail.com" title="Email Us" style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: #334155; color: #fff; border-radius: 12px; font-size: 20px; text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
                         ✉️
                     </a>
                 </div>
+
                 <div class="footer-copyright">© 2026 Uroo Enterprise. All rights reserved. Express Pan-India Shipping.</div>
             </div>
         </div>
@@ -83,7 +103,7 @@
             <div class="app-product-grid" id="searchProductGrid"></div>
         </div>
 
-        <!-- PDP View -->
+        <!-- Product Detail View -->
         <div id="pdpView" class="app-view">
             <div class="pdp-view-card" id="pdpCardContent"></div>
             <div class="section-header" style="margin-top: 24px;">Similar Recommendations</div>
@@ -94,12 +114,15 @@
         <div id="aboutView" class="app-view">
             <div class="pdp-view-card" style="padding: 24px;">
                 <h2 style="font-size: 20px; font-weight: 700; color: var(--app-primary); margin-bottom: 12px;">About Uroo Enterprise</h2>
+
                 <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px;">
-                    Welcome to <strong>Uroo Enterprise</strong>, your premier destination for authentic, high-quality natural crystal gemstone jewelry, spiritual decor, and astrological Rashi bracelets. 
+                    Welcome to <strong>Uroo Enterprise</strong>, your premier destination for authentic, high-quality natural crystal gemstone jewelry, spiritual decor, and astrological Rashi bracelets.
                 </p>
+
                 <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px;">
                     Founded with a passion for positive energy and holistic well-being, we handcraft and curate sacred items—including Pyrite tortoises, zodiac bead combinations, and natural healing stones—designed to align your aura and attract prosperity.
                 </p>
+
                 <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
                     We pride ourselves on direct transparency, fast Pan-India dispatch, and personalized customer support via WhatsApp.
                 </p>
@@ -111,17 +134,20 @@
             <div class="pdp-view-card" style="padding: 24px; text-align: center;">
                 <h2 style="font-size: 20px; font-weight: 700; color: var(--app-primary); margin-bottom: 8px;">Connect With Uroo Enterprise</h2>
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">We would love to hear from you! Reach out or follow us below.</p>
-                
+
                 <div style="display: flex; flex-direction: column; gap: 12px; text-align: left;">
                     <a href="https://www.instagram.com/urooenterprise" target="_blank" rel="noopener noreferrer" class="app-btn" style="background: #e1306c; color: #fff;">
                         <img src="images/instagramicon.png" alt="Instagram" style="width: 18px; height: 18px; object-fit: contain; vertical-align: middle;"> Follow on Instagram (@urooenterprise)
                     </a>
+
                     <a href="https://www.facebook.com/share/18UGzyEyVY/" target="_blank" rel="noopener noreferrer" class="app-btn" style="background: #1877f2; color: #fff;">
                         <img src="images/facebookicon.png" alt="Facebook" style="width: 18px; height: 18px; object-fit: contain; vertical-align: middle;"> Connect on Facebook
                     </a>
+
                     <a href="mailto:urooenterprise@gmail.com" class="app-btn" style="background: #334155; color: #fff;">
                         ✉️ Email Us (urooenterprise@gmail.com)
                     </a>
+
                     <a href="https://wa.me/919016406623?text=Hi%20Uroo%20Enterprise,%20I%20have%20an%20inquiry." target="_blank" rel="noopener noreferrer" class="app-btn whatsapp-order">
                         💬 WhatsApp Support (+91 90164 06623)
                     </a>
@@ -134,7 +160,7 @@
             <div class="pdp-view-card" style="padding: 24px; text-align: center;">
                 <h2 style="font-size: 20px; font-weight: 700; color: var(--app-primary); margin-bottom: 8px;">Uroo Enterprise Secure Checkout</h2>
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Complete your UPI payment securely.</p>
-                
+
                 <div id="payDetailsBox" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;"></div>
 
                 <div style="margin: 20px 0;">
@@ -158,20 +184,25 @@
         </div>
     </div>
 
+    <!-- Bottom Navigation -->
     <nav class="app-bottom-nav">
         <button class="nav-item active" id="navHome" onclick="navigateTo({view: 'homeView'})">
             <span class="icon">🏠</span> Home
         </button>
+
         <button class="nav-item" id="navCategories" onclick="goToCategories()">
             <span class="icon">📂</span> Categories
         </button>
+
         <button class="nav-item" id="navSearch" onclick="navigateTo({view: 'searchView'})">
             <span class="icon">🔍</span> Search
         </button>
+
         <button class="nav-item" id="navContact" onclick="navigateTo({view: 'contactView'})">
             <span class="icon">📞</span> Contact
         </button>
     </nav>
+
     <!-- Cart Modal Drawer -->
     <div class="modal-overlay" id="cartModal">
         <div class="modal-sheet">
@@ -179,12 +210,15 @@
                 <div class="modal-title">🛒 Your Shopping Cart</div>
                 <button class="modal-close" onclick="closeCartModal()" aria-label="Close">✕</button>
             </div>
+
             <div id="cartModalItemsList" class="cart-items-list"></div>
+
             <div id="cartModalFooter" class="cart-footer">
                 <div class="cart-subtotal-row">
                     <span>Subtotal:</span>
                     <span id="cartSubtotalAmount">₹0</span>
                 </div>
+
                 <button onclick="proceedToCartCheckout()" class="app-btn whatsapp-order">
                     💬 Proceed to WhatsApp Checkout
                 </button>
