@@ -372,7 +372,7 @@
         "stock": "In Stock",
         "mrp": 999,
         "price": 299,
-        "images": ["https://images-r.meesho.com/images/products/897953259/kt2ss_512.avif?width=512", "https://images-r.meesho.com/images/products/899265717/zptjv_512.avif?width=512", "https://images-r.meesho.com/images/products/892766023/1onzw_512.avif?width=512", "https://images-r.meesho.com/images/products/892766023/eqsni_512.avif?width=512", "https://images-r.meesho.com/images/products/897953259/ty5au_512.avif?width=512", "https://images.meesho.com/images/products/899266040/1v3to_512.avif?width=512", "https://images-r.meesho.com/images/products/899265717/o8oc0_512.avif?width=512", "https://images-r.meesho.com/images/products/897953259/dugwk_512.avif?width=512", "https://images-r.meesho.com/images/products/892766023/d6h04_512.avif?width=512"],
+        "images": ["https://images-r.meesho.com/images/products/897953259/ty5au_512.avif?width=512", "https://images-r.meesho.com/images/products/897953259/kt2ss_512.avif?width=512", "https://images-r.meesho.com/images/products/899265717/zptjv_512.avif?width=512", "https://images-r.meesho.com/images/products/892766023/1onzw_512.avif?width=512", "https://images-r.meesho.com/images/products/892766023/eqsni_512.avif?width=512", "https://images.meesho.com/images/products/899266040/1v3to_512.avif?width=512", "https://images-r.meesho.com/images/products/899265717/o8oc0_512.avif?width=512", "https://images-r.meesho.com/images/products/897953259/dugwk_512.avif?width=512", "https://images-r.meesho.com/images/products/892766023/d6h04_512.avif?width=512"],
         "amazon": "https://www.amazon.in/",
         "meesho": "https://www.meesho.com/",
         "discount": "10%"
