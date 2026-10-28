@@ -359,7 +359,7 @@
         "stock": "In Stock",
         "mrp": 999,
         "price": 299,
-        "images": [],
+        "images": ["images/machhmaniwhite1.webp", "images/machhmaniwhite2.webp", "images/machhmaniwhite3.webp", "images/machhmaniwhite4.webp", "images/machhmaniwhite5.webp", "images/machhmaniwhite6.webp", "images/machhmaniwhite7.webp", "images/machhmaniwhite9.webp", "images/machhmaniwhite11.webp"],
         "amazon": "https://www.amazon.in/",
         "meesho": "https://www.meesho.com/",
         "discount": "10%"
