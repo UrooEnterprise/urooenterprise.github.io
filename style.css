@@ -565,3 +565,32 @@ body.has-cart-bar .app-toast { bottom: 135px; }
 .lb-prev { left: 15px; }
 .lb-next { right: 15px; }
 .lb-counter { position: absolute; bottom: 25px; color: #fff; font-size: 14px; background: rgba(0,0,0,0.6); padding: 5px 14px; border-radius: 15px; }
+
+/* ===== Shared buttons used by checkout ===== */
+.app-card-img { position: relative; }
+.guide-wa {
+    display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; padding: 14px;
+    background: #25d366; color: #fff; border-radius: 12px; font-size: 15px; font-weight: 700; text-decoration: none; text-align: center; line-height: 1.3;
+}
+.guide-another { display: block; width: 100%; margin-top: 10px; padding: 14px; background: #f1f5f9; border: 1px solid var(--border-color); border-radius: 12px; font-size: 15px; font-weight: 600; color: var(--text-main); cursor: pointer; }
+
+/* ===== Checkout: pincode check, confirm screen, saved details ===== */
+#checkoutForm .form-input { font-size: 16px; }
+#checkoutForm .form-label { font-size: 13px; }
+.pin-msg { margin-top: 8px; padding: 10px 12px; border-radius: 8px; font-size: 14px; font-weight: 600; line-height: 1.4; }
+.pin-ok { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.pin-bad { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+.pin-warn { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+.pin-loading { background: #f1f5f9; color: var(--text-muted); border: 1px solid var(--border-color); }
+.pin-help { margin-top: 8px; font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+#checkBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+.saved-row { margin-top: 12px; font-size: 12px; color: var(--text-muted); text-align: center; line-height: 1.6; }
+.saved-clear { display: block; margin: 4px auto 0; background: none; border: none; color: #dc2626; font-size: 13px; font-weight: 600; text-decoration: underline; cursor: pointer; padding: 6px; }
+.confirm-q { font-size: 17px; font-weight: 700; text-align: center; color: var(--app-primary); margin-bottom: 10px; }
+.confirm-box { border: 1.5px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+.confirm-row { padding: 10px 12px; border-bottom: 1px solid var(--border-color); }
+.confirm-row:last-child { border-bottom: none; }
+.confirm-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
+.confirm-value { font-size: 17px; font-weight: 600; color: var(--text-main); line-height: 1.4; word-break: break-word; }
+.confirm-total-row { background: #f8fafc; }
+.confirm-total { font-size: 22px; font-weight: 700; color: var(--app-primary); }
