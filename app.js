@@ -344,7 +344,7 @@ function addToCart(sku) {
     const product = PRODUCTS.find(p => p.sku === sku);
     if (!product) return;
     if (!canOrder(product)) {
-        showToast('Sorry, this item is currently unavailable');
+        showToast(ct('unavailable'));
         return;
     }
     const mainImg = productImages(product)[0];
@@ -511,7 +511,7 @@ function openCheckoutModal(sku) {
     const p = PRODUCTS.find(x => x.sku === sku);
     if (!p) return;
     if (!canOrder(p)) {
-        showToast('Sorry, this item is currently unavailable');
+        showToast(ct('unavailable'));
         return;
     }
     checkoutContext = { items: [{ sku: p.sku, title: p.title, price: safePrice(p.price), quantity: 1 }], fromCart: false };
@@ -524,47 +524,404 @@ function openCartCheckoutModal() {
     renderCheckoutForm();
 }
 
+/* ---- Checkout words (follows the language chosen in the guide: English / Hindi / Tamil) ---- */
+const CHECKOUT_TEXT = {
+    en: {
+        title: 'Enter Delivery Details', confirmTitle: 'Please check your details',
+        item: 'Item', totalPrice: 'Total Price', cartSummary: 'Cart Summary', items: 'items', totalAmount: 'Total Amount',
+        name: 'Full Name', namePh: 'Enter your full name',
+        phone: 'WhatsApp Number', phonePh: '10-digit mobile number', phoneTitle: 'Enter a valid 10-digit mobile number',
+        address: 'Delivery Address', addressPh: 'House No, Street, Area, City',
+        landmark: 'Nearby Landmark (optional)', landmarkPh: 'Example: Near temple, school or petrol pump',
+        pincode: 'Pincode', pincodePh: '6-digit pincode', pincodeTitle: 'Enter a valid 6-digit pincode',
+        checking: 'Checking pincode…', chooseArea: 'Choose your area',
+        notFound: 'This pincode was not found. Please check the number.',
+        notFoundHelp: 'If your pincode is correct, message us on WhatsApp and we will help you place the order.',
+        waHelp: 'Talk to us on WhatsApp',
+        unverified: 'Could not check the pincode right now. Please make sure it is correct.',
+        processTitle: 'Easy Process',
+        p1: 'Send your order on WhatsApp using the button below.',
+        p2: 'Tap the secure payment link you get in WhatsApp.',
+        p3: (t) => `Pay ${t} instantly via GPay/PhonePe/Paytm.`,
+        continueBtn: 'Check my details ➔', confirmQ: 'Is everything correct?',
+        edit: 'Change details', send: 'Yes, send order on WhatsApp',
+        savedNote: 'Your details are saved on this phone only.', clearSaved: 'Clear saved details',
+        blocked: 'Please fix the pincode first, or talk to us on WhatsApp.',
+        unavailable: 'Sorry, this item is currently unavailable',
+        areaLbl: 'Area', cityLbl: 'City / District', stateLbl: 'State'
+    },
+    hi: {
+        title: 'डिलीवरी की जानकारी भरें', confirmTitle: 'कृपया अपनी जानकारी जाँचें',
+        item: 'प्रोडक्ट', totalPrice: 'कुल कीमत', cartSummary: 'कार्ट', items: 'प्रोडक्ट', totalAmount: 'कुल रकम',
+        name: 'पूरा नाम', namePh: 'अपना पूरा नाम लिखें',
+        phone: 'WhatsApp नंबर', phonePh: '10 अंकों का मोबाइल नंबर', phoneTitle: '10 अंकों का सही मोबाइल नंबर लिखें',
+        address: 'डिलीवरी का पता', addressPh: 'मकान नंबर, गली, इलाका, शहर',
+        landmark: 'पास की पहचान (ज़रूरी नहीं)', landmarkPh: 'जैसे: मंदिर, स्कूल या पेट्रोल पंप के पास',
+        pincode: 'पिनकोड', pincodePh: '6 अंकों का पिनकोड', pincodeTitle: '6 अंकों का सही पिनकोड लिखें',
+        checking: 'पिनकोड जाँच रहे हैं…', chooseArea: 'अपना इलाका चुनें',
+        notFound: 'यह पिनकोड नहीं मिला। कृपया नंबर जाँचें।',
+        notFoundHelp: 'अगर पिनकोड सही है, तो WhatsApp पर हमें संदेश भेजें। हम ऑर्डर पूरा करने में मदद करेंगे।',
+        waHelp: 'WhatsApp पर हमसे बात करें',
+        unverified: 'अभी पिनकोड जाँच नहीं हो पाई। कृपया देख लें कि वह सही है।',
+        processTitle: 'आसान प्रक्रिया',
+        p1: 'नीचे बटन दबाकर WhatsApp पर ऑर्डर भेजें।',
+        p2: 'WhatsApp में मिला सुरक्षित पेमेंट लिंक दबाएँ।',
+        p3: (t) => `GPay/PhonePe/Paytm से ${t} का भुगतान करें।`,
+        continueBtn: 'मेरी जानकारी जाँचें ➔', confirmQ: 'क्या सब कुछ सही है?',
+        edit: 'जानकारी बदलें', send: 'हाँ, WhatsApp पर ऑर्डर भेजें',
+        savedNote: 'आपकी जानकारी सिर्फ़ इसी फ़ोन में सेव रहेगी।', clearSaved: 'सेव की हुई जानकारी हटाएँ',
+        blocked: 'पहले पिनकोड ठीक करें, या WhatsApp पर हमसे बात करें।',
+        unavailable: 'माफ़ कीजिए, यह प्रोडक्ट अभी उपलब्ध नहीं है',
+        areaLbl: 'इलाका', cityLbl: 'शहर / ज़िला', stateLbl: 'राज्य'
+    },
+    ta: {
+        title: 'டெலிவரி விவரங்களை உள்ளிடவும்', confirmTitle: 'உங்கள் விவரங்களைச் சரிபார்க்கவும்',
+        item: 'பொருள்', totalPrice: 'மொத்த விலை', cartSummary: 'கார்ட்', items: 'பொருட்கள்', totalAmount: 'மொத்தத் தொகை',
+        name: 'முழு பெயர்', namePh: 'உங்கள் முழு பெயரை எழுதவும்',
+        phone: 'WhatsApp எண்', phonePh: '10 இலக்க மொபைல் எண்', phoneTitle: 'சரியான 10 இலக்க மொபைல் எண்ணை உள்ளிடவும்',
+        address: 'டெலிவரி முகவரி', addressPh: 'வீட்டு எண், தெரு, பகுதி, ஊர்',
+        landmark: 'அருகிலுள்ள அடையாளம் (விருப்பம்)', landmarkPh: 'எ.கா: கோவில், பள்ளி, பெட்ரோல் பங்க் அருகில்',
+        pincode: 'பின்கோடு', pincodePh: '6 இலக்க பின்கோடு', pincodeTitle: 'சரியான 6 இலக்க பின்கோடை உள்ளிடவும்',
+        checking: 'பின்கோடை சரிபார்க்கிறோம்…', chooseArea: 'உங்கள் பகுதியைத் தேர்ந்தெடுக்கவும்',
+        notFound: 'இந்த பின்கோடு கிடைக்கவில்லை. எண்ணைச் சரிபார்க்கவும்.',
+        notFoundHelp: 'பின்கோடு சரியாக இருந்தால், WhatsApp-ல் எங்களுக்கு செய்தி அனுப்புங்கள். ஆர்டர் செய்ய உதவுவோம்.',
+        waHelp: 'WhatsApp-ல் எங்களிடம் பேசுங்கள்',
+        unverified: 'இப்போது பின்கோடை சரிபார்க்க முடியவில்லை. அது சரியானதா என்று பார்க்கவும்.',
+        processTitle: 'எளிதான முறை',
+        p1: 'கீழே உள்ள பட்டனை அழுத்தி WhatsApp-ல் ஆர்டர் அனுப்பவும்.',
+        p2: 'WhatsApp-ல் வரும் பாதுகாப்பான பணம் செலுத்தும் லிங்கைத் தொடவும்.',
+        p3: (t) => `GPay/PhonePe/Paytm மூலம் ${t} செலுத்தவும்.`,
+        continueBtn: 'என் விவரங்களைச் சரிபார்க்க ➔', confirmQ: 'எல்லாம் சரியாக உள்ளதா?',
+        edit: 'விவரங்களை மாற்று', send: 'ஆம், WhatsApp-ல் ஆர்டர் அனுப்பு',
+        savedNote: 'உங்கள் விவரங்கள் இந்த போனில் மட்டும் சேமிக்கப்படும்.', clearSaved: 'சேமித்த விவரங்களை நீக்கு',
+        blocked: 'முதலில் பின்கோடை சரிசெய்யவும், அல்லது WhatsApp-ல் எங்களிடம் பேசுங்கள்.',
+        unavailable: 'மன்னிக்கவும், இந்தப் பொருள் தற்போது இல்லை',
+        areaLbl: 'பகுதி', cityLbl: 'ஊர் / மாவட்டம்', stateLbl: 'மாநிலம்'
+    }
+};
+
+function checkoutLang() {
+    return (typeof guideLang !== 'undefined' && CHECKOUT_TEXT[guideLang]) ? guideLang : 'en';
+}
+function ct(key, arg) {
+    const v = CHECKOUT_TEXT[checkoutLang()][key];
+    return typeof v === 'function' ? v(arg) : v;
+}
+function checkoutLangSwitch() {
+    return (typeof guideLangSwitchHTML === 'function') ? guideLangSwitchHTML() : '';
+}
+
+/* ---- Saved customer details (kept on this phone only) ---- */
+function loadSavedCustomer() {
+    try {
+        const s = JSON.parse(localStorage.getItem('uroo_customer') || 'null');
+        if (!s || typeof s !== 'object') return null;
+        const clean = (v, max) => (typeof v === 'string' ? v.slice(0, max) : '');
+        const out = {
+            name: clean(s.name, 60), phone: clean(s.phone, 10), address: clean(s.address, 250),
+            landmark: clean(s.landmark, 100), pincode: clean(s.pincode, 6), area: clean(s.area, 80)
+        };
+        return out.name || out.phone || out.address ? out : null;
+    } catch (e) { return null; }
+}
+function saveCustomer(f) {
+    try { localStorage.setItem('uroo_customer', JSON.stringify(f)); } catch (e) {}
+}
+function clearSavedCustomer() {
+    try { localStorage.removeItem('uroo_customer'); } catch (e) {}
+    if (checkoutContext) checkoutContext.form = null;
+    renderCheckoutForm();
+}
+
+/* ---- Pincode lookup (India Post, free). If the service is down we never block the customer. ---- */
+const pinCache = {};
+let pinState = { pin: '', status: 'idle', places: [], district: '', state: '', area: '' };
+let pinRequestId = 0;
+let pinPromise = Promise.resolve();
+const PIN_RE = /^[1-9][0-9]{5}$/;
+
+async function fetchPincode(pin) {
+    if (pinCache[pin]) return pinCache[pin];
+
+    const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    const timer = ctrl ? setTimeout(() => ctrl.abort(), 7000) : null;
+    try {
+        const res = await fetch(`https://api.postalpincode.in/pincode/${pin}`, ctrl ? { signal: ctrl.signal } : undefined);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        const entry = Array.isArray(data) ? data[0] : null;
+        if (!entry) throw new Error('Unexpected response');
+
+        let result;
+        if (entry.Status === 'Success' && Array.isArray(entry.PostOffice) && entry.PostOffice.length) {
+            const po = entry.PostOffice;
+            result = {
+                status: 'ok',
+                places: [...new Set(po.map(x => x && x.Name).filter(Boolean))],
+                district: po[0].District || po[0].Block || '',
+                state: po[0].State || ''
+            };
+        } else if (entry.Status === '404' || entry.Status === 'Error' || /no records/i.test(entry.Message || '')) {
+            result = { status: 'notfound', places: [], district: '', state: '' };
+        } else {
+            throw new Error('Unrecognised status');
+        }
+        pinCache[pin] = result;
+        return result;
+    } catch (e) {
+        console.warn('Pincode lookup failed:', e);
+        return { status: 'unverified', places: [], district: '', state: '' };   // not cached, never blocks the order
+    } finally {
+        if (timer) clearTimeout(timer);
+    }
+}
+
+async function startPinLookup(pin, preferArea) {
+    const id = ++pinRequestId;
+    pinState = { pin, status: 'loading', places: [], district: '', state: '', area: '' };
+    updatePinUI();
+    const r = await fetchPincode(pin);
+    if (id !== pinRequestId) return pinState;   // customer changed the pincode meanwhile
+    pinState = { pin, status: r.status, places: r.places, district: r.district, state: r.state, area: '' };
+    if (r.status === 'ok') {
+        if (r.places.length === 1) pinState.area = r.places[0];
+        else if (preferArea && r.places.includes(preferArea)) pinState.area = preferArea;
+    }
+    updatePinUI();
+    return pinState;
+}
+
+function pinHelpLink() {
+    const ctx = checkoutContext;
+    const lines = ctx ? ctx.items.map(i => `- ${i.title} x ${i.quantity}`).join('\n') : '';
+    const total = ctx ? ctx.items.reduce((s, i) => s + i.price * i.quantity, 0) : 0;
+    const msg = `Hello Uroo Enterprise,\nMy pincode ${pinState.pin} is not accepted in the order form. Please help me place my order.\n\n` +
+        (lines ? `Items:\n${lines}\nTotal: ${formatINR(total)}` : '');
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+}
+
+function updatePinUI() {
+    const box = $('pinStatus');
+    const btn = $('checkBtn');
+    if (!box) return;
+    const s = pinState;
+    let html = '';
+
+    if (s.status === 'loading') {
+        html = `<div class="pin-msg pin-loading">⏳ ${ct('checking')}</div>`;
+    } else if (s.status === 'ok') {
+        const place = s.places.length === 1 ? `${escapeHtml(s.places[0])}, ` : '';
+        html = `<div class="pin-msg pin-ok">✓ ${place}${escapeHtml(s.district)}, ${escapeHtml(s.state)}</div>`;
+        if (s.places.length > 1) {
+            html += `
+                <label class="form-label" for="custArea" style="margin-top:8px;">${ct('chooseArea')} *</label>
+                <select id="custArea" class="form-input" required>
+                    <option value="">—</option>
+                    ${s.places.map(p => `<option value="${escapeHtml(p)}"${p === s.area ? ' selected' : ''}>${escapeHtml(p)}</option>`).join('')}
+                </select>`;
+        }
+    } else if (s.status === 'notfound') {
+        html = `
+            <div class="pin-msg pin-bad">❌ ${ct('notFound')}</div>
+            <div class="pin-help">${ct('notFoundHelp')}</div>
+            <a class="guide-wa" href="${escapeHtml(pinHelpLink())}" target="_blank" rel="noopener noreferrer">💬 ${ct('waHelp')}</a>`;
+    } else if (s.status === 'unverified') {
+        html = `<div class="pin-msg pin-warn">⚠️ ${ct('unverified')}</div>`;
+    }
+
+    box.innerHTML = html;
+    if (btn) btn.disabled = (s.status === 'notfound');
+}
+
+function onPincodeInput(e) {
+    const el = e.target;
+    const digits = el.value.replace(/\D/g, '').slice(0, 6);
+    if (el.value !== digits) el.value = digits;
+
+    if (PIN_RE.test(digits)) {
+        pinPromise = startPinLookup(digits);
+    } else {
+        pinRequestId++;
+        pinState = { pin: digits, status: 'idle', places: [], district: '', state: '', area: '' };
+        updatePinUI();
+    }
+}
+
+document.addEventListener('change', (e) => {
+    if (e.target && e.target.id === 'custArea') pinState.area = e.target.value;
+});
+
+/* ---- Step 1: the form ---- */
+function readField(id) {
+    const el = $(id);
+    return el ? el.value.trim() : '';
+}
+
+function captureForm() {
+    const ctx = checkoutContext;
+    if (!ctx || !$('checkoutForm')) return;
+    ctx.form = {
+        name: readField('custName'), phone: readField('custPhone'), address: readField('custAddress'),
+        landmark: readField('custLandmark'), pincode: readField('custPincode'), area: pinState.area || ''
+    };
+}
+
+function checkoutTotals(ctx) {
+    return {
+        total: ctx.items.reduce((s, i) => s + i.price * i.quantity, 0),
+        count: ctx.items.reduce((s, i) => s + i.quantity, 0)
+    };
+}
+
 function renderCheckoutForm() {
     const ctx = checkoutContext;
     if (!ctx) return;
-    const total = ctx.items.reduce((s, i) => s + i.price * i.quantity, 0);
-    const count = ctx.items.reduce((s, i) => s + i.quantity, 0);
+    ctx.step = 'form';
+
+    const { total, count } = checkoutTotals(ctx);
+    const saved = loadSavedCustomer();
+    const f = ctx.form || saved || {};
+    pinState = { pin: '', status: 'idle', places: [], district: '', state: '', area: '' };
+    pinRequestId++;
 
     const summary = ctx.items.length === 1 && ctx.items[0].quantity === 1
-        ? `<strong>Item:</strong> ${escapeHtml(ctx.items[0].title)}<br><strong>Total Price:</strong> `
-        : `<strong>Cart Summary:</strong> ${count} items<br><strong>Total Amount:</strong> `;
+        ? `<strong>${ct('item')}:</strong> ${escapeHtml(ctx.items[0].title)}<br><strong>${ct('totalPrice')}:</strong> `
+        : `<strong>${ct('cartSummary')}:</strong> ${count} ${ct('items')}<br><strong>${ct('totalAmount')}:</strong> `;
 
-    $('checkoutModalTitle').textContent = 'Enter Delivery Details';
+    $('checkoutModalTitle').textContent = ct('title');
     $('checkoutModalBody').innerHTML = `
+        ${checkoutLangSwitch()}
         <div class="checkout-summary">${summary}<span class="checkout-total">${formatINR(total)}</span></div>
-        <form id="checkoutForm" onsubmit="submitCheckout(event)" autocomplete="on">
+        <form id="checkoutForm" onsubmit="submitCheckoutForm(event)" autocomplete="on">
             <div class="form-group">
-                <label class="form-label" for="custName">Full Name *</label>
-                <input type="text" id="custName" class="form-input" required minlength="2" maxlength="60" autocomplete="name" placeholder="Enter your full name">
+                <label class="form-label" for="custName">${ct('name')} *</label>
+                <input type="text" id="custName" class="form-input" required minlength="2" maxlength="60" autocomplete="name" placeholder="${escapeHtml(ct('namePh'))}" value="${escapeHtml(f.name || '')}">
             </div>
             <div class="form-group">
-                <label class="form-label" for="custPhone">WhatsApp Number *</label>
-                <input type="tel" id="custPhone" class="form-input" required inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}" title="Enter a valid 10-digit mobile number" autocomplete="tel-national" placeholder="10-digit mobile number">
+                <label class="form-label" for="custPhone">${ct('phone')} *</label>
+                <input type="tel" id="custPhone" class="form-input" required inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}" title="${escapeHtml(ct('phoneTitle'))}" autocomplete="tel-national" placeholder="${escapeHtml(ct('phonePh'))}" value="${escapeHtml(f.phone || '')}">
             </div>
             <div class="form-group">
-                <label class="form-label" for="custAddress">Delivery Address *</label>
-                <textarea id="custAddress" class="form-input" rows="2" required minlength="8" maxlength="250" autocomplete="street-address" placeholder="House No, Street, Landmark, City"></textarea>
+                <label class="form-label" for="custAddress">${ct('address')} *</label>
+                <textarea id="custAddress" class="form-input" rows="2" required minlength="8" maxlength="250" autocomplete="street-address" placeholder="${escapeHtml(ct('addressPh'))}">${escapeHtml(f.address || '')}</textarea>
             </div>
             <div class="form-group">
-                <label class="form-label" for="custPincode">Pincode *</label>
-                <input type="text" id="custPincode" class="form-input" required inputmode="numeric" maxlength="6" pattern="[1-9][0-9]{5}" title="Enter a valid 6-digit pincode" autocomplete="postal-code" placeholder="6-digit pincode">
+                <label class="form-label" for="custLandmark">${ct('landmark')}</label>
+                <input type="text" id="custLandmark" class="form-input" maxlength="100" placeholder="${escapeHtml(ct('landmarkPh'))}" value="${escapeHtml(f.landmark || '')}">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="custPincode">${ct('pincode')} *</label>
+                <input type="text" id="custPincode" class="form-input" required inputmode="numeric" maxlength="6" pattern="[1-9][0-9]{5}" title="${escapeHtml(ct('pincodeTitle'))}" autocomplete="postal-code" placeholder="${escapeHtml(ct('pincodePh'))}" value="${escapeHtml(f.pincode || '')}">
+                <div id="pinStatus" aria-live="polite"></div>
             </div>
             <div class="process-box">
-                ✨ <strong>Easy Process / आसान प्रक्रिया / எளிதான முறை:</strong><br>
-                1️⃣ Click below to send order on WhatsApp.<br>
-                2️⃣ Tap the secure payment link received in WhatsApp.<br>
-                3️⃣ Pay ${formatINR(total)} instantly via GPay/PhonePe/Paytm!
+                ✨ <strong>${ct('processTitle')}:</strong><br>
+                1️⃣ ${ct('p1')}<br>
+                2️⃣ ${ct('p2')}<br>
+                3️⃣ ${ct('p3', formatINR(total))}
             </div>
-            <button type="submit" class="app-btn whatsapp-order" style="margin-top:10px;">
-                💬 ${ctx.fromCart ? 'Send Cart Order' : 'Send Order'} &amp; Pay via WhatsApp
-            </button>
+            <button type="submit" id="checkBtn" class="app-btn whatsapp-order" style="margin-top:10px;">${ct('continueBtn')}</button>
+            <div class="saved-row">
+                🔒 ${ct('savedNote')}
+                ${saved ? `<button type="button" class="saved-clear" onclick="clearSavedCustomer()">${ct('clearSaved')}</button>` : ''}
+            </div>
         </form>`;
+
+    $('custPincode').addEventListener('input', onPincodeInput);
+    if (PIN_RE.test(f.pincode || '')) pinPromise = startPinLookup(f.pincode, f.area);
+
     $('checkoutModal').classList.add('active');
+}
+
+async function submitCheckoutForm(e) {
+    e.preventDefault();
+    const ctx = checkoutContext;
+    if (!ctx) return;
+    captureForm();
+    const f = ctx.form;
+
+    // Make sure the pincode has been looked up for exactly what is typed now
+    if (pinState.pin !== f.pincode || pinState.status === 'idle') {
+        pinPromise = startPinLookup(f.pincode, f.area);
+    }
+    if (pinState.status === 'loading') await pinPromise;
+
+    if (pinState.status === 'notfound') {
+        updatePinUI();
+        showToast(ct('blocked'));
+        const el = $('pinStatus');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+    if (pinState.status === 'ok' && pinState.places.length > 1 && !pinState.area) {
+        showToast(ct('chooseArea'));
+        const sel = $('custArea');
+        if (sel) sel.focus();
+        return;
+    }
+
+    f.area = pinState.area || '';
+    ctx.geo = { status: pinState.status, area: pinState.area || '', district: pinState.district, state: pinState.state };
+    renderCheckoutConfirm();
+}
+
+/* ---- Step 2: "Please check your details" ---- */
+function renderCheckoutConfirm() {
+    const ctx = checkoutContext;
+    if (!ctx || !ctx.form || !ctx.geo) return;
+    ctx.step = 'confirm';
+
+    const f = ctx.form;
+    const g = ctx.geo;
+    const { total } = checkoutTotals(ctx);
+    const place = [g.area, g.district, g.state].filter(Boolean).join(', ');
+    const row = (label, value) => value ? `
+        <div class="confirm-row">
+            <div class="confirm-label">${label}</div>
+            <div class="confirm-value">${escapeHtml(value)}</div>
+        </div>` : '';
+
+    $('checkoutModalTitle').textContent = ct('confirmTitle');
+    $('checkoutModalBody').innerHTML = `
+        ${checkoutLangSwitch()}
+        <div class="confirm-q">${ct('confirmQ')}</div>
+        <div class="confirm-box">
+            ${row(ct('name'), f.name)}
+            ${row(ct('phone'), f.phone)}
+            ${row(ct('address'), f.address)}
+            ${row(ct('landmark').replace(/\s*\(.*\)\s*$/, ''), f.landmark)}
+            ${row(ct('pincode'), f.pincode + (place ? ` - ${place}` : ''))}
+            <div class="confirm-row">
+                <div class="confirm-label">${ct('item')}</div>
+                <div class="confirm-value">
+                    ${ctx.items.map(i => `${escapeHtml(i.title)} × ${i.quantity}`).join('<br>')}
+                </div>
+            </div>
+            <div class="confirm-row confirm-total-row">
+                <div class="confirm-label">${ct('totalPrice')}</div>
+                <div class="confirm-total">${formatINR(total)}</div>
+            </div>
+        </div>
+        ${g.status === 'unverified' ? `<div class="pin-msg pin-warn" style="margin-top:10px;">⚠️ ${ct('unverified')}</div>` : ''}
+        <button type="button" class="app-btn whatsapp-order" style="margin-top:14px;" onclick="confirmAndSend()">✓ ${ct('send')}</button>
+        <button type="button" class="guide-another" onclick="editCheckout()">✏️ ${ct('edit')}</button>`;
+}
+
+function editCheckout() {
+    renderCheckoutForm();   // ctx.form is kept, so everything is filled in again
+}
+
+// Language changed (from the switch inside checkout): redraw the current step, keep what was typed
+function onLangChanged() {
+    const modal = $('checkoutModal');
+    const ctx = checkoutContext;
+    if (!modal || !ctx || !modal.classList.contains('active')) return;
+    if (ctx.step === 'confirm') {
+        renderCheckoutConfirm();
+    } else {
+        captureForm();
+        renderCheckoutForm();
+    }
 }
 
 function closeCheckoutModal() {
@@ -581,49 +938,59 @@ function openWhatsApp(text) {
     }
 }
 
-function submitCheckout(e) {
-    e.preventDefault();
+/* ---- Step 3: send the order ---- */
+function confirmAndSend() {
     const ctx = checkoutContext;
-    if (!ctx || !ctx.items.length) return;
+    if (!ctx || !ctx.items.length || !ctx.form || !ctx.geo) return;
 
     // Re-check against the live catalogue so the price in the message can't be stale
     const items = [];
     for (const it of ctx.items) {
         const p = PRODUCTS.find(x => x.sku === it.sku);
         if (!p || !canOrder(p)) {
-            showToast(`"${it.title}" is no longer available`);
+            showToast(`"${it.title}": ${ct('unavailable')}`);
             return;
         }
         items.push({ sku: p.sku, title: p.title, price: safePrice(p.price), quantity: it.quantity });
     }
 
-    const name = $('custName').value.trim();
-    const phone = $('custPhone').value.trim();
-    const address = $('custAddress').value.trim();
-    const pincode = $('custPincode').value.trim();
+    const f = ctx.form;
+    const g = ctx.geo;
     const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
     const orderId = generateUniqueOrderId();
 
-    const payLink = `${location.origin}${location.pathname}?view=pay&orderId=${encodeURIComponent(orderId)}&price=${total}&name=${encodeURIComponent(name)}`;
+    const payLink = `${location.origin}${location.pathname}?view=pay&orderId=${encodeURIComponent(orderId)}&price=${total}&name=${encodeURIComponent(f.name)}`;
     const multi = items.length > 1 || items[0].quantity > 1;
-
     const itemsText = items.map((i, idx) => `${idx + 1}. *${i.title}* (SKU: ${i.sku}) x ${i.quantity} = ${formatINR(i.price * i.quantity)}`).join('\n');
 
+    const addressLines = [
+        `• Name: ${f.name}`,
+        `• Phone: ${f.phone}`,
+        `• Address: ${f.address}`,
+        f.landmark ? `• Landmark: ${f.landmark}` : '',
+        g.area ? `• Area: ${g.area}` : '',
+        g.district ? `• City/District: ${g.district}` : '',
+        g.state ? `• State: ${g.state}` : '',
+        `• Pincode: ${f.pincode}${g.status === 'ok' ? ' (verified)' : ' (not verified)'}`
+    ].filter(Boolean).join('\n');
+
+    const divider = '━━━━━━━━━━━━━━━━━━';
     const message =
+        `${payLink}\n` +
+        `${divider}\n` +
+        `👆 *Click on the above link to make payment / भुगतान करने के लिए ऊपर दिए गए लिंक पर क्लिक करें / பணம் செலுத்த மேலே உள்ள லிங்கைக் கிளிக் செய்யவும்*\n` +
+        `${divider}\n\n` +
         `*${multi ? 'MULTIPLE ITEMS ORDER' : 'NEW ORDER'} - Uroo Enterprise*\n` +
         `*Order ID:* ${orderId}\n\n` +
         `*Items Ordered:*\n${itemsText}\n\n` +
         `*Total Amount:* ${formatINR(total)}\n\n` +
-        `*Customer Details:*\n` +
-        `• Name: ${name}\n` +
-        `• Phone: ${phone}\n` +
-        `• Address: ${address} - ${pincode}\n\n` +
+        `*Customer Details:*\n${addressLines}\n\n` +
         `✨ *Easy Process / आसान प्रक्रिया / எளிதான முறை:*\n` +
         `1️⃣ Click below to send order on WhatsApp / व्हाट्सएप पर आर्डर भेजें\n` +
         `2️⃣ Tap the secure payment link received in WhatsApp / भुगतान लिंक पर टैप करें\n` +
-        `3️⃣ Pay ${formatINR(total)} instantly via GPay/PhonePe/Paytm / भुगतान करें\n\n` +
-        `👆 *Click above to pay securely / सुरक्षित भुगतान के लिए ऊपर क्लिक करें / பாதுகாப்பாக பணம் செலுத்த மேலே கிளிக் செய்யவும்:*\n` +
-        `${payLink}`;
+        `3️⃣ Pay ${formatINR(total)} instantly via GPay/PhonePe/Paytm / भुगतान करें`;
+
+    saveCustomer({ name: f.name, phone: f.phone, address: f.address, landmark: f.landmark, pincode: f.pincode, area: g.area });
 
     closeCheckoutModal();
     openWhatsApp(message);
