@@ -594,3 +594,12 @@ body.has-cart-bar .app-toast { bottom: 135px; }
 .confirm-value { font-size: 17px; font-weight: 600; color: var(--text-main); line-height: 1.4; word-break: break-word; }
 .confirm-total-row { background: #f8fafc; }
 .confirm-total { font-size: 22px; font-weight: 700; color: var(--app-primary); }
+
+/* ===== Bottom bar hides on scroll down, shows on scroll up ===== */
+.app-bottom-nav { transition: transform 0.25s ease; will-change: transform; }
+body.nav-hidden .app-bottom-nav { transform: translateY(100%); box-shadow: none; }
+.cart-float-bar { transition: bottom 0.25s ease; }
+body.nav-hidden .cart-float-bar { bottom: 0; }
+.app-toast { transition: opacity 0.3s ease, bottom 0.25s ease; }
+body.nav-hidden .app-toast { bottom: 20px; }
+body.nav-hidden.has-cart-bar .app-toast { bottom: 80px; }
