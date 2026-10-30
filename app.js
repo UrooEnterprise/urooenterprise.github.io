@@ -1517,6 +1517,7 @@ function navigateTo(state, push = true) {
             break;
     }
 
+    setNavHidden(false);
     window.scrollTo(0, 0);
 }
 
@@ -1622,5 +1623,49 @@ document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowRight') lightboxChange(1);
     }
 });
+
+/* ---------------------------------------------------------
+   Bottom menu bar: hides while scrolling down, returns when scrolling up
+   --------------------------------------------------------- */
+function setNavHidden(hidden) {
+    document.body.classList.toggle('nav-hidden', hidden);
+}
+
+(function initScrollHideNav() {
+    const THRESHOLD = 8;   // ignore tiny movements
+    const TOP_ZONE = 80;   // always show near the top of the page
+    let lastY = window.scrollY || 0;
+    let ticking = false;
+
+    function update() {
+        ticking = false;
+        const y = Math.max(0, window.scrollY || 0);
+        const atBottom = window.innerHeight + y >= document.documentElement.scrollHeight - 4;
+        const delta = y - lastY;
+
+        if (y <= TOP_ZONE || atBottom) {
+            setNavHidden(false);
+            lastY = y;
+        } else if (delta > THRESHOLD) {
+            setNavHidden(true);       // scrolling down
+            lastY = y;
+        } else if (delta < -THRESHOLD) {
+            setNavHidden(false);      // scrolling up
+            lastY = y;
+        }
+    }
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(update);
+        }
+    }, { passive: true });
+
+    // Keyboard users tabbing into the bar should always see it
+    document.addEventListener('focusin', (e) => {
+        if (e.target && e.target.closest && e.target.closest('.app-bottom-nav')) setNavHidden(false);
+    });
+})();
 
 window.addEventListener('DOMContentLoaded', loadProducts);
