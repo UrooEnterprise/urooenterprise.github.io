@@ -24,7 +24,7 @@ const CATEGORY_IMAGES = {
     "Rashi/Zodiac Bracelet": "images/cat_rashi_bracelets.webp",
     "Mala & Pendant": "images/cat_mala_machhmani.webp",
     "Anklets": "images/cat_anklet.webp",
-    "Vastu & Prosperity": "images/cat_vastu.webp",
+    "Vastu Decor": "images/cat_vastu.webp",
     "Jewellery": "images/cat_jewellery.webp"
 };
 
@@ -1481,7 +1481,7 @@ function navigateTo(state, push = true) {
     const title = $('appTopbarTitle');
     const subtitle = $('appTopbarSubtitle');
     backBtn.style.display = state.view === 'homeView' ? 'none' : 'flex';
-    document.title = 'Uroo Enterprise - Certified Natural Crystals & Spiritual Store';
+    document.title = 'Uroo Enterprise | Crystal Bracelets, Malas & Vastu Decor';
 
     switch (state.view) {
         case 'homeView':
@@ -1553,7 +1553,10 @@ function handleInitialRoute() {
     } else if (view === 'pdp' && params.get('sku')) {
         state = { view: 'pdpView', sku: params.get('sku') };
     } else if (view === 'category' && params.get('category')) {
-        state = { view: 'categoryView', category: params.get('category') };
+        // Old category names (from previously shared links) map to their new names
+        const CATEGORY_ALIASES = { 'vastu & prosperity': 'Vastu Decor' };
+        const reqCat = params.get('category');
+        state = { view: 'categoryView', category: CATEGORY_ALIASES[reqCat.toLowerCase().trim()] || reqCat };
     } else if (view === 'search') {
         state = { view: 'searchView' };
     } else if (view === 'about') {
