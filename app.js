@@ -1127,12 +1127,85 @@ function renderCategoryProducts(catName) {
     const grid = $('categoryProductGrid');
     grid.innerHTML = '';
     const wanted = String(catName || '').toLowerCase().trim();
-    const filtered = PRODUCTS.filter(p => p.category.toLowerCase().trim() === wanted);
+    const filtered = wanted === 'all products' ? PRODUCTS.slice() : PRODUCTS.filter(p => p.category.toLowerCase().trim() === wanted);
     if (!filtered.length) {
         grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">No products found in this category.</div>';
         return;
     }
     filtered.forEach(p => grid.appendChild(createProductCard(p)));
+}
+
+/* ---------------------------------------------------------
+   "Explore more" horizontal category rows
+   (used on category pages and product detail pages)
+   --------------------------------------------------------- */
+function renderOtherCategoryRows(containerId, currentCategory) {
+    const box = $(containerId);
+    if (!box) return;
+    box.innerHTML = '';
+
+    const current = String(currentCategory || '').toLowerCase().trim();
+    if (current === 'all products') return;   // "All Products" already shows everything
+
+    const MAX_PER_ROW = 8;
+    const cats = [...new Set(PRODUCTS.map(p => p.category))]
+        .filter(c => c.toLowerCase().trim() !== current);   // never show the category the customer is already in
+    if (!cats.length) return;
+
+    const heading = document.createElement('div');
+    heading.className = 'section-header';
+    heading.textContent = 'Explore More Categories';
+    box.appendChild(heading);
+
+    cats.forEach(cat => {
+        const items = PRODUCTS.filter(p => p.category === cat);
+        if (!items.length) return;
+
+        const row = document.createElement('div');
+        row.className = 'h-row';
+
+        const head = document.createElement('div');
+        head.className = 'h-row-head';
+        head.innerHTML = `<span class="h-row-title">${escapeHtml(cat)} <small>(${items.length})</small></span>
+            <button type="button" class="h-row-all">See all →</button>`;
+        head.querySelector('.h-row-all').addEventListener('click', () => navigateTo({ view: 'categoryView', category: cat }));
+        row.appendChild(head);
+
+        const wrap = document.createElement('div');
+        wrap.className = 'h-row-wrap';
+
+        const scroller = document.createElement('div');
+        scroller.className = 'h-row-scroll';
+        items.slice(0, MAX_PER_ROW).forEach(p => scroller.appendChild(createProductCard(p)));
+
+        // Last tile: "See all"
+        const more = document.createElement('div');
+        more.className = 'h-row-more';
+        more.setAttribute('role', 'link');
+        more.tabIndex = 0;
+        more.innerHTML = `<span>See all<br>${escapeHtml(cat)}</span><b>→</b>`;
+        const goCat = () => navigateTo({ view: 'categoryView', category: cat });
+        more.addEventListener('click', goCat);
+        more.addEventListener('keydown', (e) => { if (e.key === 'Enter') goCat(); });
+        scroller.appendChild(more);
+
+        // Desktop-only arrow buttons (hidden on touch screens via CSS)
+        const mkArrow = (dir, label, cls) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'h-row-arrow ' + cls;
+            b.setAttribute('aria-label', label);
+            b.textContent = dir < 0 ? '‹' : '›';
+            b.addEventListener('click', () => scroller.scrollBy({ left: dir * scroller.clientWidth * 0.8, behavior: 'smooth' }));
+            return b;
+        };
+        wrap.appendChild(mkArrow(-1, 'Scroll left', 'h-row-arrow-left'));
+        wrap.appendChild(scroller);
+        wrap.appendChild(mkArrow(1, 'Scroll right', 'h-row-arrow-right'));
+
+        row.appendChild(wrap);
+        box.appendChild(row);
+    });
 }
 
 // Search (this function was missing, so search never worked)
@@ -1325,6 +1398,7 @@ function renderPDP(sku, opts = {}) {
         recs = [...sameCat, ...PRODUCTS.filter(p => p.sku !== product.sku && !sameCat.includes(p))];
     }
     recs.slice(0, 4).forEach(rec => recGrid.appendChild(createProductCard(rec)));
+    renderOtherCategoryRows('pdpMoreRows', product.category);
 }
 
 function copyProductLink() {
@@ -1493,6 +1567,7 @@ function navigateTo(state, push = true) {
             subtitle.textContent = 'Collection';
             $('categoryViewTitle').textContent = state.category;
             renderCategoryProducts(state.category);
+            renderOtherCategoryRows('categoryMoreRows', state.category);
             break;
         case 'pdpView':
             title.textContent = 'Product Details';
