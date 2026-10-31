@@ -67,6 +67,9 @@
 
             <div class="section-header">Trending Collections</div>
             <div class="app-product-grid" id="homeTrendingGrid"></div>
+            <button type="button" class="app-btn" style="background:var(--app-primary);color:#fff;margin-top:14px;" onclick="navigateTo({view: 'categoryView', category: 'All Products'})">
+                View All Products →
+            </button>
 
             <!-- Professional Store Footer Section -->
             <div class="store-footer">
@@ -100,6 +103,7 @@
         <div id="categoryView" class="app-view">
             <div class="section-header" id="categoryViewTitle">Category Products</div>
             <div class="app-product-grid" id="categoryProductGrid"></div>
+            <div class="more-rows" id="categoryMoreRows"></div>
         </div>
 
         <!-- Search View -->
@@ -115,6 +119,7 @@
             <div class="pdp-view-card" id="pdpCardContent"></div>
             <div class="section-header" style="margin-top: 24px;">Similar Recommendations</div>
             <div class="app-product-grid" id="pdpRecommendedGrid"></div>
+            <div class="more-rows" id="pdpMoreRows"></div>
         </div>
 
         <!-- About Us View -->
