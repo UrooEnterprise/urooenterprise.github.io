@@ -406,12 +406,12 @@
     {
         "category": "Vastu Decor",
         "sku": "TortoiseDhanyog",
-        "title": "Dhanyog Tortoise",
-        "description": "Dhanyog tortoise decor piece for home or office display.",
+        "title": "Dhanyog Tortoise (3 cm H x 7 cm L)",
+        "description": "Dhanyog tortoise decor piece for home or office display. Turtle for Wealth & Prosperity | Pyrite, Citrine, Green Aventurine & Tiger Eye | Vastu Feng Shui Lucky Tortoise for Home Office Desk Business Gift",
         "stock": "In Stock",
         "mrp": 999,
         "price": 299,
-        "images": [],
+        "images": ["images/dhanyogtortoise1.jpg", "images/dhanyogtortoise2.jpg", "images/dhanyogtortoise3.jpg", "images/dhanyogtortoise4.jpg"],
         "amazon": "",
         "meesho": "",
         "discount": "10%"
