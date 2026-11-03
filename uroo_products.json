@@ -429,6 +429,21 @@
         "meesho": "https://www.meesho.com/af_invite/578425887:youtube_long_form:14881393?p_id=907030052&ext_id=f00sv8&utm_source=youtube_long_form",
         "discount": "10%"
     },
+        {
+        "category": "Vastu Decor",
+        "sku": "EvilEyeTree15Bds",
+        "title": "Evil Eye Tree with 15 Evil Eye Beads Decorative Showpiece for Home Office Table Decor",
+        "description": "Give your home and workspace a beautiful decorative touch with this attractive Evil Eye Tree featuring 15 Evil Eye Beads from Uroo Enterprise. Designed with multiple evil eye beads arranged in a tree shape, this decorative showpiece adds a distinctive and eye-catching element to your interior decoration.
+
+The popular blue evil eye design makes this decorative tree a lovely addition to living rooms, bedrooms, office desks, workstations, shelves and entrance areas. Its unique appearance also makes it a thoughtful gifting option for friends, family members and loved ones.",
+        "stock": "In Stock",
+        "mrp": 999,
+        "price": 249,
+        "images": ["images/evileyetree1.webp", "images/evileyetree2.webp", "images/evileyetree3.webp", "images/evileyetree4.webp", "images/evileyetree5.webp", "images/evileyetree6.webp", "images/evileyetree7.webp", "images/evileyetree8.webp"],
+        "amazon": "",
+        "meesho": "",
+        "discount": "10%"
+    },
     {
         "category": "Jewellery",
         "sku": "SqrDiamondPendant",
