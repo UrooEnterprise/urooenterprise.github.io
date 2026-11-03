@@ -767,8 +767,11 @@ function captureForm() {
 }
 
 function checkoutTotals(ctx) {
+    const subtotal = ctx.items.reduce((s, i) => s + i.price * i.quantity, 0);
+    const discount = ctx.coupon ? Math.min(ctx.coupon.discount, subtotal) : 0;
     return {
-        total: ctx.items.reduce((s, i) => s + i.price * i.quantity, 0),
+        subtotal, discount,
+        total: subtotal - discount,
         count: ctx.items.reduce((s, i) => s + i.quantity, 0)
     };
 }
@@ -780,7 +783,7 @@ function renderCheckoutForm() {
 
     const { total, count } = checkoutTotals(ctx);
     const saved = loadSavedCustomer();
-    const f = ctx.form || saved || {};
+    const f = ctx.form || saved || (typeof couponPrefill === 'function' ? couponPrefill() : null) || {};
     pinState = { pin: '', status: 'idle', places: [], district: '', state: '', area: '' };
     pinRequestId++;
 
@@ -814,6 +817,7 @@ function renderCheckoutForm() {
                 <input type="text" id="custPincode" class="form-input" required inputmode="numeric" maxlength="6" pattern="[1-9][0-9]{5}" title="${escapeHtml(ct('pincodeTitle'))}" autocomplete="postal-code" placeholder="${escapeHtml(ct('pincodePh'))}" value="${escapeHtml(f.pincode || '')}">
                 <div id="pinStatus" aria-live="polite"></div>
             </div>
+            ${typeof couponBoxHTML === 'function' ? couponBoxHTML(ctx) : ''}
             <div class="process-box">
                 ✨ <strong>${ct('processTitle')}:</strong><br>
                 1️⃣ ${ct('p1')}<br>
@@ -831,6 +835,7 @@ function renderCheckoutForm() {
     if (PIN_RE.test(f.pincode || '')) pinPromise = startPinLookup(f.pincode, f.area);
 
     $('checkoutModal').classList.add('active');
+    if (typeof maybeAutoApplyCoupon === 'function') maybeAutoApplyCoupon();
 }
 
 async function submitCheckoutForm(e) {
@@ -873,7 +878,7 @@ function renderCheckoutConfirm() {
 
     const f = ctx.form;
     const g = ctx.geo;
-    const { total } = checkoutTotals(ctx);
+    const { total, discount } = checkoutTotals(ctx);
     const place = [g.area, g.district, g.state].filter(Boolean).join(', ');
     const row = (label, value) => value ? `
         <div class="confirm-row">
@@ -897,6 +902,7 @@ function renderCheckoutConfirm() {
                     ${ctx.items.map(i => `${escapeHtml(i.title)} × ${i.quantity}`).join('<br>')}
                 </div>
             </div>
+            ${discount ? `<div class="confirm-row"><div class="confirm-label">Coupon ${escapeHtml(ctx.coupon.code)}</div><div class="confirm-value" style="color:var(--success-green);font-weight:700;">−${formatINR(discount)}</div></div>` : ''}
             <div class="confirm-row confirm-total-row">
                 <div class="confirm-label">${ct('totalPrice')}</div>
                 <div class="confirm-total">${formatINR(total)}</div>
@@ -956,7 +962,15 @@ function confirmAndSend() {
 
     const f = ctx.form;
     const g = ctx.geo;
-    const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
+    if (ctx.coupon && ctx.coupon.phone !== f.phone) {
+        ctx.coupon = null;
+        showToast('The coupon was for a different WhatsApp number, so it was removed.');
+        renderCheckoutConfirm();
+        return;
+    }
+    const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
+    const discount = ctx.coupon ? Math.round(subtotal * ctx.coupon.pct / 100) : 0;
+    const total = subtotal - discount;
     const orderId = generateUniqueOrderId();
 
     const payLink = `${location.origin}${location.pathname}?view=pay&orderId=${encodeURIComponent(orderId)}&price=${total}&name=${encodeURIComponent(f.name)}`;
@@ -983,12 +997,21 @@ function confirmAndSend() {
         `*${multi ? 'MULTIPLE ITEMS ORDER' : 'NEW ORDER'} - Uroo Enterprise*\n` +
         `*Order ID:* ${orderId}\n\n` +
         `*Items Ordered:*\n${itemsText}\n\n` +
+        (discount ? `*Subtotal:* ${formatINR(subtotal)}\n*Coupon ${ctx.coupon.code} (${ctx.coupon.pct}% off):* -${formatINR(discount)}\n` : '') +
         `*Total Amount:* ${formatINR(total)}\n\n` +
         `*Customer Details:*\n${addressLines}\n\n` +
         `✨ *Easy Process / आसान प्रक्रिया / எளிதான முறை:*\n` +
         `1️⃣ Click below to send order on WhatsApp / व्हाट्सएप पर आर्डर भेजें\n` +
         `2️⃣ Tap the secure payment link received in WhatsApp / भुगतान लिंक पर टैप करें\n` +
         `3️⃣ Pay ${formatINR(total)} instantly via GPay/PhonePe/Paytm / भुगतान करें`;
+
+    if (typeof logOrderToSheet === 'function') {
+        logOrderToSheet({
+            orderId, name: f.name, phone: f.phone, address: f.address, landmark: f.landmark, pincode: f.pincode,
+            area: g.area, district: g.district, state: g.state, items, subtotal,
+            coupon: discount ? ctx.coupon.code : '', discount, total
+        });
+    }
 
     saveCustomer({ name: f.name, phone: f.phone, address: f.address, landmark: f.landmark, pincode: f.pincode, area: g.area });
 
