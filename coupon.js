@@ -5,7 +5,7 @@
    ========================================================= */
 
 // Paste your Google Apps Script "Web app" URL here (see setup steps). Leave as is to keep coupons switched off.
-const SHEET_API_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxpUyl-2SQJNQrJMgzpLG1XIKhHRMEdnBRzSQ5Sboh-Ot9t2o9RsvhvuDfI_fDl7jJS/exec";
 
 const COUPON_KEY = 'uroo_coupon';
 const COUPON_SNOOZE_KEY = 'uroo_coupon_snooze';
